@@ -50,7 +50,7 @@ setup(
     url='https://github.com/mozilla/jx-python',
     license='MPL 2.0',
     packages=find_packages('.', lib_prefix=''),
-    install_requires=["mo-collections", "mo-dots>=1.5.17188", "mo-files>=1.2", "mo-json-config", "mo-json>=1.0.17168", "mo-kwargs", "mo-logs", "mo-math", "mo-testing>=1.0.17168", "mo-threads", "mo-times"],
+    install_requires=["future", "mo-collections", "mo-dots>=1.5.17188", "mo-files>=1.2", "mo-json-config", "mo-json>=1.0.17168", "mo-kwargs", "mo-logs", "mo-math", "mo-testing>=1.0.17168", "mo-threads", "mo-times"],
     include_package_data=True,
     zip_safe=False,
     classifiers=[  #https://pypi.python.org/pypi?%3Aaction=list_classifiers
