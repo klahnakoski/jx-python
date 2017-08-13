@@ -42,11 +42,11 @@ def find_packages(where='.', lib_prefix='', exclude=()):
 
 setup(
     name='jx-python',
-    version='0.9.17206',
+    version='0.10.17206',
     description='JSON query expressions using Python',
     long_description=long_desc,
-    author='Rohit Kumar, Kyle Lahnakoski',
-    author_email='rohitkumar.a255@gmail.com, kyle@lahnakoski.com',
+    author='Kyle Lahnakoski',
+    author_email='kyle@lahnakoski.com',
     url='https://github.com/mozilla/jx-python',
     license='MPL 2.0',
     packages=find_packages('.', lib_prefix=''),
