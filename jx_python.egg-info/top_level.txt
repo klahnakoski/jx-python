@@ -1,2 +1,0 @@
-jx_base
-jx_python

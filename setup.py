@@ -42,7 +42,7 @@ def find_packages(where='.', lib_prefix='', exclude=()):
 
 setup(
     name='jx-python',
-    version='0.11.17206',
+    version='0.11.17264',
     description='JSON query expressions using Python',
     long_description=long_desc,
     author='Kyle Lahnakoski',
