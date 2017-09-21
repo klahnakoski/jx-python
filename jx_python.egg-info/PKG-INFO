@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: jx-python
+Version: 0.11.17206
+Summary: JSON query expressions using Python
+Home-page: https://github.com/klahnakoski/jx-python
+Author: Kyle Lahnakoski
+Author-email: kyle@lahnakoski.com
+License: MPL 2.0
+Description: jx-python
+        =========
+        
+        Python library for JSON Expressions
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 1 - Planning
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)
