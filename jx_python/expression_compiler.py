@@ -15,7 +15,7 @@ import re
 
 from pyLibrary import convert
 from mo_logs import Log
-from mo_dots import coalesce, Data, listwrap
+from mo_dots import coalesce, Data, listwrap, wrap_leaves
 from mo_times.dates import Date
 
 true = True
@@ -41,17 +41,22 @@ def compile_expression(source):
     _ = Data
     _ = EMPTY_DICT
     _ = re
+    _ = wrap_leaves
 
-    output = None
+    fake_locals = {}
     try:
-        exec """
+        exec(
+"""
 def output(row, rownum=None, rows=None):
     _source = """ + convert.value2quote(source) + """
     try:
         return """ + source + """
     except Exception as e:
         Log.error("Problem with dynamic function {{func|quote}}",  func=_source, cause=e)
-"""
+""",
+            globals(),
+            fake_locals
+        )
     except Exception as e:
         Log.error("Bad source: {{source}}", source=source, cause=e)
-    return output
+    return fake_locals['output']
