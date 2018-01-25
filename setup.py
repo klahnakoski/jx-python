@@ -53,10 +53,11 @@ setup(
     install_requires=["future", "mo-collections", "mo-dots>=1.5.17188", "mo-files>=1.2", "mo-json-config", "mo-json>=1.0.17168", "mo-kwargs", "mo-logs", "mo-math", "mo-testing>=1.0.17168", "mo-threads", "mo-times"],
     include_package_data=True,
     zip_safe=False,
-    classifiers=[  #https://pypi.python.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 1 - Planning',
+    classifiers=[  # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Development Status :: 4 - Beta',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
+        'Programming Language :: Python :: 2.7'
     ]
 )
