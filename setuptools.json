@@ -1,0 +1,17 @@
+{
+    "name": "jx-python",
+    "version": "1.7.18072",
+    "description": "JSON query expressions using Python",
+    "author": "Kyle Lahnakoski",
+    "author_email": "kyle@lahnakoski.com",
+    "url": "https://github.com/klahnakoski/jx-python",
+    "license": "MPL 2.0",
+    "include_package_data": true,
+    "classifiers": [
+        "Development Status :: 4 - Beta",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "Programming Language :: Python :: 2.7"
+    ]
+}
