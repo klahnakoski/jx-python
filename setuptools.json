@@ -1,6 +1,6 @@
 {
     "name": "jx-python",
-    "version": "1.7.18072",
+    "version": "3.7.18072",
     "description": "JSON query expressions using Python",
     "author": "Kyle Lahnakoski",
     "author_email": "kyle@lahnakoski.com",
