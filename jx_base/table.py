@@ -9,23 +9,13 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+
 from mo_future import is_text, is_binary
-import jx_base
-from mo_dots import Data
+class Table(object):
 
+    def __init__(self, full_name):
+        self.name = full_name
 
-class Table(jx_base.Table):
-
-    __slots__ = ['header', 'data', 'meta']
-
-
-    def __init__(self, header=None, data=None):
-        self.header = header
-
-        self.data = data
-        self.meta = Data()
-
-    def groupby(self, keys):
-        pass
-
+    def map(self, mapping):
+        return self
 
