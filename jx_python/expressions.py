@@ -76,6 +76,7 @@ from jx_base.expressions import (
     StringOp as StringOp_,
     SubOp as SubOp_,
     SuffixOp as SuffixOp_,
+    simplified,
     TRUE,
     TrueOp as TrueOp_,
     TupleOp as TupleOp_,
@@ -113,7 +114,7 @@ def jx_expression_to_function(expr):
 
 
 class PythonScript(PythonScript_):
-    __slots__ = ("miss", "data_type", "expr", "many")
+    __slots__ = ("miss", "data_type", "expr", "frum", "many")
 
     def __init__(self, type, expr, frum, miss=None, many=False):
         object.__init__(self)
@@ -240,9 +241,10 @@ class IntegerOp(IntegerOp_):
 
 class GetOp(GetOp_):
     def to_python(self, not_null=False, boolean=False, many=False):
-        obj = Python[self.var].to_python()
-        code = Python[self.offset].to_python()
-        return "listwrap(" + obj + ")[" + code + "]"
+        output = ["(" + Python[self.var].to_python() + ")"]
+        for o in self.offsets:
+            output.append("[" + Python[o].to_python() + "]")
+        return "".join(output)
 
 
 class LastOp(LastOp_):
@@ -373,19 +375,6 @@ class DivOp(DivOp_):
     to_python = _binaryop_to_python
 
 
-class BaseInequalityOp(BaseInequalityOp_):
-    def to_python(self, not_null=False, boolean=False, many=False):
-        return (
-            "("
-            + Python[self.lhs].to_python()
-            + ") "
-            + _python_operators[self.op][0]
-            + " ("
-            + Python[self.rhs].to_python()
-            + ")"
-        )
-
-
 class InOp(InOp_):
     def to_python(self, not_null=False, boolean=False, many=False):
         return (
@@ -472,7 +461,7 @@ class LengthOp(LengthOp_):
 class FirstOp(FirstOp_):
     def to_python(self, not_null=False, boolean=False, many=False):
         value = Python[self.term].to_python()
-        return "listwrap(" + value + ").first()"
+        return "listwrap(" + value + ")[0]"
 
 
 class NumberOp(NumberOp_):
@@ -688,6 +677,40 @@ class SplitOp(SplitOp_):
 
 
 class FindOp(FindOp_):
+
+    @simplified
+    def partial_eval(self):
+        index = self.lang[BasicIndexOfOp([
+            self.value,
+            self.find,
+            self.start
+        ])].partial_eval()
+
+        output = self.lang[WhenOp(
+            OrOp([
+                self.value.missing(),
+                self.find.missing(),
+                BasicEqOp([index, Literal(-1)])
+            ]),
+            **{"then": self.default, "else": index}
+        )].partial_eval()
+        return output
+
+    def missing(self):
+        output = AndOp([
+            self.default.missing(),
+            OrOp([
+                self.value.missing(),
+                self.find.missing(),
+                EqOp([BasicIndexOfOp([
+                    self.value,
+                    self.find,
+                    self.start
+                ]), Literal(-1)])
+            ])
+        ]).partial_eval()
+        return output
+
     def to_python(self, not_null=False, boolean=False, many=False):
         # [Null if f==-1 else f for f in [(self.value.find(self.find))]][0]
         return assign_and_eval(
