@@ -16,11 +16,9 @@ from mo_logs import Log, strings
 from mo_logs.strings import quote
 from mo_times.dates import Date
 
-
 from jx_base.expressions import (
     AddOp as AddOp_,
     AndOp as AndOp_,
-    BaseInequalityOp as BaseInequalityOp_,
     BasicEqOp as BasicEqOp_,
     BasicIndexOfOp as BasicIndexOfOp_,
     BetweenOp as BetweenOp_,
