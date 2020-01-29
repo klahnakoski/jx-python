@@ -34,6 +34,7 @@
          "jx_python/containers",       "jx_python/cubes",       "jx_python/lists",
           "jx_python/namespace",             "jx_python"
     ],
+    "python_requires": "==2.7, ==3.6, ==3.7, ==3.8",
     "url": "https://github.com/klahnakoski/jx-python",
     "version": "3.15.20029"
 }
