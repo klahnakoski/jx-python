@@ -11,12 +11,12 @@
     "description": "JSON query expressions using Python",
     "include_package_data": true,
     "install_requires": [
-        "mo-collections>=3.5.19316",       "mo-dots>=3.14.19317",
-              "mo-files>=3.4.19316",      "mo-future>=3.1.19316",
-               "mo-json>=3.4.19316", "mo-json-config>=3.7.19316",
-             "mo-kwargs>=3.5.19316",       "mo-logs>=3.14.19317",
-               "mo-math>=3.7.19316",     "mo-threads>=3.6.19316",
-              "mo-times>=3.4.19316"
+        "mo-collections>=3.38.20029",        "mo-dots>=3.33.20028",
+              "mo-files>=3.38.20029",      "mo-future>=3.32.20028",
+               "mo-json>=3.38.20029",  "mo-json-config>=3.7.19316",
+             "mo-kwargs>=3.38.20029",        "mo-logs>=3.38.20029",
+               "mo-math>=3.38.20029",     "mo-threads>=3.23.19346",
+              "mo-times>=3.38.20029"
     ],
     "license": "MPL 2.0",
     "long_description": {
@@ -34,6 +34,7 @@
          "jx_python/containers",       "jx_python/cubes",       "jx_python/lists",
           "jx_python/namespace",             "jx_python"
     ],
+    "python_requires": "==2.7, ==3.6, ==3.7, ==3.8",
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "3.15.20029"
+    "version": "3.38.20029"
 }
