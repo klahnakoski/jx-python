@@ -8,12 +8,12 @@ setup(
     classifiers=["Development Status :: 4 - Beta","Topic :: Software Development :: Libraries","Topic :: Software Development :: Libraries :: Python Modules","License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)","Programming Language :: Python :: 2.7"],
     description='JSON query expressions using Python',
     include_package_data=True,
-    install_requires=["mo-collections>=3.38.20029","mo-dots>=3.41.20031","mo-files>=3.41.20031","mo-future>=3.40.20031","mo-json>=3.38.20029","mo-json-config>=3.42.20031","mo-kwargs>=3.38.20029","mo-logs>=3.38.20029","mo-math>=3.41.20031","mo-threads>=3.42.20031","mo-times>=3.38.20029"],
+    install_requires=["mo-collections>=3.46.20032","mo-dots>=3.47.20042","mo-files>=3.41.20031","mo-future>=3.47.20042","mo-json>=3.47.20042","mo-json-config>=3.42.20031","mo-kwargs>=3.47.20042","mo-logs>=3.47.20042","mo-math>=3.41.20031","mo-threads>=3.42.20031","mo-times>=3.46.20032"],
     license='MPL 2.0',
     long_description='# jx-python\nPython library for JSON Expressions \n',
     long_description_content_type='text/markdown',
     name='jx-python',
     packages=["jx_base","jx_base/expressions","jx_python/expressions","jx_python/containers","jx_python/cubes","jx_python/lists","jx_python/namespace","jx_python"],
     url='https://github.com/klahnakoski/jx-python',
-    version='3.43.20031'
+    version='3.47.20042'
 )
