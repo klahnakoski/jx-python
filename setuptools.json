@@ -13,10 +13,10 @@
     "install_requires": [
         "mo-collections>=3.46.20032",        "mo-dots>=3.47.20042",
               "mo-files>=3.41.20031",      "mo-future>=3.47.20042",
-               "mo-json>=3.47.20042", "mo-json-config>=3.42.20031",
-             "mo-kwargs>=3.47.20042",        "mo-logs>=3.47.20042",
+               "mo-json>=3.50.20043", "mo-json-config>=3.42.20031",
+             "mo-kwargs>=3.47.20042",        "mo-logs>=3.50.20043",
                "mo-math>=3.41.20031",     "mo-threads>=3.42.20031",
-              "mo-times>=3.46.20032"
+              "mo-times>=3.50.20043"
     ],
     "license": "MPL 2.0",
     "long_description": {
@@ -35,5 +35,5 @@
           "jx_python/namespace",             "jx_python"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "3.47.20042"
+    "version": "3.50.20043"
 }
