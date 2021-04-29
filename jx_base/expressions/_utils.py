@@ -88,10 +88,10 @@ def _jx_expression(expr, lang):
     """
     if is_expression(expr):
         # CONVERT TO lang
-        new_op = lang[expr]
+        new_op = expr
         if not new_op:
             # CAN NOT BE FOUND, TRY SOME PARTIAL EVAL
-            return language[expr.get_id()].partial_eval()
+            return language[expr.get_id()].partial_eval(lang)
         return expr
         # return new_op(expr.args)  # THIS CAN BE DONE, BUT IT NEEDS MORE CODING, AND I WOULD EXPECT IT TO BE SLOW
 
@@ -104,7 +104,7 @@ def _jx_expression(expr, lang):
     elif expr.__class__ is Date:
         return Literal(expr.unix)
     elif is_sequence(expr):
-        return lang[TupleOp([_jx_expression(e, lang) for e in expr])]
+        return TupleOp([_jx_expression(e, lang) for e in expr])
 
     # expr = to_data(expr)
     try:
@@ -120,7 +120,7 @@ def _jx_expression(expr, lang):
 
                 # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
                 class_ = language[op.get_id()]
-                output = class_.define(expr).partial_eval()
+                output = class_.define(expr).partial_eval(lang)
                 return _jx_expression(output, lang)
         else:
             if not items:
