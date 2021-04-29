@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.expression import Expression
+from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.true_op import TrueOp
 from jx_base.expressions.tuple_op import TupleOp
 from mo_dots import is_many
@@ -26,7 +26,7 @@ class CountOp(Expression):
         Expression.__init__(self, terms)
         if is_many(terms):
             # SHORTCUT: ASSUME AN ARRAY OF IS A TUPLE
-            self.terms = self.lang[TupleOp(terms)]
+            self.terms = TupleOp(terms)
         else:
             self.terms = terms
 
@@ -37,9 +37,9 @@ class CountOp(Expression):
         return self.terms.vars()
 
     def map(self, map_):
-        return self.lang[CountOp(self.terms.map(map_))]
+        return CountOp(self.terms.map(map_))
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
     def exists(self):
