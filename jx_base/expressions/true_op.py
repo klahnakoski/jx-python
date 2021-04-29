@@ -44,10 +44,10 @@ class TrueOp(Literal):
     def map(self, map_):
         return self
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
-    def invert(self):
+    def invert(self, lang):
         return FALSE
 
     def __call__(self, row=None, rownum=None, rows=None):
@@ -62,6 +62,9 @@ class TrueOp(Literal):
     def __bool__(self):
         return True
 
+    def __rcontains__(self, superset):
+        return self is superset
+
     def __nonzero__(self):
         return True
 
@@ -73,4 +76,3 @@ export("jx_base.expressions.literal", TRUE)
 export("jx_base.expressions.false_op", TRUE)
 export("jx_base.expressions._utils", TRUE)
 export("jx_base.expressions.expression", TRUE)
-

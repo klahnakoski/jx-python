@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions._utils import simplified
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.expression import Expression
@@ -37,17 +36,17 @@ class EqOp(Expression):
         items = terms.items()
         if len(items) == 1:
             if is_many(items[0][1]):
-                return cls.lang[InOp(items[0])]
+                return (InOp(items[0]))
             else:
-                return cls.lang[EqOp(items[0])]
+                return (EqOp(items[0]))
         else:
             acc = []
             for lhs, rhs in items:
                 if rhs.json.startswith("["):
-                    acc.append(cls.lang[InOp([Variable(lhs), rhs])])
+                    acc.append(InOp([Variable(lhs), rhs]))
                 else:
-                    acc.append(cls.lang[EqOp([Variable(lhs), rhs])])
-            return cls.lang[AndOp(acc)]
+                    acc.append(EqOp([Variable(lhs), rhs]))
+            return (AndOp(acc))
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -68,28 +67,23 @@ class EqOp(Expression):
         return self.lhs.vars() | self.rhs.vars()
 
     def map(self, map_):
-        return self.lang[EqOp([self.lhs.map(map_), self.rhs.map(map_)])]
+        return EqOp([self.lhs.map(map_), self.rhs.map(map_)])
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
     def exists(self):
         return TRUE
 
-    @simplified
-    def partial_eval(self):
-        lhs = self.lang[self.lhs].partial_eval()
-        rhs = self.lang[self.rhs].partial_eval()
+    def partial_eval(self, lang):
+        lhs = (self.lhs).partial_eval(lang)
+        rhs = (self.rhs).partial_eval(lang)
 
         if is_literal(lhs) and is_literal(rhs):
             return FALSE if value_compare(lhs.value, rhs.value) else TRUE
         else:
-            return self.lang[
-                self.lang[CaseOp(
-                    [
-                        WhenOp(lhs.missing(), **{"then": rhs.missing()}),
-                        WhenOp(rhs.missing(), **{"then": FALSE}),
-                        BasicEqOp([lhs, rhs]),
-                    ]
-                )]
-            ].partial_eval()
+            return CaseOp([
+                WhenOp(lhs.missing(lang), **{"then": rhs.missing(lang)}),
+                WhenOp(rhs.missing(lang), **{"then": FALSE}),
+                BasicEqOp([lhs, rhs]),
+            ]).partial_eval(lang)
