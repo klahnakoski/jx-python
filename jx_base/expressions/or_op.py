@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import and_op
-from jx_base.expressions._utils import simplified
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -39,13 +37,13 @@ class OrOp(Expression):
         return output
 
     def map(self, map_):
-        return self.lang[OrOp([t.map(map_) for t in self.terms])]
+        return (OrOp([t.map(map_) for t in self.terms]))
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
-    def invert(self):
-        return self.lang[AndOp([t.invert() for t in self.terms])].partial_eval()
+    def invert(self, lang):
+        return AndOp([t.invert(lang) for t in self.terms]).partial_eval(lang)
 
     def __call__(self, row=None, rownum=None, rows=None):
         return any(t(row, rownum, rows) for t in self.terms)
@@ -57,12 +55,14 @@ class OrOp(Expression):
             return False
         return all(t == u for t, u in zip(self.terms, other.terms))
 
-    @simplified
-    def partial_eval(self):
+    def __contains__(self, item):
+        return any(item in t for t in self.terms)
+
+    def partial_eval(self, lang):
         terms = []
         ands = []
         for t in self.terms:
-            simple = self.lang[t].partial_eval()
+            simple = (t).partial_eval(lang)
             if simple.type != BOOLEAN:
                 simple = simple.exists()
 
@@ -89,7 +89,7 @@ class OrOp(Expression):
             return FALSE
         if len(terms) == 1:
             return terms[0]
-        return self.lang[OrOp(terms)]
+        return (OrOp(terms))
 
 
 export("jx_base.expressions.and_op", OrOp)
