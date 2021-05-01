@@ -29,7 +29,7 @@ class IsStringOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return self.lang[IsStringOp(self.term.map(map_))]
+        return (IsStringOp(self.term.map(map_)))
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
