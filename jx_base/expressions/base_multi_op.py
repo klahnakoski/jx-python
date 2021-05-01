@@ -28,6 +28,7 @@ class BaseMultiOp(Expression):
     has_simple_form = True
     data_type = NUMBER
     op = None
+    zero = None
 
     def __init__(self, terms, **clauses):
         Expression.__init__(self, terms)
@@ -43,6 +44,29 @@ class BaseMultiOp(Expression):
             "default": self.default,
             "nulls": self.nulls,
         }
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        op = builtin_ops[self.op]
+        terms = [t(row, rownum, rows) for t in self.terms]
+        if self.nulls(row, rownum, rows):
+            acc = None
+            for t in terms:
+                if t == None:
+                    continue
+                if acc is None:
+                    acc = self.zero
+                acc = op(acc, t)
+            if acc is None:
+                return self.default(row, rownum, rows)
+            else:
+                return acc
+        else:
+            acc = self.zero
+            for t in terms:
+                if t == None:
+                    return self.default(row, rownum, rows)
+                acc = op(acc, t)
+            return acc
 
     def vars(self):
         output = set()
