@@ -15,7 +15,7 @@
               "mo-files==4.25.21109",     "mo-future==3.147.20327",
                "mo-json==4.23.21108", "mo-json-config==3.77.20190",
              "mo-kwargs==4.22.21108",        "mo-logs==4.23.21108",
-               "mo-math==4.23.21108",     "mo-threads==4.30.21121",
+               "mo-math==4.23.21108",     "mo-threads==4.33.21121",
               "mo-times==4.23.21108"
     ],
     "license": "MPL 2.0",
@@ -35,5 +35,5 @@
           "jx_python/namespace",             "jx_python"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.31.21121"
+    "version": "4.33.21121"
 }
