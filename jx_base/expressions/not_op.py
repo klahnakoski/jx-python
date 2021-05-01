@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions._utils import simplified
 from jx_base.expressions.expression import Expression
 from jx_base.language import is_op
 from mo_imports import export
@@ -36,17 +35,16 @@ class NotOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return self.lang[NotOp(self.term.map(map_))]
+        return NotOp(self.term.map(map_))
 
-    def missing(self):
-        return self.lang[self.term].missing()
+    def missing(self, lang):
+        return (self.term).missing(lang)
 
-    def invert(self):
-        return self.lang[self.term].partial_eval()
+    def invert(self, lang):
+        return self.term.partial_eval(lang)
 
-    @simplified
-    def partial_eval(self):
-        return self.lang[self.term].invert()
+    def partial_eval(self, lang):
+        return self.term.invert(lang)
 
 
 export("jx_base.expressions.and_op", NotOp)
