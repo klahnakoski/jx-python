@@ -30,11 +30,14 @@ class BasicEqOp(Expression):
     def __data__(self):
         return {"basic.eq": [self.lhs.__data__(), self.rhs.__data__()]}
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
     def vars(self):
         return self.lhs.vars() | self.rhs.vars()
+
+    def map(self, map_):
+        return BasicEqOp([self.lhs.map(map_), self.rhs.map(map_)])
 
     def __eq__(self, other):
         if not is_op(other, BasicEqOp):
