@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions._utils import simplified
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.not_op import NotOp
@@ -40,29 +39,28 @@ class MissingOp(Expression):
         return self.expr.vars()
 
     def map(self, map_):
-        return self.lang[MissingOp(self.expr.map(map_))]
+        return (MissingOp(self.expr.map(map_)))
 
-    def missing(self):
+    def missing(self, lang):
         return FALSE
 
-    def invert(self):
-        output = self.expr.missing()
+    def invert(self, lang):
+        output = self.expr.missing(lang)
         if is_op(output, MissingOp):
             # break call cycle
-            return self.lang[NotOp(output)]
+            return (NotOp(output))
         else:
-            return self.lang[output.invert()]
+            return (output.invert(lang))
 
     def exists(self):
         return TRUE
 
-    @simplified
-    def partial_eval(self):
-        output = self.lang[self.expr].partial_eval().missing()
+    def partial_eval(self, lang):
+        output = self.expr.partial_eval(lang).missing(lang)
         if is_op(output, MissingOp):
             return output
         else:
-            return output.partial_eval()
+            return output.partial_eval(lang)
 
 
 export("jx_base.expressions.expression", MissingOp)
