@@ -14,13 +14,13 @@ from jx_base.expressions._utils import TRUE
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from mo_imports import expect
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 NotOp = expect("NotOp")
 
 
 class ExistsOp(Expression):
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, [term])
@@ -28,6 +28,10 @@ class ExistsOp(Expression):
 
     def __data__(self):
         return {"exists": self.expr.__data__()}
+
+    def __call__(self, row, rownum, rows):
+        value = self.expr(row, rownum, rows)
+        return value != None and value != ""
 
     def vars(self):
         return self.expr.vars()

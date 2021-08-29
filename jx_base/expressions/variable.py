@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.missing_op import MissingOp
 from jx_base.language import is_op
 from jx_base.utils import get_property_name
 from mo_dots import is_sequence, split_field
@@ -20,34 +19,28 @@ from mo_dots.lists import last
 from mo_future import is_text
 from mo_imports import export
 from mo_json.typed_encoder import inserter_type_to_json_type
+from mo_json.types import ToJsonType, JsonType
 
 
 class Variable(Expression):
-    def __init__(self, var, type=None, multi=None):
+    def __init__(self, var, type=None):
         """
-
         :param var:   DOT DELIMITED PATH INTO A DOCUMENT
         :param type:  JSON TYPE, IF KNOWN
-        :param multi: NUMBER OF DISTINCT VALUES IN A SLOT
         """
         Expression.__init__(self, None)
 
-        # if self.lang != self.__class_.lang:
-        #     pass
         self.var = get_property_name(var)
 
         if type == None:
-            jx_type = inserter_type_to_json_type.get(last(split_field(var)))
-            if jx_type:
-                self.data_type = jx_type
+            # MAYBE THE NAME HAS A HINT TO THE TYPE
+            self.data_type = ToJsonType(inserter_type_to_json_type.get(last(split_field(var))))
         else:
-            self.data_type = type
+            self.data_type = ToJsonType(type)
+        if not isinstance(self.data_type, JsonType):
+            Log.error("expecting json type")
 
-        self._many = False
-        if multi and multi > 1:
-            self._many = True
-
-    def __call__(self, row, rownum=None, rows=None):
+    def __call__(self, row, rownum, rows):
         path = split_field(self.var)
         for p in path:
             row = row.get(p)
@@ -59,10 +52,6 @@ class Variable(Expression):
 
     def __data__(self):
         return self.var
-
-    @property
-    def many(self):
-        return self._many
 
     def vars(self):
         return {self}
@@ -97,10 +86,12 @@ class Variable(Expression):
         if self.var == "_id":
             return FALSE
         else:
-            return (MissingOp(self))
+            return lang.MissingOp(self)
 
 
 IDENTITY = Variable(".")
 
 export("jx_base.expressions._utils", Variable)
 export("jx_base.expressions.expression", Variable)
+export("jx_base.expressions.base_binary_op", Variable)
+export("jx_base.expressions.basic_in_op", Variable)

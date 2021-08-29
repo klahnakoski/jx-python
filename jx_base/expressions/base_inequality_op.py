@@ -13,16 +13,15 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions._utils import builtin_ops
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import Literal
-from jx_base.expressions.literal import is_literal
+from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 
 class BaseInequalityOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
     op = None
 
     def __init__(self, terms):

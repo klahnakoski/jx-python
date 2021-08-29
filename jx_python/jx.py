@@ -27,8 +27,24 @@ from jx_python.expressions import jx_expression_to_function as get
 from jx_python.flat_list import PartFlatList
 from mo_collections.index import Index
 from mo_collections.unique_index import UniqueIndex
-from mo_dots import Data, FlatList, Null, coalesce, is_container, is_data, is_list, is_many, join_field, listwrap, \
-    set_default, split_field, unwrap, to_data, dict_to_data, list_to_data
+from mo_dots import (
+    Data,
+    FlatList,
+    Null,
+    coalesce,
+    is_container,
+    is_data,
+    is_list,
+    is_many,
+    join_field,
+    listwrap,
+    set_default,
+    split_field,
+    unwrap,
+    to_data,
+    dict_to_data,
+    list_to_data,
+)
 from mo_dots import _getdefault
 from mo_dots.objects import DataObject
 from mo_future import is_text, sort_using_cmp
@@ -57,7 +73,9 @@ def run(query, container=Null):
         container = to_data(query)["from"]
         query_op = QueryOp.wrap(query, container=container, namespace=container.schema)
     else:
-        query_op = QueryOp.wrap(query, container=container, namespace=container.namespace)
+        query_op = QueryOp.wrap(
+            query, container=container, namespace=container.namespace
+        )
 
     if container == None:
         from jx_python.containers.list import DUAL
@@ -153,7 +171,8 @@ def unique_index(data, keys=None, fail_on_dup=True):
         except Exception as e:
             o.add(d)
             Log.error(
-                "index {{index}} is not unique {{key}} maps to both {{value1}} and {{value2}}",
+                "index {{index}} is not unique {{key}} maps to both {{value1}} and"
+                " {{value2}}",
                 index=keys,
                 key=select([d], keys)[0],
                 value1=o[d],
@@ -281,15 +300,13 @@ def select(data, field_name):
     return list with values from field_name
     """
     if isinstance(data, Cube):
-        return data._select(_normalize_selects(field_name))
+        return data._select(_normalize_selects(field_name, data, format="cube"))
 
     if isinstance(data, PartFlatList):
         return data.select(field_name)
 
     if isinstance(data, UniqueIndex):
-        data = (
-            data._data.values()
-        )  # THE SELECT ROUTINE REQUIRES dicts, NOT Data WHILE ITERATING
+        data = data._data.values()  # THE SELECT ROUTINE REQUIRES dicts, NOT Data WHILE ITERATING
 
     if is_data(field_name):
         field_name = to_data(field_name)
@@ -470,12 +487,10 @@ def get_columns(data, leaves=False):
     if not leaves:
         return list_to_data([{"name": n} for n in UNION(set(d.keys()) for d in data)])
     else:
-        return to_data(
-            [
-                {"name": leaf}
-                for leaf in set(leaf for row in data for leaf, _ in row.leaves())
-            ]
-        )
+        return to_data([
+            {"name": leaf}
+            for leaf in set(leaf for row in data for leaf, _ in row.leaves())
+        ])
 
 
 _ = """
@@ -545,8 +560,12 @@ def _deeper_iterator(columns, nested_path, path, data):
 
 def sort(data, fieldnames=None, already_normalized=False):
     """
-    PASS A FIELD NAME, OR LIST OF FIELD NAMES, OR LIST OF STRUCTS WITH {"field":field_name, "sort":direction}
+    :param data: THE DATA TO SORT
+    :param fieldnames: A FIELDNAME, LIST OF FIELD NAMES
+    :param already_normalized: True IF fieldnames IS SORT STRUCTURE:  {"field":field_name, "sort":direction}
+    :return: A NEW LIST OF DATA, BUT SORTED
     """
+
     try:
         if data == None:
             return Null
@@ -556,12 +575,7 @@ def sort(data, fieldnames=None, already_normalized=False):
         else:
             if not fieldnames:
                 return to_data(sort_using_cmp(data, value_compare))
-
-            if already_normalized:
-                formal = fieldnames
-            else:
-                formal = _normalize_sort(fieldnames)
-
+            formal = fieldnames if already_normalized else _normalize_sort(fieldnames)
             funcs = [(get(f.value), f.sort) for f in formal]
 
         def comparer(left, right):
@@ -575,16 +589,17 @@ def sort(data, fieldnames=None, already_normalized=False):
             return 0
 
         if is_list(data):
-            output = FlatList([unwrap(d) for d in sort_using_cmp(data, cmp=comparer)])
+            output = list_to_data([
+                unwrap(d) for d in sort_using_cmp(data, cmp=comparer)
+            ])
         elif is_text(data):
             Log.error("Do not know how to handle")
         elif hasattr(data, "__iter__"):
-            output = FlatList(
-                [unwrap(d) for d in sort_using_cmp(list(data), cmp=comparer)]
-            )
+            output = list_to_data([
+                unwrap(d) for d in sort_using_cmp(list(data), cmp=comparer)
+            ])
         else:
-            Log.error("Do not know how to handle")
-            output = None
+            raise Log.error("Do not know how to handle")
 
         return output
     except Exception as e:
@@ -619,7 +634,7 @@ def slide(values, size):
     window = builtin_tuple(window)
     for t in i:
         yield window
-        window = window[1:] + (t, )
+        window = window[1:] + (t,)
 
     yield window
 
@@ -656,7 +671,9 @@ def filter(data, where):
     if is_container(data):
         temp = get(where)
         dd = to_data(data)
-        return list_to_data([unwrap(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)])
+        return list_to_data([
+            unwrap(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)
+        ])
     else:
         Log.error(
             "Do not know how to handle type {{type}}", type=data.__class__.__name__
@@ -666,9 +683,9 @@ def filter(data, where):
         return drill_filter(where, data)
     except Exception as _:
         # WOW!  THIS IS INEFFICIENT!
-        return to_data(
-            [unwrap(d) for d in drill_filter(where, [DataObject(d) for d in data])]
-        )
+        return to_data([
+            unwrap(d) for d in drill_filter(where, [DataObject(d) for d in data])
+        ])
 
 
 def drill(data, path):
@@ -678,6 +695,7 @@ def drill(data, path):
     :param path: DOT-DELIMITED PATH TO REACH INTO
     :return:
     """
+
     def _drill(d, p):
         if p:
             if is_many(d):
@@ -706,9 +724,7 @@ def drill_filter(esfilter, data):
     esfilter = unwrap(esfilter)
     primary_nested = []  # track if nested, changes if not
     primary_column = []  # only one path allowed
-    primary_branch = (
-        []
-    )  # CONTAINS LISTS OF RECORDS TO ITERATE: constantly changing as we dfs the tree
+    primary_branch = []  # CONTAINS LISTS OF RECORDS TO ITERATE: constantly changing as we dfs the tree
 
     def parse_field(fieldname, data, depth):
         """
@@ -1011,13 +1027,9 @@ def window(data, param):
     edges = param.edges  # columns to gourp by
     where = param.where  # DO NOT CONSIDER THESE VALUES
     sortColumns = param.sort  # columns to sort by
-    calc_value = get(
-        param.value
-    )  # function that takes a record and returns a value (for aggregation)
+    calc_value = get(param.value)  # function that takes a record and returns a value (for aggregation)
     aggregate = param.aggregate  # WindowFunction to apply
-    _range = (
-        param.range
-    )  # of form {"min":-10, "max":0} to specify the size and relative position of window
+    _range = param.range  # of form {"min":-10, "max":0} to specify the size and relative position of window
 
     data = filter(data, where)
 

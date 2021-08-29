@@ -16,9 +16,17 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
-from mo_dots import Data, data_types, listwrap, NullType, startswith_field
+from mo_dots import Data, data_types, listwrap, NullType, startswith_field, null_types
 from mo_dots.lists import list_types, is_many
-from mo_future import boolean_type, long, none_type, text, transpose, function_type, get_function_arguments
+from mo_future import (
+    boolean_type,
+    long,
+    none_type,
+    text,
+    transpose,
+    function_type,
+    get_function_arguments,
+)
 from mo_logs import Log
 from mo_times import Date
 
@@ -105,14 +113,21 @@ def partial_eval(self, lang):
         output.simplified = True
         return output
     except Exception as cause:
+        try:
+            func(self, lang)
+        except Exception as e:
+            pass
         Log.error("Not expected", cause=cause)
 
 
 def get_dispatcher_for(name):
     def dispatcher(self, lang):
-        func = self.lookups[name][lang.id]
-        output = func(self, lang)
-        return output
+        try:
+            func = self.lookups[name][lang.id]
+            output = func(self, lang)
+            return output
+        except Exception as cause:
+            Log.error("problem", cause=cause)
 
     return dispatcher
 
@@ -171,14 +186,15 @@ class Language(object):
                 # ENSURE THE partial_eval IS REGISTERED
                 if jx_op is None:
                     for dd_method in double_dispatch_methods:
-                        member = extract_method(new_op, dd_method)
+                        member = _extract_method(new_op, dd_method)
                         args = get_function_arguments(member)
                         if args[:2] != ("self", "lang"):
                             Log.error(
-                                "{{module}}.{{clazz}}.{{name}} is expecting (self, lang) parameters, minimum",
+                                "{{module}}.{{clazz}}.{{name}} is expecting (self,"
+                                " lang) parameters, minimum",
                                 module=new_op.__module__,
                                 clazz=new_op.__name__,
-                                name=dd_method
+                                name=dd_method,
                             )
                         new_op.lookups[dd_method] = [member]
                 elif jx_op.__name__ != new_op.__name__:
@@ -186,7 +202,7 @@ class Language(object):
                 else:
                     new_op.lookups = jx_op.lookups
                     for dd_method in double_dispatch_methods:
-                        member = extract_method(new_op, dd_method)
+                        member = _extract_method(new_op, dd_method)
                         jx_op.lookups[dd_method] += [member]
 
                     # COPY OTHER DEFINED METHODS
@@ -196,7 +212,7 @@ class Language(object):
                             o = getattr(jx_op, n, None)
                             if o is None:
                                 setattr(jx_op, n, v)
-        if self.name == 'JX':
+        if self.name == "JX":
             # FINALLY, SWAP OUT THE BASE METHODS
             for dd_method in double_dispatch_methods:
                 existing = getattr(BaseExpression, dd_method, None)
@@ -236,7 +252,7 @@ class Language(object):
         return self.name
 
 
-def is_op(call, op):
+def is_op(call, op) -> bool:
     """
     :param call: The specific operator instance (a method call)
     :param op: The the operator we are testing against
@@ -344,16 +360,13 @@ def value_compare(left, right, ordering=1):
 def type_order(dtype, ordering):
     o = TYPE_ORDER.get(dtype)
     if o is None:
-        if dtype in NULL_TYPES:
+        if dtype in null_types:
             return ordering * 10
         else:
             Log.warning("type will be treated as its own type while sorting")
             TYPE_ORDER[dtype] = 6
             return 6
     return o
-
-
-NULL_TYPES = (none_type, NullType)
 
 
 TYPE_ORDER = {
@@ -372,22 +385,23 @@ TYPE_ORDER = {
 }
 
 
-all_removed_methods = {}
+_all_removed_methods = {}
 
 
-def extract_method(cls, name):
+def _extract_method(cls, name):
+    # PULL cls.name OUT OF CLASS DEFINITION, PUT IT IN _all_removed_methods
     # ENSURE WE TERMINATE AT ORIGINAL Expression METHODS
     to_do = deque([cls])
     while to_do:
         cls = to_do.popleft()
         if cls is BaseExpression:
             return None
-        method = all_removed_methods.get((cls.__module__, cls.__name__, name))
+        method = _all_removed_methods.get((cls.__module__, cls.__name__, name))
         if method:
             return method
         if name in vars(cls):
             method = getattr(cls, name)
-            all_removed_methods[(cls.__module__, cls.__name__, name)] = method
+            _all_removed_methods[(cls.__module__, cls.__name__, name)] = method
             delattr(cls, name)
             return method
         to_do.extend(cls.__bases__)

@@ -30,7 +30,8 @@ class FindOp(FindOp_):
                 self.find.missing(Python),
                 BasicEqOp([index, Literal(-1)]),
             ]),
-            **{"then": self.default, "else": index}
+            then=self.default,
+            **{"else": index}
         ).partial_eval(lang)
         return output
 

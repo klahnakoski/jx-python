@@ -16,7 +16,18 @@ from jx_base.utils import is_variable_name
 from jx_base.expressions import QueryOp
 from jx_base.language import is_op
 from jx_python.namespace import Namespace, convert_list
-from mo_dots import Data, coalesce, is_data, is_list, listwrap, set_default, unwraplist, to_data, is_many, dict_to_data
+from mo_dots import (
+    Data,
+    coalesce,
+    is_data,
+    is_list,
+    listwrap,
+    set_default,
+    unwraplist,
+    to_data,
+    is_many,
+    dict_to_data,
+)
 from mo_future import is_text
 from mo_logs import Log
 from mo_math import is_number
@@ -24,7 +35,6 @@ from mo_times.dates import Date
 
 
 class Rename(Namespace):
-
     def __init__(self, dimensions, source):
         """
         EXPECTING A LIST OF {"name":name, "value":value} OBJECTS TO PERFORM A MAPPING
@@ -32,7 +42,11 @@ class Rename(Namespace):
         dimensions = to_data(dimensions)
         if is_data(dimensions) and dimensions.name == None:
             # CONVERT TO A REAL DIMENSION DEFINITION
-            dimensions = {"name": ".", "type": "set", "edges":[{"name": k, "field": v} for k, v in dimensions.items()]}
+            dimensions = {
+                "name": ".",
+                "type": "set",
+                "edges": [{"name": k, "field": v} for k, v in dimensions.items()],
+            }
 
         self.dimensions = Dimension(dimensions, None, source)
 
@@ -58,8 +72,10 @@ class Rename(Namespace):
             if expr["from"]:
                 return self._convert_query(expr)
             elif len(expr) >= 2:
-                #ASSUME WE HAVE A NAMED STRUCTURE, NOT AN EXPRESSION
-                return dict_to_data({name: self.convert(value) for name, value in expr.leaves()})
+                # ASSUME WE HAVE A NAMED STRUCTURE, NOT AN EXPRESSION
+                return dict_to_data({
+                    name: self.convert(value) for name, value in expr.leaves()
+                })
             else:
                 # ASSUME SINGLE-CLAUSE EXPRESSION
                 k, v = expr.items()[0]
@@ -80,9 +96,6 @@ class Rename(Namespace):
         output.format = query.format
 
         return output
-
-
-
 
     def _convert_bop(self, op, term):
         if is_list(term):
@@ -105,7 +118,7 @@ class Rename(Namespace):
             return edge
 
         if len(listwrap(dim.fields)) == 1:
-            #TODO: CHECK IF EDGE DOMAIN AND DIMENSION DOMAIN CONFLICT
+            # TODO: CHECK IF EDGE DOMAIN AND DIMENSION DOMAIN CONFLICT
             new_edge = set_default({"value": unwraplist(dim.fields)}, edge)
             return new_edge
             new_edge.domain = dim.getDomain()
@@ -128,11 +141,11 @@ class Rename(Namespace):
         else:
             return [set_default({"value": self.convert(c.value)}, c) for c in clause]
 
+
 converter_map = {
     "and": Rename._convert_many,
     "or": Rename._convert_many,
     "not": Rename.convert,
     "missing": Rename.convert,
-    "exists": Rename.convert
+    "exists": Rename.convert,
 }
-

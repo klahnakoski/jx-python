@@ -31,7 +31,7 @@ class LastOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return (LastOp(self.term.map(map_)))
+        return LastOp(self.term.map(map_))
 
     def missing(self, lang):
         return self.term.missing(lang)
@@ -47,4 +47,4 @@ class LastOp(Expression):
         elif is_literal(term):
             return last(term)
         else:
-            return (LastOp(term))
+            return LastOp(term)

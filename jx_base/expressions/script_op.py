@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from mo_future import is_text
-from mo_json import OBJECT
 from mo_logs import Log
 
 
@@ -21,7 +20,7 @@ class ScriptOp(Expression):
     ONLY FOR WHEN YOU TRUST THE SCRIPT SOURCE
     """
 
-    def __init__(self, script, data_type=OBJECT):
+    def __init__(self, script, data_type):
         Expression.__init__(self, None)
         if not is_text(script):
             Log.error("expecting text of a script")
@@ -37,7 +36,7 @@ class ScriptOp(Expression):
                 " = {{script|quote}}",
                 script=expr.script.term,
             )
-            return (ScriptOp(expr.script))
+            return ScriptOp(expr.script)
         else:
             Log.error("scripting is disabled")
 

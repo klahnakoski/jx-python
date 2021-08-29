@@ -16,13 +16,13 @@ from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
 from jx_base.language import is_op
 from mo_dots import startswith_field
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 from mo_logs import Log
 from mo_math import UNION
 
 
 class OuterJoinOp(Expression):
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["frum", "nests"]
@@ -38,7 +38,7 @@ class OuterJoinOp(Expression):
         self.nests = nests
         last = "."
         for n in reversed(nests):
-            path = n.path.var
+            path = n.nested_path.var
             if not startswith_field(path, last):
                 Log.error("Expecting nests to be reverse nested order")
             last = path
@@ -76,10 +76,6 @@ class OuterJoinOp(Expression):
             [self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]
         ).partial_eval(lang)
 
-    @property
-    def many(self):
-        return True
-
     def partial_eval(self, lang):
         nests = []
         for n in self.nests:
@@ -90,8 +86,6 @@ class OuterJoinOp(Expression):
                 nests.append(n)
 
         if nests:
-            return OuterJoinOp(
-                frum=self.frum.partial_eval(lang), nests=nests
-            )
+            return OuterJoinOp(frum=self.frum.partial_eval(lang), nests=nests)
         else:
             return NULL

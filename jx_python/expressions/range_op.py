@@ -10,17 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions import RangeOp as RangeOp_
-from jx_python.expressions._utils import Python
 
 
 class RangeOp(RangeOp_):
-    def to_python(self, not_null=False, boolean=False, many=False):
-        return (
-            "("
-            + (self.then).to_python(not_null=not_null)
-            + ") if ("
-            + (self.when).to_python(boolean=True)
-            + ") else ("
-            + (self.els_).to_python(not_null=not_null)
-            + ")"
-        )
+    pass

@@ -16,11 +16,11 @@ from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from mo_dots import is_many
 from mo_imports import export
-from mo_json import OBJECT
+from mo_json import value_to_json_type, union_type, T_ARRAY, array_type
 
 
 class TupleOp(Expression):
-    date_type = OBJECT
+    date_type = T_ARRAY
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -37,6 +37,10 @@ class TupleOp(Expression):
     def __data__(self):
         return {"tuple": [t.__data__() for t in self.terms]}
 
+    @property
+    def type(self):
+        return array_type(union_type(t.type for t in self.terms))
+
     def vars(self):
         output = set()
         for t in self.terms:
@@ -44,7 +48,7 @@ class TupleOp(Expression):
         return output
 
     def map(self, map_):
-        return (TupleOp([t.map(map_) for t in self.terms]))
+        return TupleOp([t.map(map_) for t in self.terms])
 
     def missing(self, lang):
         return FALSE
@@ -54,7 +58,7 @@ class TupleOp(Expression):
 
     def partial_eval(self, lang):
         if all(is_literal(t) for t in self.terms):
-            return (Literal([t.value for t in self.terms]))
+            return Literal([t.value for t in self.terms])
 
         return self
 

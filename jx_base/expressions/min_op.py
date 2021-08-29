@@ -18,12 +18,12 @@ from jx_base.expressions.null_op import NULL
 from jx_base.expressions.null_op import NullOp
 from jx_base.language import is_op
 from mo_dots import is_many
-from mo_json import NUMBER
+from mo_json.types import T_NUMBER
 from mo_math import MIN
 
 
 class MinOp(Expression):
-    data_type = NUMBER
+    data_type = T_NUMBER
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -44,7 +44,7 @@ class MinOp(Expression):
         return output
 
     def map(self, map_):
-        return (MinOp([t.map(map_) for t in self.terms]))
+        return MinOp([t.map(map_) for t in self.terms])
 
     def missing(self, lang):
         return FALSE
@@ -67,8 +67,8 @@ class MinOp(Expression):
                 return Literal(minimum)
         else:
             if minimum == None:
-                output = (MinOp(terms))
+                output = MinOp(terms)
             else:
-                output = (MinOp([Literal(minimum)] + terms))
+                output = MinOp([Literal(minimum)] + terms)
 
         return output

@@ -10,33 +10,30 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions.missing_op import MissingOp
-
+from mo_imports import expect
 from jx_base.expressions.and_op import AndOp
-from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
+from jx_base.expressions.literal import Literal, is_literal
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import Literal
-from jx_base.expressions.literal import is_literal
-from jx_base.expressions.nested_op import NestedOp
-from jx_base.expressions.not_op import NotOp
-from jx_base.expressions.null_op import NULL
-from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
 from mo_dots import is_many
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 from mo_logs import Log
+
+EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect(
+    "EqOp", "MissingOp", "NestedOp", "NotOp", "NULL", "Variable"
+)
 
 
 class BasicInOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
 
     def __new__(cls, terms):
         if is_op(terms[0], Variable) and is_op(terms[1], Literal):
             name, value = terms
             if not is_many(value.value):
-                return (EqOp([name, Literal([value.value])]))
+                return EqOp([name, Literal([value.value])])
         return object.__new__(cls)
 
     def __init__(self, term):
@@ -72,7 +69,15 @@ class BasicInOp(Expression):
         elif is_literal(value) and is_literal(superset):
             return Literal(value() in superset())
         elif is_op(value, NestedOp):
-            return NestedOp(value.path, None, AndOp([BasicInOp([value.select, superset]), value.where])).exists().partial_eval(lang)
+            return (
+                NestedOp(
+                    value.nested_path,
+                    None,
+                    AndOp([BasicInOp([value.select, superset]), value.where]),
+                )
+                .exists()
+                .partial_eval(lang)
+            )
         else:
             return lang.BasicInOp([value, superset])
 

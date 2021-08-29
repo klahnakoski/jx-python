@@ -17,11 +17,11 @@ from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.basic_in_op import BasicInOp
 from jx_base.expressions.basic_index_of_op import BasicIndexOfOp
 from jx_base.expressions.basic_mul_op import BasicMulOp
+from jx_base.expressions.basic_not_op import BasicNotOp
 from jx_base.expressions.basic_multi_op import BasicMultiOp
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.between_op import BetweenOp
-from jx_base.expressions.boolean_op import BooleanOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.concat_op import ConcatOp
@@ -44,11 +44,11 @@ from jx_base.expressions.gt_op import GtOp
 from jx_base.expressions.gte_op import GteOp
 from jx_base.expressions.in_op import InOp
 from jx_base.expressions.inner_join_op import InnerJoinOp
-from jx_base.expressions.integer_op import IntegerOp
+from jx_base.expressions.integer_op import ToIntegerOp
 from jx_base.expressions.is_boolean_op import IsBooleanOp
 from jx_base.expressions.is_integer_op import IsIntegerOp
 from jx_base.expressions.is_number_op import IsNumberOp
-from jx_base.expressions.is_string_op import IsStringOp
+from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.expressions.last_op import LastOp
 from jx_base.expressions.leaves_op import LeavesOp
 from jx_base.expressions.left_op import LeftOp
@@ -67,7 +67,6 @@ from jx_base.expressions.not_left_op import NotLeftOp
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.not_right_op import NotRightOp
 from jx_base.expressions.null_op import NullOp, NULL
-from jx_base.expressions.number_op import NumberOp
 from jx_base.expressions.offset_op import OffsetOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
@@ -85,9 +84,11 @@ from jx_base.expressions.sql_eq_op import SqlEqOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
 from jx_base.expressions.sql_script import SQLScript
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
-from jx_base.expressions.string_op import StringOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.suffix_op import SuffixOp
+from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions.to_number_op import ToNumberOp
+from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.expressions.true_op import TrueOp, TRUE
 from jx_base.expressions.tuple_op import TupleOp
 from jx_base.expressions.union_op import UnionOp
@@ -125,7 +126,7 @@ set_default(
         "in": InOp,
         "instr": FindOp,
         "is_number": IsNumberOp,
-        "is_string": IsStringOp,
+        "is_text": IsTextOp,
         "last": LastOp,
         "left": LeftOp,
         "length": LengthOp,
@@ -146,7 +147,7 @@ set_default(
         "not_left": NotLeftOp,
         "not_right": NotRightOp,
         "null": NullOp,
-        "number": NumberOp,
+        "number": ToNumberOp,
         "offset": OffsetOp,
         "or": OrOp,
         "postfix": SuffixOp,
@@ -159,7 +160,8 @@ set_default(
         "script": ScriptOp,
         "select": SelectOp,
         "split": SplitOp,
-        "string": StringOp,
+        "to_text": ToTextOp,
+        "text": ToTextOp,
         "suffix": SuffixOp,
         "sub": SubOp,
         "subtract": SubOp,

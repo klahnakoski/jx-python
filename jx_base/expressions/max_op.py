@@ -15,12 +15,12 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal, is_literal
 from jx_base.expressions.null_op import NULL
 from mo_dots import is_many
-from mo_json import NUMBER
+from mo_json.types import T_NUMBER
 from mo_math import MAX
 
 
 class MaxOp(Expression):
-    data_type = NUMBER
+    data_type = T_NUMBER
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -41,7 +41,7 @@ class MaxOp(Expression):
         return output
 
     def map(self, map_):
-        return (MaxOp([t.map(map_) for t in self.terms]))
+        return MaxOp([t.map(map_) for t in self.terms])
 
     def missing(self, lang):
         return FALSE
@@ -64,8 +64,8 @@ class MaxOp(Expression):
                 return Literal(maximum)
         else:
             if maximum == None:
-                output = (MaxOp(terms))
+                output = MaxOp(terms)
             else:
-                output = (MaxOp([Literal(maximum)] + terms))
+                output = MaxOp([Literal(maximum)] + terms)
 
         return output

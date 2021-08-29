@@ -11,20 +11,27 @@ from __future__ import absolute_import, division, unicode_literals
 
 from uuid import uuid4
 
-from mo_imports import export
-
 from jx_base.expressions import jx_expression
 from jx_base.facts import Facts
 from jx_base.namespace import Namespace
 from jx_base.schema import Schema
 from jx_base.snowflake import Snowflake
 from jx_base.table import Table
-from jx_python.expressions import Literal, Python
+from jx_python.expressions import Literal
 from mo_dots import coalesce, listwrap, to_data
 from mo_dots.datas import register_data
 from mo_dots.lists import last
 from mo_future import is_text, text
-from mo_json import value2json, true, false, null, EXISTS, OBJECT, NESTED
+from mo_imports import export
+from mo_json import (
+    value2json,
+    true,
+    false,
+    null,
+    EXISTS,
+    OBJECT,
+    ARRAY,
+)
 from mo_json.typed_encoder import EXISTS_TYPE
 from mo_logs import Log
 from mo_logs.strings import expand_template, quote
@@ -33,7 +40,8 @@ ENABLE_CONSTRAINTS = True
 
 
 def generateGuid():
-    """Gets a random GUID.
+    """
+    Gets a random GUID.
     Note: python's UUID generation library is used here.
     Basically UUID is the same as GUID when represented as a string.
     :Returns:
@@ -52,19 +60,31 @@ def _exec(code, name):
         globs = globals()
         fake_locals = {}
         exec(code, globs, fake_locals)
-        temp = globs[name] = fake_locals[name]
+        temp = fake_locals[name]
         return temp
-    except Exception as e:
-        Log.error("Can not make class\n{{code}}", code=code, cause=e)
+    except Exception as cause:
+        Log.error("Can not make class\n{{code}}", code=code, cause=cause)
 
 
 _ = listwrap, last, true, false, null
 
 
+def failure(row, rownum, rows, constraint):
+    constraint = to_data(constraint)
+    if constraint['and']:
+        for a in constraint['and']:
+            failure(row, rownum, rows, a)
+        return
+    expr = jx_expression(constraint)
+
+    if not expr(row, rownum, row):
+        Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
+
+
 def DataClass(name, columns, constraint=None):
     """
     Use the DataClass to define a class, but with some extra features:
-    1. restrict the datatype of property
+    1. restrict the data type of property
     2. restrict if `required`, or if `nulls` are allowed
     3. generic constraints on object properties
 
@@ -78,7 +98,7 @@ def DataClass(name, columns, constraint=None):
             "required", - False if it must be defined (even if None)
             "nulls",    - True if property can be None, or missing
             "default",  - A default value, if none is provided
-            "type"      - a Python datatype
+            "type"      - a Python data type
         }
     :param constraint: a JSON query Expression for extra constraints (return true if all constraints are met)
     :return: The class that has been created
@@ -100,13 +120,14 @@ def DataClass(name, columns, constraint=None):
     required = to_data(filter(lambda c: c.required and c.default == None, columns)).name
     # nulls = to_data(filter(lambda c: c.nulls, columns)).name
     defaults = {c.name: coalesce(c.default, None) for c in columns}
-    types = {c.name: coalesce(c.jx_type, object) for c in columns}
+    types = {c.name: coalesce(c.type, object) for c in columns}
 
     code = expand_template(
         """
 from __future__ import unicode_literals
-from mo_future import is_text, is_binary
-from collections import Mapping
+from mo_future import is_text, is_binary, Mapping
+from mo_dots import Null
+from jx_base import failure
 
 meta = None
 types_ = {{types}}
@@ -120,6 +141,7 @@ class {{class_name}}(Mapping):
         code = {{constraint_expr|quote}}
         if {{constraint_expr}}:
             return
+        failure(row, rownum, rows, {{constraint}})
         Log.error(
             "constraint\\n{" + "{code}}\\nnot satisfied {" + "{expect}}\\n{" + "{value|indent}}",
             code={{constraint_expr|quote}},
@@ -242,7 +264,6 @@ Column = DataClass(
         "es_index",
         "es_type",
         "jx_type",
-        {"name": "useSource", "default": False},
         "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
         {"name": "count", "nulls": True},
         {"name": "cardinality", "nulls": True},
@@ -260,7 +281,7 @@ Column = DataClass(
             "else": True,
         },
         {
-            "when": {"eq": {"name": "."}},
+            "when": {"eq": {"es_column": "."}},
             "then": {"in": {"jx_type": ["nested", "object"]}},
             "else": True,
         },
@@ -283,7 +304,7 @@ Column = DataClass(
             "else": True,
         },
         {
-            "when": {"eq": {"jx_type": NESTED}},
+            "when": {"eq": {"jx_type": ARRAY}},
             "then": {"in": {"cardinality": [0, 1]}},
             "else": True,
         },

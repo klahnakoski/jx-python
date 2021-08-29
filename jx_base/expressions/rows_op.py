@@ -44,4 +44,4 @@ class RowsOp(Expression):
         return self.var.vars() | self.offset.vars() | {"rows", "rownum"}
 
     def map(self, map_):
-        return (RowsOp([self.var.map(map_), self.offset.map(map_)]))
+        return RowsOp([self.var.map(map_), self.offset.map(map_)])

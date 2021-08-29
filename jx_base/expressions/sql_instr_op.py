@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from mo_json import INTEGER
+from mo_json import T_INTEGER
 
 
 class SqlInstrOp(Expression):
-    data_type = INTEGER
+    data_type = T_INTEGER
 
     def __init__(self, params):
         Expression.__init__(self, params)

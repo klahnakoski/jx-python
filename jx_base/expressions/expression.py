@@ -19,17 +19,25 @@ from jx_base.language import BaseExpression, ID, is_expression, is_op
 from mo_dots import is_data, is_sequence, is_container
 from mo_future import items as items_, text
 from mo_imports import expect
-from mo_json import BOOLEAN, OBJECT, value2json
+from mo_json import BOOLEAN, value2json, T_IS_NULL
 from mo_logs import Log
 from mo_threads import register_thread
 
 TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expect(
-    "TRUE", "FALSE", "Literal", "is_literal", "MissingOp", "NotOp", "NULL", "Variable", "AndOp"
+    "TRUE",
+    "FALSE",
+    "Literal",
+    "is_literal",
+    "MissingOp",
+    "NotOp",
+    "NULL",
+    "Variable",
+    "AndOp",
 )
 
 
 class Expression(BaseExpression):
-    data_type = OBJECT
+    data_type = T_IS_NULL
     has_simple_form = False
 
     def __init__(self, args):
@@ -98,19 +106,17 @@ class Expression(BaseExpression):
                     return class_(term, **clauses)
                 else:
                     return class_(_jx_expression(term, lang), **clauses)
-        except Exception as e:
-            Log.error("programmer error expr = {{value|quote}}", value=expr, cause=e)
+        except Exception as cause:
+            Log.warning(
+                "programmer error expr = {{value|quote}}", value=expr, cause=cause
+            )
+            Log.error(
+                "programmer error expr = {{value|quote}}", value=expr, cause=cause
+            )
 
     @property
     def name(self):
         return self.__class__.__name__
-
-    @property
-    def many(self):
-        """
-        :return: True IF THE EXPRESSION RETURNS A MULTIVALUE (WHICH IS NOT A LIST OR A TUPLE)
-        """
-        return False
 
     def __data__(self):
         raise NotImplementedError
@@ -143,13 +149,13 @@ class Expression(BaseExpression):
         """
         :return: TRUE IF FALSE
         """
-        inv = self.partial_eval(lang)
-        if inv is TRUE:
+        better = self.partial_eval(lang)
+        if better is TRUE:
             return FALSE
-        elif inv is FALSE:
+        elif better is FALSE:
             return TRUE
         else:
-            return (NotOp(inv))
+            return NotOp(better)
 
     def partial_eval(self, lang):
         """
@@ -163,12 +169,12 @@ class Expression(BaseExpression):
         return self.data_type
 
     def __eq__(self, other):
-        if other is None:
+        try:
+            if self.get_id() != other.get_id():
+                return False
+        except Exception:
             return False
-        if self.get_id() != other.get_id():
-            return False
-        self_class = self.__class__
-        Log.note("this is slow on {{type}}", type=text(self_class.__name__))
+        Log.note("this is slow on {{type}}", type=self.__class__.__name__)
         return self.__data__() == other.__data__()
 
     def __contains__(self, item):

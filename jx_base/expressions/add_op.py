@@ -15,4 +15,3 @@ from jx_base.expressions.base_multi_op import BaseMultiOp
 
 class AddOp(BaseMultiOp):
     op = "add"
-    zero = 0

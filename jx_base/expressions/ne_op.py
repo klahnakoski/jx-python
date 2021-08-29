@@ -21,13 +21,13 @@ from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.language import is_op
 from mo_dots import is_data, is_sequence
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 from mo_logs import Log
 
 
 class NeOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -44,11 +44,14 @@ class NeOp(Expression):
         else:
             return {"ne": [self.lhs.__data__(), self.rhs.__data__()]}
 
+    def __call__(self, row, rownum, rows):
+        return self.lhs(row, rownum, rows) != self.rhs(row, rownum, rows)
+
     def vars(self):
         return self.lhs.vars() | self.rhs.vars()
 
     def map(self, map_):
-        return (NeOp([self.lhs.map(map_), self.rhs.map(map_)]))
+        return NeOp([self.lhs.map(map_), self.rhs.map(map_)])
 
     def missing(self, lang):
         return FALSE  # USING THE decisive EQUALITY https://github.com/mozilla/jx-sqlite/blob/master/docs/Logical%20Equality.md#definitions
@@ -66,14 +69,14 @@ class NeOp(Expression):
 
         if is_op(lhs, NestedOp):
             return NestedOp(
-                path=lhs.path.partial_eval(lang),
+                path=lhs.nested_path.partial_eval(lang),
                 select=IDENTITY,
                 where=AndOp([lhs.where, NeOp([lhs.select, rhs])]).partial_eval(lang),
                 sort=lhs.sort.partial_eval(lang),
                 limit=lhs.limit.partial_eval(lang),
             ).partial_eval(lang)
 
-        output =AndOp([
+        output = AndOp([
             lhs.exists(),
             rhs.exists(),
             NotOp(BasicEqOp([lhs, rhs])),

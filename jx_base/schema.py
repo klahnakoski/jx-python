@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from copy import copy
 
 from mo_dots import Null, relative_field, set_default, startswith_field, dict_to_data
-from mo_json import EXISTS, NESTED, OBJECT, INTERNAL
+from mo_json import EXISTS, ARRAY, OBJECT, INTERNAL
 from mo_json.typed_encoder import unnest_path, untype_path
 from mo_logs import Log
 
@@ -30,7 +30,9 @@ class Schema(object):
         self._columns = copy(columns)
         self.table = table_name
         self.query_path = "."
-        self.lookup, self.lookup_leaves, self.lookup_variables = _indexer(columns, self.query_path)
+        self.lookup, self.lookup_leaves, self.lookup_variables = _indexer(
+            columns, self.query_path
+        )
 
     def __getitem__(self, column_name):
         cs = self.lookup.get(column_name)
@@ -88,14 +90,16 @@ class Schema(object):
                 relative_field(c.name, full_name): c.es_column
                 for k, cs in self.lookup.items()
                 # if startswith_field(k, full_name)
-                for c in cs if c.jx_type not in INTERNAL
+                for c in cs
+                if c.jx_type not in INTERNAL
             },
             {
                 c.name: c.es_column
                 for k, cs in self.lookup.items()
                 # if startswith_field(k, full_name)
-                for c in cs if c.jx_type not in INTERNAL
-            }
+                for c in cs
+                if c.jx_type not in INTERNAL
+            },
         )
 
     @property
@@ -112,9 +116,9 @@ def _indexer(columns, query_path):
             cname = relative_field(c.name, query_path)
             nfp = unnest_path(cname)
             if (
-                startswith_field(nfp, full_name) and
-                c.es_type not in [EXISTS, OBJECT, NESTED] and
-                (c.es_column != "_id" or full_name == "_id")
+                startswith_field(nfp, full_name)
+                and c.es_type not in [EXISTS, OBJECT, ARRAY]
+                and (c.es_column != "_id" or full_name == "_id")
             ):
                 cs = lookup_leaves.setdefault(full_name, set())
                 cs.add(c)
@@ -127,10 +131,10 @@ def _indexer(columns, query_path):
             cname = relative_field(c.name, query_path)
             nfp = unnest_path(cname)
             if (
-                startswith_field(nfp, full_name) and
-                c.es_type not in [EXISTS, OBJECT] and
-                (c.es_column != "_id" or full_name == "_id") and
-                startswith_field(c.nested_path[0], query_path)
+                startswith_field(nfp, full_name)
+                and c.es_type not in [EXISTS, OBJECT]
+                and (c.es_column != "_id" or full_name == "_id")
+                and startswith_field(c.nested_path[0], query_path)
             ):
                 cs = lookup_variables.setdefault(full_name, set())
                 cs.add(c)
@@ -164,4 +168,3 @@ def _indexer(columns, query_path):
                 lookup_variables[k] = cs
 
     return relative_lookup, lookup_leaves, lookup_variables
-

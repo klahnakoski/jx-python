@@ -13,9 +13,8 @@ from __future__ import absolute_import, division, unicode_literals
 import operator
 
 from jx_base.language import is_expression, Language
-from mo_dots import is_sequence
+from mo_dots import is_sequence, is_missing
 from mo_future import (
-    first,
     get_function_name,
     is_text,
     items as items_,
@@ -24,10 +23,12 @@ from mo_future import (
 )
 from mo_imports import expect
 from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, OBJECT, STRING, scrub
+from mo_json.types import T_IS_NULL, ToJsonType
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
 
+TYPE_CHECK = True  # A LITTLE FASTER IF False
 ALLOW_SCRIPTING = False
 EMPTY_DICT = {}
 
@@ -51,11 +52,11 @@ def extend(cls):
 
 
 def simplified(func):
-    def mark_as_simple(self):
+    def mark_as_simple(self, lang):
         if self.simplified:
             return self
 
-        output = func(self)
+        output = func(self, lang)
         output.simplified = True
         return output
 
@@ -68,17 +69,16 @@ def jx_expression(expr, schema=None):
     if expr == None:
         return None
 
-    # UPDATE THE VARIABLE WITH THIER KNOWN TYPES
+    # UPDATE THE VARIABLE WITH THEIR KNOWN TYPES
     if not schema:
         output = _jx_expression(expr, language)
         return output
     output = _jx_expression(expr, language)
     for v in output.vars():
-        leaves = schema.leaves(v.var)
-        if len(leaves) == 0:
-            v.data_type = IS_NULL
-        if len(leaves) == 1:
-            v.data_type = first(leaves).jx_type
+        data_type = T_IS_NULL
+        for leaf in schema.leaves(v.var):
+            data_type |= ToJsonType(leaf.jx_type)
+        v.data_type = data_type
     return output
 
 
@@ -95,11 +95,15 @@ def _jx_expression(expr, lang):
         return expr
         # return new_op(expr.args)  # THIS CAN BE DONE, BUT IT NEEDS MORE CODING, AND I WOULD EXPECT IT TO BE SLOW
 
-    if expr is None:
+    if expr is True:
         return TRUE
+    elif expr is False:
+        return FALSE
+    elif is_missing(expr):
+        return NULL
     elif is_text(expr):
         return Variable(expr)
-    elif expr in (True, False, None) or expr == None or is_number(expr):
+    elif is_number(expr):
         return Literal(expr)
     elif expr.__class__ is Date:
         return Literal(expr.unix)
@@ -127,8 +131,8 @@ def _jx_expression(expr, lang):
                 return NULL
             raise Log.error("{{instruction|json}} is not known", instruction=expr)
 
-    except Exception as e:
-        Log.error("programmer error expr = {{value|quote}}", value=expr, cause=e)
+    except Exception as cause:
+        Log.error("programmer error expr = {{value|quote}}", value=expr, cause=cause)
 
 
 language = Language(None)

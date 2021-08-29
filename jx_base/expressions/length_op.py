@@ -16,11 +16,11 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
 from mo_future import is_text
-from mo_json import INTEGER
+from mo_json import T_INTEGER
 
 
 class LengthOp(Expression):
-    data_type = INTEGER
+    data_type = T_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, [term])
@@ -37,7 +37,7 @@ class LengthOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return (LengthOp(self.term.map(map_)))
+        return LengthOp(self.term.map(map_))
 
     def missing(self, lang):
         return self.term.missing(lang)
@@ -46,8 +46,8 @@ class LengthOp(Expression):
         term = self.term.partial_eval(lang)
         if is_literal(term):
             if is_text(term.value):
-                return (Literal(len(term.value)))
+                return Literal(len(term.value))
             else:
                 return NULL
         else:
-            return (LengthOp(term))
+            return LengthOp(term)

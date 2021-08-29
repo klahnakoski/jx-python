@@ -10,8 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
-class Table(object):
-
+class Table:
     def __init__(self, full_name):
         self.name = full_name
 
@@ -23,4 +22,3 @@ class Table(object):
 
     def partial_eval(self, lang):
         return self
-

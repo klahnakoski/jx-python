@@ -35,4 +35,5 @@ class Facts(object):
 
     @property
     def schema(self):
-        return self.container.ns.get_schema(self.name)
+        return self.container.namespace.get_schema(self.name)
+

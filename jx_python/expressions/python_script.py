@@ -19,7 +19,7 @@ from jx_base.expressions import (
     Expression,
 )
 from jx_python.expressions import _utils, Python
-from mo_dots import coalesce
+from jx_base.utils import coalesce
 from mo_future import PY2, text
 from mo_logs import Log
 
@@ -33,14 +33,11 @@ class PythonScript(PythonScript_):
             if frum.lang != miss.lang:
                 Log.error("logic error")
 
-        self.miss = coalesce(
-            miss, FALSE
-        )  # Expression that will return true/false to indicate missing result
+        self.miss = coalesce(miss, FALSE)
         self.data_type = type
         self.expr = expr
         self.many = many  # True if script returns multi-value
         self.frum = frum  # THE ORIGINAL EXPRESSION THAT MADE expr
-
 
     def __str__(self):
         missing = self.miss.partial_eval(Python)
@@ -60,7 +57,7 @@ class PythonScript(PythonScript_):
     if PY2:
         __unicode__ = __str__
 
-    def to_python(self, not_null=False, boolean=False, many=True):
+    def to_python(self, not_null=False, boolean=False):
         return self
 
     def missing(self, lang):
@@ -76,5 +73,6 @@ class PythonScript(PythonScript_):
             return True
         else:
             return False
+
 
 _utils.PythonScript = PythonScript

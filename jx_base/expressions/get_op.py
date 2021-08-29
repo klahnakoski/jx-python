@@ -35,6 +35,4 @@ class GetOp(Expression):
         return output
 
     def map(self, map_):
-        return GetOp(
-            [self.var.map(map_)] + [o.map(map_) for o in self.offsets]
-        )
+        return GetOp([self.var.map(map_)] + [o.map(map_) for o in self.offsets])

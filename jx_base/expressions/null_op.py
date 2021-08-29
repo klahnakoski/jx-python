@@ -16,7 +16,7 @@ from jx_base.expressions.true_op import TRUE
 from jx_base.language import TYPE_ORDER
 from mo_dots import Null
 from mo_imports import export
-from mo_json import IS_NULL, OBJECT
+from mo_json.types import T_IS_NULL
 from mo_logs import Log
 
 
@@ -26,7 +26,7 @@ class NullOp(Literal):
     USE IT TO EXPECT A NULL VALUE IN assertAlmostEqual
     """
 
-    data_type = OBJECT
+    data_type = T_IS_NULL
 
     @classmethod
     def define(cls, expr):
@@ -78,6 +78,10 @@ class NullOp(Literal):
     def exists(self):
         return FALSE
 
+    @property
+    def type(self):
+        return T_IS_NULL
+
     def __call__(self, row=None, rownum=None, rows=None):
         return Null
 
@@ -86,10 +90,6 @@ class NullOp(Literal):
 
     def __str__(self):
         return b"null"
-
-    @property
-    def type(self):
-        return IS_NULL
 
     def __hash__(self):
         return id(None)
@@ -106,5 +106,7 @@ TYPE_ORDER[NullOp] = 9
 TYPE_ORDER[NULL] = 9
 
 export("jx_base.expressions._utils", NULL)
-export("jx_base.expressions.literal", NULL)
 export("jx_base.expressions.expression", NULL)
+export("jx_base.expressions.basic_in_op", NULL)
+export("jx_base.expressions.literal", NULL)
+export("jx_base.expressions.base_multi_op", NULL)

@@ -26,19 +26,12 @@ from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
 from mo_dots import is_many
 from mo_imports import export
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 
 class InOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
-
-    def __new__(cls, terms):
-        if is_op(terms[0], Variable) and is_op(terms[1], Literal):
-            name, value = terms
-            if not is_many(value.value):
-                return (EqOp([name, Literal([value.value])]))
-        return object.__new__(cls)
+    data_type = T_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -50,6 +43,11 @@ class InOp(Expression):
         else:
             return {"in": [self.value.__data__(), self.superset.__data__()]}
 
+    def __call__(self, row, rownum, rows):
+        value = self.value(row, rownum, rows)
+        superset = self.superset(row, rownum, rows)
+        return value in superset
+
     def __eq__(self, other):
         if is_op(other, InOp):
             return self.value == other.value and self.superset == other.superset
@@ -59,7 +57,7 @@ class InOp(Expression):
         return self.value.vars()
 
     def map(self, map_):
-        return (InOp([self.value.map(map_), self.superset.map(map_)]))
+        return InOp([self.value.map(map_), self.superset.map(map_)])
 
     def partial_eval(self, lang):
         value = self.value.partial_eval(lang)
@@ -68,12 +66,25 @@ class InOp(Expression):
             return FALSE
         elif value is NULL:
             return FALSE
-        elif is_literal(value) and is_literal(superset):
-            return Literal(value() in superset())
+        elif is_literal(superset):
+            if is_literal(value):
+                return Literal(value() in listwrap(superset.value))
+            elif is_many(superset.value):
+                return InOp([value, superset])
+            else:
+                return EqOp([value, superset])
         elif is_op(value, NestedOp):
-            return NestedOp(value.path, None, AndOp([InOp([value.select, superset]), value.where])).exists().partial_eval(lang)
+            return (
+                NestedOp(
+                    value.nested_path,
+                    None,
+                    AndOp([InOp([value.select, superset]), value.where]),
+                )
+                .exists()
+                .partial_eval(lang)
+            )
         else:
-            return (InOp([value, superset]))
+            return InOp([value, superset])
 
     def __call__(self, row):
         return self.value(row) in self.superset(row)

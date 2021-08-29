@@ -13,12 +13,12 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.literal import Literal
 from mo_dots import coalesce, is_data
 from mo_imports import export
-from mo_json import NUMBER
+from mo_json.types import T_NUMBER
 from mo_times.dates import Date
 
 
 class DateOp(Literal):
-    date_type = NUMBER
+    date_type = T_NUMBER
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)

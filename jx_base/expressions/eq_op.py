@@ -10,7 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from mo_imports import export
 from jx_base.expressions.and_op import AndOp
+from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -20,14 +22,14 @@ from jx_base.expressions.variable import Variable
 from jx_base.language import is_op, value_compare
 from mo_dots import is_many
 from mo_imports import expect
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
-CaseOp, InOp, WhenOp = expect("CaseOp", "InOp", "WhenOp")
+InOp, WhenOp = expect("InOp", "WhenOp")
 
 
 class EqOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
 
     def __new__(cls, terms):
         if is_many(terms):
@@ -36,9 +38,9 @@ class EqOp(Expression):
         items = terms.items()
         if len(items) == 1:
             if is_many(items[0][1]):
-                return (InOp(items[0]))
+                return InOp(items[0])
             else:
-                return (EqOp(items[0]))
+                return EqOp(items[0])
         else:
             acc = []
             for lhs, rhs in items:
@@ -46,7 +48,7 @@ class EqOp(Expression):
                     acc.append(InOp([Variable(lhs), rhs]))
                 else:
                     acc.append(EqOp([Variable(lhs), rhs]))
-            return (AndOp(acc))
+            return AndOp(acc)
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -57,6 +59,9 @@ class EqOp(Expression):
             return {"eq": {self.lhs.var: self.rhs.value}}
         else:
             return {"eq": [self.lhs.__data__(), self.rhs.__data__()]}
+
+    def __call__(self, row, rownum, rows):
+        return self.lhs(row, rownum, rows) == self.rhs(row, rownum, rows)
 
     def __eq__(self, other):
         if is_op(other, EqOp):
@@ -83,7 +88,10 @@ class EqOp(Expression):
             return FALSE if value_compare(lhs.value, rhs.value) else TRUE
         else:
             return CaseOp([
-                WhenOp(lhs.missing(lang), **{"then": rhs.missing(lang)}),
-                WhenOp(rhs.missing(lang), **{"then": FALSE}),
+                WhenOp(lhs.missing(lang), then=rhs.missing(lang)),
+                WhenOp(rhs.missing(lang), then=FALSE),
                 BasicEqOp([lhs, rhs]),
             ]).partial_eval(lang)
+
+
+export("jx_base.expressions.basic_in_op", EqOp)

@@ -21,14 +21,14 @@ from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import Variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
-from mo_dots import is_data
+from mo_dots import is_data, is_missing
 from mo_future import first
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 
 class PrefixOp(Expression):
     has_simple_form = True
-    data_type = BOOLEAN
+    data_type = T_BOOLEAN
 
     def __init__(self, expr, prefix):
         Expression.__init__(self, (expr, prefix))
@@ -43,8 +43,12 @@ class PrefixOp(Expression):
         if not term:
             return PrefixOp(NULL, NULL)
         elif is_data(term):
-            expr, const = first(term.items())
-            return PrefixOp(Variable(expr), Literal(const))
+            kv_pair = first(term.items())
+            if kv_pair:
+                expr, const = first(term.items())
+                return PrefixOp(Variable(expr), Literal(const))
+            else:
+                return TRUE
         else:
             expr, const = term
             return PrefixOp(jx_expression(expr), jx_expression(const))
@@ -57,6 +61,15 @@ class PrefixOp(Expression):
         else:
             return {"prefix": [self.expr.__data__(), self.prefix.__data__()]}
 
+    def __call__(self, row, rownum, rows):
+        expr = self.expr(row, rownum, rows)
+        if is_missing(expr):
+            return None
+        prefix=self.prefix(row, rownum, rows)
+        if is_missing(prefix):
+            return None
+        return expr.startswith(prefix)
+
     def vars(self):
         if self.expr is NULL:
             return set()
@@ -66,7 +79,7 @@ class PrefixOp(Expression):
         if self.expr is NULL:
             return self
         else:
-            return (PrefixOp(self.expr.map(map_), self.prefix.map(map_)))
+            return PrefixOp(self.expr.map(map_), self.prefix.map(map_))
 
     def missing(self, lang):
         return FALSE

@@ -18,4 +18,6 @@ class RightOp(RightOp_):
         v = (self.value).to_python()
         l = (self.length).to_python()
 
-        return with_var("v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]")
+        return with_var(
+            "v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]"
+        )

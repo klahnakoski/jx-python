@@ -22,12 +22,12 @@ from jx_base.expressions.variable import Variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from mo_dots import is_data
-from mo_json import STRING
+from mo_json.types import T_TEXT
 
 
 class LeftOp(Expression):
     has_simple_form = True
-    data_type = STRING
+    data_type = T_TEXT
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -46,7 +46,7 @@ class LeftOp(Expression):
         return self.value.vars() | self.length.vars()
 
     def map(self, map_):
-        return (LeftOp([self.value.map(map_), self.length.map(map_)]))
+        return LeftOp([self.value.map(map_), self.length.map(map_)])
 
     def missing(self, lang):
         return OrOp([

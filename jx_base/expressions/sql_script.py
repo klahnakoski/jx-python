@@ -17,5 +17,4 @@ class SQLScript(Expression):
     """
     REPRESENT A SQL SCRIPT
     """
-
-    pass
+    simplified = True

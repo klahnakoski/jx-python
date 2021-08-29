@@ -15,12 +15,12 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.true_op import TrueOp
 from jx_base.expressions.tuple_op import TupleOp
 from mo_dots import is_many
-from mo_json import INTEGER
+from mo_json.types import T_INTEGER
 
 
 class CountOp(Expression):
     has_simple_form = False
-    data_type = INTEGER
+    data_type = T_INTEGER
 
     def __init__(self, terms, **clauses):
         Expression.__init__(self, terms)

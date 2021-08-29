@@ -22,7 +22,7 @@ from mo_logs import Log
 def cube_aggs(frum, query):
     select = listwrap(query.select)
 
-    #MATCH EDGES IN QUERY TO ONES IN frum
+    # MATCH EDGES IN QUERY TO ONES IN frum
     for e in query.edges:
         for fs in frum.select:
             if fs.name == e.value:
@@ -40,11 +40,13 @@ def cube_aggs(frum, query):
                     e.value = e.value + "." + fe.domain.key
                     break
 
-
     result = {
         s.name: Matrix(
-            dims=[len(e.domain.partitions) + (1 if e.allowNulls else 0) for e in query.edges],
-            zeros=s.default
+            dims=[
+                len(e.domain.partitions) + (1 if e.allowNulls else 0)
+                for e in query.edges
+            ],
+            zeros=s.default,
         )
         for s in select
     }
@@ -78,7 +80,9 @@ def cube_aggs(frum, query):
                     if acc == None:
                         acc = windows.name2accumulator.get(agg)
                         if acc == None:
-                            Log.error("select aggregate {{agg}} is not recognized",  agg= agg)
+                            Log.error(
+                                "select aggregate {{agg}} is not recognized", agg=agg
+                            )
                         acc = acc(**s)
                         mat[c] = acc
                     acc.add(val)

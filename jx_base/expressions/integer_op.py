@@ -14,11 +14,11 @@ from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.first_op import FirstOp
 from jx_base.language import is_op
-from mo_json import INTEGER
+from mo_json import T_INTEGER
 
 
-class IntegerOp(Expression):
-    data_type = INTEGER
+class ToIntegerOp(Expression):
+    data_type = T_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, [term])
@@ -31,7 +31,7 @@ class IntegerOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return (IntegerOp(self.term.map(map_)))
+        return ToIntegerOp(self.term.map(map_))
 
     def missing(self, lang):
         return self.term.missing(lang)
@@ -39,7 +39,7 @@ class IntegerOp(Expression):
     def partial_eval(self, lang):
         term = FirstOp(self.term).partial_eval(lang)
         if is_op(term, CoalesceOp):
-            return (CoalesceOp([IntegerOp(t) for t in term.terms]))
-        if term.type == INTEGER:
+            return CoalesceOp([ToIntegerOp(t) for t in term.terms])
+        if term.type in T_INTEGER:
             return term
-        return (IntegerOp(term))
+        return ToIntegerOp(term)

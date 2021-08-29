@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import datetime
 from collections import Mapping
 
-from mo_json.typed_encoder import NESTED_TYPE, json_type_to_inserter_type
+from mo_json.typed_encoder import ARRAY_TYPE, json_type_to_inserter_type
 
 from jx_base import Column, TableDesc
 from jx_base.schema import Schema
@@ -76,7 +76,7 @@ def _get_schema_from_list(
             column = columns[full_name]
             if not column:
                 es_type = d.__class__
-                jx_type =native_type_to_json_type[es_type]
+                jx_type = native_type_to_json_type[es_type]
 
                 column = Column(
                     name=concat_field(table_name, json_type_to_inserter_type[jx_type]),
@@ -121,7 +121,7 @@ def _get_schema_from_list(
                         last_updated=Date.now(),
                         nested_path=nested_path,
                         cardinality=1 if jx_type == OBJECT else None,
-                        multi=1
+                        multi=1,
                     )
                     columns.add(column)
                 else:
@@ -191,7 +191,7 @@ META_COLUMNS_DESC = TableDesc(
                 jx_type=INTEGER,
                 last_updated=Date.now(),
                 nested_path=ROOT_PATH,
-                multi=1
+                multi=1,
             )
             for c in ["count", "cardinality", "multi"]
         ]
@@ -214,7 +214,7 @@ META_COLUMNS_DESC = TableDesc(
                 jx_type=NUMBER,
                 last_updated=Date.now(),
                 nested_path=ROOT_PATH,
-                multi=1
+                multi=1,
             ),
         ]
     ),
@@ -235,7 +235,7 @@ META_TABLES_DESC = TableDesc(
                 jx_type=STRING,
                 last_updated=Date.now(),
                 nested_path=ROOT_PATH,
-                multi=1
+                multi=1,
             )
             for c in ["name", "url", "query_path"]
         ]
@@ -248,7 +248,7 @@ META_TABLES_DESC = TableDesc(
                 jx_type=INTEGER,
                 last_updated=Date.now(),
                 nested_path=ROOT_PATH,
-                multi=1
+                multi=1,
             )
             for c in ["timestamp"]
         ]
@@ -266,8 +266,7 @@ SIMPLE_METADATA_COLUMNS = (  # FOR PURELY INTERNAL PYTHON LISTS, NOT MAPPING TO 
             jx_type=STRING,
             last_updated=Date.now(),
             nested_path=ROOT_PATH,
-            multi=1
-
+            multi=1,
         )
         for c in ["table", "name", "type"]
     ]
@@ -280,7 +279,7 @@ SIMPLE_METADATA_COLUMNS = (  # FOR PURELY INTERNAL PYTHON LISTS, NOT MAPPING TO 
             jx_type=INTEGER,
             last_updated=Date.now(),
             nested_path=ROOT_PATH,
-            multi=1
+            multi=1,
         )
         for c in ["count", "cardinality", "multi"]
     ]
@@ -293,7 +292,7 @@ SIMPLE_METADATA_COLUMNS = (  # FOR PURELY INTERNAL PYTHON LISTS, NOT MAPPING TO 
             jx_type=NUMBER,
             last_updated=Date.now(),
             nested_path=ROOT_PATH,
-            multi=1
+            multi=1,
         ),
         Column(
             name="nested_path",
@@ -303,9 +302,8 @@ SIMPLE_METADATA_COLUMNS = (  # FOR PURELY INTERNAL PYTHON LISTS, NOT MAPPING TO 
             jx_type=STRING,
             last_updated=Date.now(),
             nested_path=ROOT_PATH,
-            multi=4
-
-        )
+            multi=4,
+        ),
     ]
 )
 

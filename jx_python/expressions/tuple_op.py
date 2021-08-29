@@ -20,4 +20,4 @@ class TupleOp(TupleOp_):
         elif len(self.terms) == 1:
             return "(" + (self.terms[0]).to_python() + ",)"
         else:
-            return "(" + (",".join((t).to_python() for t in self.terms)) + ")"
+            return "(" + ",".join((t).to_python() for t in self.terms) + ")"

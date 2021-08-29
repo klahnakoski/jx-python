@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.language import is_op
-from mo_json import NUMBER
+from mo_json.types import T_NUMBER
 
 
 class AbsOp(Expression):
-    data_type = NUMBER
+    data_type = T_NUMBER
 
     def __init__(self, term):
         Expression.__init__(self, term)

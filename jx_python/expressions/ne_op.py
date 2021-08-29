@@ -18,4 +18,6 @@ class NeOp(NeOp_):
         lhs = (self.lhs).to_python()
         rhs = (self.rhs).to_python()
 
-        return with_var("r, l", "("+lhs+","+rhs+")", "l!=None and r!=None and l!=r")
+        return with_var(
+            "r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"
+        )
