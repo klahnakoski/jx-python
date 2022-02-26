@@ -10,27 +10,28 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
+from jx_base.expressions.false_op import FALSE
 from jx_base.language import is_op
-from mo_imports import export
 from mo_json.types import T_BOOLEAN
 
 
-class NotOp(Expression):
+class SqlNotOp(Expression):
     data_type = T_BOOLEAN
 
     def __init__(self, term):
+        """
+        EMPTY STRINGS AND `0` ARE TREATED AS FALSE
+        """
         Expression.__init__(self, term)
         self.term = term
 
     def __data__(self):
-        return {"not": self.term.__data__()}
-
-    def __call__(self, row, rownum=None, rows=None):
-        return not self.term(row, rownum, rows)
+        return {"sql.not": self.term.__data__()}
 
     def __eq__(self, other):
-        if not is_op(other, NotOp):
+        if not is_op(other, SqlNotOp):
             return False
         return self.term == other.term
 
@@ -41,16 +42,17 @@ class NotOp(Expression):
         return NotOp(self.term.map(map_))
 
     def missing(self, lang):
-        return (self.term).missing(lang)
+        return FALSE
 
     def invert(self, lang):
-        return self.term.partial_eval(lang)
+        return (
+            WhenOp(
+                OrOp(self.term.missing(lang), BasicEqOp(self.term, ZERO)),
+                *{"then": self, "else": ToBoolean(self.term)}
+            )
+            .term
+            .partial_eval(lang)
+        )
 
     def partial_eval(self, lang):
         return self.term.invert(lang)
-
-
-export("jx_base.expressions.and_op", NotOp)
-export("jx_base.expressions.basic_in_op", NotOp)
-export("jx_base.expressions.exists_op", NotOp)
-export("jx_base.expressions.expression", NotOp)

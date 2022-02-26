@@ -10,6 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.domains import ALGEBRAIC, Domain, KNOWN
+from jx_base.expressions import NullOp
 from mo_dots import (
     Data,
     FlatList,
@@ -310,9 +311,9 @@ class Dimension(object):
     def getSelect(self, **kwargs):
         if self.fields:
             if len(self.fields) == 1:
-                return Data(name=self.full_name, value=self.fields[0], aggregate="none")
+                return Data(name=self.full_name, value=self.fields[0], aggregate=NullOp)
             else:
-                return Data(name=self.full_name, value=self.fields, aggregate="none")
+                return Data(name=self.full_name, value=self.fields, aggregate=NullOp)
 
         domain = self.getDomain(**kwargs)
         if not domain.getKey:
@@ -320,7 +321,7 @@ class Dimension(object):
         if not domain.NULL:
             Log.error("Should not happen")
 
-        return Data(name=self.full_name, domain=domain, aggregate="none")
+        return Data(name=self.full_name, domain=domain, aggregate=NullOp)
 
 
 def addParts(parentPart, childPath, count, index):

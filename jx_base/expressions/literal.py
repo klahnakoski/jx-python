@@ -24,6 +24,7 @@ class Literal(Expression):
     """
     A literal JSON document
     """
+    op = "literal"
 
     def __new__(cls, term):
         if term == None:
@@ -40,6 +41,7 @@ class Literal(Expression):
         return object.__new__(cls)
 
     def __init__(self, value):
+
         Expression.__init__(self, None)
         self.simplified = True
         self._value = value

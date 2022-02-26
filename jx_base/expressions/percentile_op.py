@@ -7,10 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions.base_multi_op import BaseMultiOp
 
 
-class BetweenOp(BetweenOp_):
-    pass
+class PercentileOp(BaseMultiOp):
+    op = "percentile"
+
+    def __init__(self, terms, default=None, nulls=False, **clauses):
+        BaseMultiOp.__init__(terms, default, nulls, **clauses)
+        self.percentile = 0.50
+

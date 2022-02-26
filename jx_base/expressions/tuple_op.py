@@ -39,7 +39,7 @@ class TupleOp(Expression):
 
     @property
     def type(self):
-        return array_type(union_type(t.type for t in self.terms))
+        return array_type(union_type(*(t.type for t in self.terms)))
 
     def vars(self):
         output = set()

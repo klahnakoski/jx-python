@@ -65,7 +65,7 @@ class SuffixOp(Expression):
         else:
             return {"suffix": [self.expr.__data__(), self.suffix.__data__()]}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         expr = self.expr(row, rownum, rows)
         if is_missing(expr):
             return None

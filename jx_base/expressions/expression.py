@@ -16,12 +16,12 @@ from jx_base.expressions._utils import (
     _jx_expression,
 )
 from jx_base.language import BaseExpression, ID, is_expression, is_op
+from jx_base.table import Table
 from mo_dots import is_data, is_sequence, is_container
-from mo_future import items as items_, text
+from mo_future import items as items_
 from mo_imports import expect
 from mo_json import BOOLEAN, value2json, T_IS_NULL
 from mo_logs import Log
-from mo_threads import register_thread
 
 TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expect(
     "TRUE",
@@ -164,6 +164,13 @@ class Expression(BaseExpression):
         """
         return self
 
+    def to_jx(self, schema):
+        """
+        :param schema: THE SCHEMA USED TO INTERPRET THIS EXPRESSION
+        :return: SOMETHING BETTER
+        """
+        return self
+
     @property
     def type(self):
         return self.data_type
@@ -187,9 +194,11 @@ class Expression(BaseExpression):
         """
         return self.__eq__(superset)
 
-    @register_thread
     def __str__(self):
         return value2json(self.__data__(), pretty=True)
+
+    def __repr__(self):
+        return value2json(self.__data__())
 
     def __getattr__(self, item):
         Log.error(

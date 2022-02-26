@@ -14,12 +14,16 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.language import is_op
 from jx_base.utils import get_property_name
-from mo_dots import is_sequence, split_field
+from mo_dots import is_sequence, split_field, startswith_field, concat_field
 from mo_dots.lists import last
 from mo_future import is_text
+from mo_imports import expect
 from mo_imports import export
 from mo_json.typed_encoder import inserter_type_to_json_type
-from mo_json.types import ToJsonType, JsonType
+from mo_json.types import to_json_type, JsonType
+from jx_base.expressions.null_op import NULL
+
+QueryOp, SelectOp = expect("QueryOp", "SelectOp")
 
 
 class Variable(Expression):
@@ -34,13 +38,13 @@ class Variable(Expression):
 
         if type == None:
             # MAYBE THE NAME HAS A HINT TO THE TYPE
-            self.data_type = ToJsonType(inserter_type_to_json_type.get(last(split_field(var))))
+            self.data_type = to_json_type(inserter_type_to_json_type.get(last(split_field(var))))
         else:
-            self.data_type = ToJsonType(type)
+            self.data_type = to_json_type(type)
         if not isinstance(self.data_type, JsonType):
             Log.error("expecting json type")
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         path = split_field(self.var)
         for p in path:
             row = row.get(p)
@@ -54,7 +58,7 @@ class Variable(Expression):
         return self.var
 
     def vars(self):
-        return {self}
+        return {self.var}
 
     def map(self, map_):
         replacement = map_.get(self.var)
@@ -65,6 +69,42 @@ class Variable(Expression):
                 return replacement
         else:
             return self
+
+    def to_jx(self, schema):
+        paths = {}
+        for rel_name, leaf in schema.leaves(self.var):
+            paths.setdefault(leaf.nested_path[0], []).append((rel_name, leaf))
+
+        if len(paths) == 1:
+            columns = paths.get(schema.nested_path[0])
+            if columns and len(columns) == 1 and columns[0][1].es_column == self.var:
+                return self
+
+        selects = []
+        for path, leaves in paths.items():
+            if startswith_field(path, schema.nested_path[0]) and len(path)>len(schema.nested_path[0]):
+                selects.append({
+                    "name": self.var,
+                    "value": QueryOp(
+                        frum=schema.container.get_table(path),
+                        select=SelectOp([
+                            {
+                                "name": rel_name,
+                                "value": Variable(leaf.es_column, leaf.jx_type),
+                                "aggregate": NULL
+                            }
+                            for rel_name, leaf in leaves
+                        ])
+                    ),
+                    "aggregate": NULL
+                })
+            else:
+                selects.extend(
+                    {"name": concat_field(self.var, rel_name), "value": Variable(leaf.es_column, leaf.jx_type), "aggregate":NULL}
+                    for rel_name, leaf in leaves
+                )
+
+        return self
 
     def __hash__(self):
         return self.var.__hash__()

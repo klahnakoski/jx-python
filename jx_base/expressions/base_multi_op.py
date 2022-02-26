@@ -27,21 +27,19 @@ AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
 class BaseMultiOp(Expression):
     has_simple_form = True
     data_type = T_NUMBER
-    op = None
 
-    def __init__(self, terms, **clauses):
+    def __init__(self, terms, default=None, nulls=False, **clauses):
         Expression.__init__(self, terms)
         self.terms = terms
-        self.default = coalesce(clauses.get("default"), NULL)
-        self.decisive = coalesce(
-            clauses.get("nulls"), FALSE
-        )  # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
+        # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
+        self.decisive = nulls in (True, TRUE)
+        self.default = coalesce(default, NULL)
 
     def __data__(self):
         return {
             self.op: [t.__data__() for t in self.terms],
-            "default": self.default,
-            "decisive": self.decisive,
+            "default": self.default.__data__(),
+            "decisive": self.decisive.__data__(),
         }
 
     def vars(self):
@@ -104,7 +102,7 @@ class BaseMultiOp(Expression):
                 AndOp([t.missing(lang) for t in terms]),
                 then=self.default,
                 **{"else": operators["basic." + self.op]([
-                    CoalesceOp([t, _jx_identity[self.op]]) for t in terms
+                    CoalesceOp([t, _jx_identity.get(self.op, NULL)]) for t in terms
                 ])}
             ).partial_eval(lang)
         else:
@@ -121,4 +119,4 @@ class BaseMultiOp(Expression):
         return output
 
 
-_jx_identity = {"add": ZERO, "mul": ONE}
+_jx_identity = {"add": ZERO, "mul": ONE, "cardinality": ZERO}

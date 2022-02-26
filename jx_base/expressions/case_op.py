@@ -20,9 +20,8 @@ from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_dots import is_sequence
-from mo_future import first
 from mo_imports import expect
-from mo_json import OBJECT, BOOLEAN
+from mo_json.types import T_BOOLEAN, union_type
 from mo_logs import Log
 
 WhenOp = expect("WhenOp")
@@ -41,7 +40,12 @@ class CaseOp(Expression):
                 Log.error(
                     "case expression does not allow `else` clause in `when` sub-clause"
                 )
-        self.whens = terms
+
+        els_ = terms[-1]
+        if is_op(els_, WhenOp):
+            self.whens = terms + [els_.els_]
+        else:
+            self.whens = terms
 
     def __data__(self):
         return {"case": [w.__data__() for w in self.whens]}
@@ -60,16 +64,12 @@ class CaseOp(Expression):
         return CaseOp([w.map(map_) for w in self.whens])
 
     def missing(self, lang):
-        m = self.whens[-1].missing(lang)
-        for w in reversed(self.whens[0:-1]):
-            when = w.when.partial_eval(lang)
-            if when is FALSE:
-                pass
-            elif when is TRUE:
-                m = w.then.partial_eval(lang).missing(lang)
-            else:
-                m = OrOp([AndOp([when, w.then.partial_eval(lang).missing(lang)]), m,])
-        return m.partial_eval(lang)
+        whens = [
+            WhenOp(w.when, then=w.then.missing(lang))
+            for w in self.whens[:-1]
+        ]+[self.whens[-1].missing(lang)]
+
+        return CaseOp(whens).partial_eval(lang)
 
     def invert(self, lang):
         return CaseOp(
@@ -78,14 +78,14 @@ class CaseOp(Expression):
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
-        if self.type == BOOLEAN:
+        if self.type is T_BOOLEAN:
             nots = []
             ors = []
             for w in self.whens[:-1]:
                 ors.append(AndOp(nots + [w.when, w.then]))
                 nots.append(NotOp(w.when))
             ors.append(AndOp(nots + [self.whens[-1]]))
-            return (OrOp(ors)).partial_eval(lang)
+            return OrOp(ors).partial_eval(lang)
 
         whens = []
         for w in self.whens[:-1]:
@@ -109,8 +109,4 @@ class CaseOp(Expression):
 
     @property
     def type(self):
-        types = set(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens)
-        if len(types) > 1:
-            return OBJECT
-        else:
-            return first(types)
+        return union_type(*(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens))

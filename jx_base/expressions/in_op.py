@@ -43,7 +43,7 @@ class InOp(Expression):
         else:
             return {"in": [self.value.__data__(), self.superset.__data__()]}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         value = self.value(row, rownum, rows)
         superset = self.superset(row, rownum, rows)
         return value in superset
@@ -86,7 +86,7 @@ class InOp(Expression):
         else:
             return InOp([value, superset])
 
-    def __call__(self, row):
+    def __call__(self, row, rownum=None, rows=None):
         return self.value(row) in self.superset(row)
 
     def missing(self, lang):

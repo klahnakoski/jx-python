@@ -9,8 +9,9 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions import ToIntegerOp as IntegerOp_
 
 
-class BetweenOp(BetweenOp_):
-    pass
+class ToIntegerOp(IntegerOp_):
+    def to_python(self, not_null=False, boolean=False, many=False):
+        return "int(" + self.term.to_python() + ")"

@@ -44,6 +44,7 @@ from mo_dots import (
     to_data,
     dict_to_data,
     list_to_data,
+    from_data
 )
 from mo_dots import _getdefault
 from mo_dots.objects import DataObject
@@ -588,15 +589,11 @@ def sort(data, fieldnames=None, already_normalized=False):
                     Log.error("problem with compare", cause)
             return 0
 
-        if is_list(data):
+        if is_text(data):
+            raise Log.error("Do not know how to handle")
+        elif is_many(data):
             output = list_to_data([
-                unwrap(d) for d in sort_using_cmp(data, cmp=comparer)
-            ])
-        elif is_text(data):
-            Log.error("Do not know how to handle")
-        elif hasattr(data, "__iter__"):
-            output = list_to_data([
-                unwrap(d) for d in sort_using_cmp(list(data), cmp=comparer)
+                d for d in sort_using_cmp((from_data(d) for d in data), cmp=comparer)
             ])
         else:
             raise Log.error("Do not know how to handle")

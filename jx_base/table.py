@@ -11,6 +11,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 
 class Table:
+    """
+    POINT TO A SPECIFIC TABLE IN A CONTAINER
+    """
+
     def __init__(self, full_name):
         self.name = full_name
 

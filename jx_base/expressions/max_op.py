@@ -22,7 +22,7 @@ from mo_math import MAX
 class MaxOp(Expression):
     data_type = T_NUMBER
 
-    def __init__(self, terms):
+    def __init__(self, terms, default=NULL):
         Expression.__init__(self, terms)
         if terms == None:
             self.terms = []
@@ -30,9 +30,10 @@ class MaxOp(Expression):
             self.terms = [t for t in terms if t != None]
         else:
             self.terms = [terms]
+        self.default = default
 
     def __data__(self):
-        return {"max": [t.__data__() for t in self.terms]}
+        return {"max": [t.__data__() for t in self.terms], "default": self.default.__data__()}
 
     def vars(self):
         output = set()

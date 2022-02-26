@@ -8,7 +8,9 @@ from jx_base.expressions._utils import (
 )
 from jx_base.expressions.abs_op import AbsOp
 from jx_base.expressions.add_op import AddOp
+from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.and_op import AndOp
+from jx_base.expressions.avg_op import AvgOp
 from jx_base.expressions.base_binary_op import BaseBinaryOp
 from jx_base.expressions.base_inequality_op import BaseInequalityOp
 from jx_base.expressions.base_multi_op import BaseMultiOp
@@ -17,11 +19,12 @@ from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.basic_in_op import BasicInOp
 from jx_base.expressions.basic_index_of_op import BasicIndexOfOp
 from jx_base.expressions.basic_mul_op import BasicMulOp
-from jx_base.expressions.basic_not_op import BasicNotOp
 from jx_base.expressions.basic_multi_op import BasicMultiOp
+from jx_base.expressions.basic_not_op import BasicNotOp
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.between_op import BetweenOp
+from jx_base.expressions.cardinality_op import CardinalityOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.concat_op import ConcatOp
@@ -102,10 +105,13 @@ set_default(
     {
         "abs": AbsOp,
         "add": AddOp,
+        "percentile": PercentileOp,
         "and": AndOp,
+        "avg": AvgOp,
         "basic.add": BasicAddOp,
         "basic.mul": BasicMulOp,
         "between": BetweenOp,
+        "cardinality": CardinalityOp,
         "case": CaseOp,
         "coalesce": CoalesceOp,
         "concat": ConcatOp,
@@ -119,6 +125,7 @@ set_default(
         "find": FindOp,
         "first": FirstOp,
         "floor": FloorOp,
+        "from": QueryOp,
         "from_unix": FromUnixOp,
         "get": GetOp,
         "gt": GtOp,

@@ -25,7 +25,7 @@ from mo_math import MIN
 class MinOp(Expression):
     data_type = T_NUMBER
 
-    def __init__(self, terms):
+    def __init__(self, terms, default=NULL):
         Expression.__init__(self, terms)
         if terms == None:
             self.terms = []
@@ -33,9 +33,10 @@ class MinOp(Expression):
             self.terms = terms
         else:
             self.terms = [terms]
+        self.default = default
 
     def __data__(self):
-        return {"min": [t.__data__() for t in self.terms]}
+        return {"min": [t.__data__() for t in self.terms], "default": self.default.__data__()}
 
     def vars(self):
         output = set()

@@ -44,7 +44,7 @@ class NeOp(Expression):
         else:
             return {"ne": [self.lhs.__data__(), self.rhs.__data__()]}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         return self.lhs(row, rownum, rows) != self.rhs(row, rownum, rows)
 
     def vars(self):

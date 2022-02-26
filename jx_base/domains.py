@@ -303,7 +303,6 @@ class SimpleSetDomain(Domain):
     ):
         Domain.__init__(self, desc)
 
-        self.type = "set"
         self.order = {}
         self.partitions = FlatList()
         self.primitive = True  # True IF DOMAIN IS A PRIMITIVE VALUE SET
@@ -319,7 +318,9 @@ class SimpleSetDomain(Domain):
             self.map = {}
             self.order[None] = len(partitions)
             for i, p in enumerate(partitions):
-                part = {"name": p, "value": p, "dataIndex": i}
+                part = {"value": p, "dataIndex": i}
+                if isinstance(p, text):
+                    part['name'] = p
                 self.partitions.append(part)
                 self.map[p] = part
                 self.order[p] = i
@@ -331,7 +332,7 @@ class SimpleSetDomain(Domain):
             self.primitive = True
             return
 
-        if partitions and dimension.fields and len(dimension.fields) > 1:
+        if partitions and dimension and dimension.fields and len(dimension.fields) > 1:
             self.key = key
             self.map = UniqueIndex(keys=dimension.fields)
         elif partitions and is_container(key):

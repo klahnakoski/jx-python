@@ -22,7 +22,7 @@ from mo_json.types import T_BOOLEAN
 
 class OrOp(Expression):
     data_type = T_BOOLEAN
-    zero = FALSE  # ADD THIS TO terms FOR NO EEFECT
+    default = FALSE  # ADD THIS TO terms FOR NO EEFECT
 
     def __init__(self, terms):
         Expression.__init__(self, terms)

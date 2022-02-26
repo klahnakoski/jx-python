@@ -81,7 +81,7 @@ class BasicInOp(Expression):
         else:
             return lang.BasicInOp([value, superset])
 
-    def __call__(self, row):
+    def __call__(self, row, rownum=None, rows=None):
         value = self.value(row)
         superset = self.superset(row)
         if value == None:

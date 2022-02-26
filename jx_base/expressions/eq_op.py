@@ -49,7 +49,6 @@ class EqOp(Expression):
                 else:
                     acc.append(EqOp([Variable(lhs), rhs]))
             return AndOp(acc)
-
     def __init__(self, terms):
         Expression.__init__(self, terms)
         self.lhs, self.rhs = terms
@@ -60,7 +59,7 @@ class EqOp(Expression):
         else:
             return {"eq": [self.lhs.__data__(), self.rhs.__data__()]}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         return self.lhs(row, rownum, rows) == self.rhs(row, rownum, rows)
 
     def __eq__(self, other):

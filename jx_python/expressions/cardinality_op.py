@@ -9,8 +9,12 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions import CardinalityOp as CardinalityOp_
 
 
-class BetweenOp(BetweenOp_):
-    pass
+class CardinalityOp(CardinalityOp_):
+    def to_python(self, not_null=False, boolean=False, many=False):
+        if not self.terms:
+            return "0"
+        else:
+            return "len(set(" + self.terms.to_python() + "))"

@@ -15,7 +15,6 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.language import is_op
 from mo_dots import startswith_field
 from mo_json.types import T_BOOLEAN
@@ -53,7 +52,7 @@ class InnerJoinOp(Expression):
 
     def __eq__(self, other):
         return (
-            is_op(other, OuterJoinOp)
+            is_op(other, InnerJoinOp)
             and self.frum == other.frum
             and self.nests == other.nests
         )

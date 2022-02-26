@@ -22,8 +22,8 @@ from mo_future import (
     utf8_json_encoder,
 )
 from mo_imports import expect
-from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, OBJECT, STRING, scrub
-from mo_json.types import T_IS_NULL, ToJsonType
+from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
+from mo_json.types import union_type, to_json_type
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
@@ -70,16 +70,10 @@ def jx_expression(expr, schema=None):
         return None
 
     # UPDATE THE VARIABLE WITH THEIR KNOWN TYPES
-    if not schema:
-        output = _jx_expression(expr, language)
-        return output
     output = _jx_expression(expr, language)
-    for v in output.vars():
-        data_type = T_IS_NULL
-        for leaf in schema.leaves(v.var):
-            data_type |= ToJsonType(leaf.jx_type)
-        v.data_type = data_type
-    return output
+    if not schema:
+        return output
+    return output.to_jx(schema).partial_eval(language)
 
 
 def _jx_expression(expr, lang):
@@ -156,10 +150,10 @@ def merge_types(jx_types):
     :param jx_types: ITERABLE OF jx TYPES
     :return: ONE TYPE TO RULE THEM ALL
     """
-    return _merge_types[max(_merge_score[t] for t in jx_types)]
+    return union_type(*(to_json_type(t) for t in jx_types))
 
 
-_merge_score = {IS_NULL: 0, BOOLEAN: 1, INTEGER: 2, NUMBER: 3, STRING: 4, OBJECT: 5}
+_merge_score = {IS_NULL: 0, BOOLEAN: 1, INTEGER: 2, NUMBER: 3, STRING: 4}
 _merge_types = {v: k for k, v in _merge_score.items()}
 
 builtin_ops = {

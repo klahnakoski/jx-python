@@ -9,8 +9,10 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions import ToBooleanOp as ToBooleanOp_
+from jx_python.expressions._utils import with_var, Python
 
 
-class BetweenOp(BetweenOp_):
-    pass
+class ToBooleanOp(ToBooleanOp_):
+    def to_python(self, not_null=False, boolean=False, many=False):
+        return with_var("f", self.term.to_python(), "bool(f)",)

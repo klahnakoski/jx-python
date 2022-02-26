@@ -51,7 +51,7 @@ class FindOp(Expression):
             output["default"] = self.default.__data__()
         return output
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         value = self.value(row, rownum, rows)
         if is_missing(value):
             return None

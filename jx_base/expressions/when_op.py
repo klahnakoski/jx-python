@@ -40,7 +40,7 @@ class WhenOp(Expression):
             "else": None if self.els_ is NULL else self.els_.__data__(),
         }
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         if self.when(row, rownum, rows):
             return self.then(row, rownum, rows)
         else:

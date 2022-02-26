@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import datetime
 from collections import Mapping
 
-from mo_json.typed_encoder import ARRAY_TYPE, json_type_to_inserter_type
+from mo_json.typed_encoder import ARRAY_KEY, json_type_to_inserter_type
 
 from jx_base import Column, TableDesc
 from jx_base.schema import Schema

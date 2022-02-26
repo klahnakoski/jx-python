@@ -10,43 +10,45 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions._utils import TRUE
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from mo_imports import expect
+from jx_base.language import is_op
 from mo_json.types import T_BOOLEAN
 
-NotOp = expect("NotOp")
 
 
-class ExistsOp(Expression):
+
+class BasicNotOp(Expression):
     data_type = T_BOOLEAN
 
     def __init__(self, term):
-        Expression.__init__(self, [term])
-        self.expr = term
+        Expression.__init__(self, term)
+        self.term = term
 
     def __data__(self):
-        return {"exists": self.expr.__data__()}
+        return {"basic.not": self.term.__data__()}
 
     def __call__(self, row, rownum=None, rows=None):
-        value = self.expr(row, rownum, rows)
-        return value != None and value != ""
+        return not self.term(row, rownum, rows)
+
+    def __eq__(self, other):
+        if not is_op(other, BasicNotOp):
+            return False
+        return self.term == other.term
 
     def vars(self):
-        return self.expr.vars()
+        return self.term.vars()
 
     def map(self, map_):
-        return ExistsOp(self.expr.map(map_))
+        return NotOp(self.term.map(map_))
 
     def missing(self, lang):
-        return FALSE
+        return (self.term).missing(lang)
 
     def invert(self, lang):
-        return (self.expr).missing(lang)
-
-    def exists(self):
-        return TRUE
+        return self.term.partial_eval(lang)
 
     def partial_eval(self, lang):
-        return (NotOp(self.expr.missing(lang))).partial_eval(lang)
+        if is_op(self.term, BasicNotOp):
+            return self.term
+        else:
+            return self

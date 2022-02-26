@@ -9,8 +9,9 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions import PercentileOp as PercentileOp_
+from jx_python.expressions._utils import multiop_to_python
 
 
-class BetweenOp(BetweenOp_):
-    pass
+class PercentileOp(PercentileOp_):
+    to_python = multiop_to_python

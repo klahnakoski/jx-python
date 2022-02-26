@@ -32,7 +32,7 @@ class FirstOp(Expression):
     def __data__(self):
         return {"first": self.term.__data__()}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         value = self.term(row, rownum, rows)
         if is_many(value):
             return first(value)

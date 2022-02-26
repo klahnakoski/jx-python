@@ -23,7 +23,7 @@ NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 class AndOp(Expression):
     data_type = T_BOOLEAN
-    zero = TRUE  # ADD THIS TO terms FOR NO EEFECT
+    default = TRUE  # ADD THIS TO terms FOR NO EEFECT
 
     def __init__(self, terms):
         Expression.__init__(self, terms)
@@ -37,7 +37,7 @@ class AndOp(Expression):
     def __data__(self):
         return {"and": [t.__data__() for t in self.terms]}
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         for a in self.terms:
             if not a(row, rownum, rows):
                 return False
