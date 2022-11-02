@@ -16,9 +16,9 @@ from mo_json import T_INTEGER
 
 
 class SqlSubstrOp(Expression):
-    data_type = T_INTEGER
+    _data_type = T_INTEGER
 
-    def __init__(self, params):
+    def __init__(self, *params):
         Expression.__init__(self, params)
         self.value, self.start, self.length = params
 

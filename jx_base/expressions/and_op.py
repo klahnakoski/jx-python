@@ -14,7 +14,6 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
-from mo_dots import is_many
 from mo_imports import expect, export
 from mo_json.types import T_BOOLEAN
 
@@ -22,17 +21,12 @@ NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 
 class AndOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
     default = TRUE  # ADD THIS TO terms FOR NO EEFECT
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
-        if terms == None:
-            self.terms = []
-        elif is_many(terms):
-            self.terms = terms
-        else:
-            self.terms = [terms]
+    def __init__(self, *terms):
+        Expression.__init__(self, *terms)
+        self.terms = terms
 
     def __data__(self):
         return {"and": [t.__data__() for t in self.terms]}

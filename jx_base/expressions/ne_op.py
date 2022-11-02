@@ -20,23 +20,16 @@ from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.language import is_op
-from mo_dots import is_data, is_sequence
 from mo_json.types import T_BOOLEAN
-from mo_logs import Log
 
 
 class NeOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
-        if is_sequence(terms):
-            self.lhs, self.rhs = terms
-        elif is_data(terms):
-            self.rhs, self.lhs = terms.items()[0]
-        else:
-            Log.error("logic error")
+    def __init__(self, lhs, rhs):
+        Expression.__init__(self, lhs, rhs)
+        self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
         if is_op(self.lhs, Variable) and is_literal(self.rhs):
@@ -45,7 +38,11 @@ class NeOp(Expression):
             return {"ne": [self.lhs.__data__(), self.rhs.__data__()]}
 
     def __call__(self, row, rownum=None, rows=None):
-        return self.lhs(row, rownum, rows) != self.rhs(row, rownum, rows)
+        v1 = self.lhs(row, rownum, rows)
+        v2 = self.rhs(row, rownum, rows)
+        if v1 == None or v2 == None:
+            return False
+        return v1 != v2
 
     def vars(self):
         return self.lhs.vars() | self.rhs.vars()

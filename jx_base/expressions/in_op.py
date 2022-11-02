@@ -31,11 +31,11 @@ from mo_json.types import T_BOOLEAN
 
 class InOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, term):
-        Expression.__init__(self, term)
-        self.value, self.superset = term
+    def __init__(self, value, superset):
+        Expression.__init__(self, value, superset)
+        self.value, self.superset = value, superset
 
     def __data__(self):
         if is_op(self.value, Variable) and is_literal(self.superset):

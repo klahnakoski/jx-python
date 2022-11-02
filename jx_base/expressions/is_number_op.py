@@ -13,13 +13,13 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.literal import is_literal
-from mo_json.types import T_NUMBER_TYPES, T_NUMBER, python_type_to_json_type
+from mo_json.types import T_NUMBER_TYPES, T_NUMBER, python_type_to_jx_type
 
 
 class IsNumberOp(Expression):
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, [term])
         self.term = term
 
@@ -41,7 +41,7 @@ class IsNumberOp(Expression):
         if term is NULL:
             return NULL
         elif is_literal(term):
-            if python_type_to_json_type(term.value.__class__) in T_NUMBER_TYPES:
+            if python_type_to_jx_type(term.value.__class__) in T_NUMBER_TYPES:
                 return term
             else:
                 return NULL

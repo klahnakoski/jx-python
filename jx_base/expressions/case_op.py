@@ -28,7 +28,7 @@ WhenOp = expect("WhenOp")
 
 
 class CaseOp(Expression):
-    def __init__(self, terms, **clauses):
+    def __init__(self, *terms, **clauses):
         if not is_sequence(terms):
             Log.error("case expression requires a list of `when` sub-clauses")
         Expression.__init__(self, terms)

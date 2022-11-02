@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.expression import Expression
 
 
-class SQLScript(Expression):
+class SqlScript(Expression):
     """
     REPRESENT A SQL SCRIPT
     """

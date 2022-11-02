@@ -91,14 +91,14 @@ class Schema(object):
                 for k, cs in self.lookup.items()
                 # if startswith_field(k, full_name)
                 for c in cs
-                if c.jx_type not in INTERNAL
+                if c.json_type not in INTERNAL
             },
             {
                 c.name: c.es_column
                 for k, cs in self.lookup.items()
                 # if startswith_field(k, full_name)
                 for c in cs
-                if c.jx_type not in INTERNAL
+                if c.json_type not in INTERNAL
             },
         )
 
@@ -156,7 +156,7 @@ def _indexer(columns, query_path):
 
     if query_path != ".":
         # ADD ABSOLUTE NAMES TO THE NAMESAPCE
-        absolute_lookup, more_leaves, more_variables = _indexer(columns, ".")
+        absolute_lookup, more_leaves, more_variables = _indexer(columns, "..")
         for k, cs in absolute_lookup.items():
             if k not in relative_lookup:
                 relative_lookup[k] = cs

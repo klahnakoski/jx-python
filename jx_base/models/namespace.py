@@ -49,6 +49,9 @@ class Namespace(object):
     def _convert_window(self, clause):
         raise NotImplementedError()
 
+    def get_tables(self):
+        raise NotImplementedError()
+
 
 def convert_list(operator, operand):
     if operand == None:

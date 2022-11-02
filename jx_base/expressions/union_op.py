@@ -21,7 +21,7 @@ from mo_math import MIN
 
 
 class UnionOp(Expression):
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         if terms == None:
             self.terms = []

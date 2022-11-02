@@ -20,9 +20,9 @@ from mo_math import MAX
 
 
 class MaxOp(Expression):
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
 
-    def __init__(self, terms, default=NULL):
+    def __init__(self, *terms, default=NULL):
         Expression.__init__(self, terms)
         if terms == None:
             self.terms = []
@@ -59,12 +59,12 @@ class MaxOp(Expression):
             else:
                 terms.append(simple)
         if len(terms) == 0:
-            if maximum == None:
+            if maximum is None:
                 return NULL
             else:
                 return Literal(maximum)
         else:
-            if maximum == None:
+            if maximum is None:
                 output = MaxOp(terms)
             else:
                 output = MaxOp([Literal(maximum)] + terms)

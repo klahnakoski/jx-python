@@ -9,14 +9,14 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import Variable
-from jx_base.language import is_op
-from mo_future import is_text, is_binary
 from copy import copy
 
-from jx_base.dimensions import Dimension
+import mo_math
+from jx_base.models.dimensions import Dimension
 from jx_base.domains import Domain, DefaultDomain
 from jx_base.expressions import QueryOp, get_all_vars
+from jx_base.expressions import Variable
+from jx_base.language import is_op
 from jx_python.containers import Container
 from jx_python.expressions import TRUE
 from jx_python.namespace import Namespace, convert_list
@@ -31,9 +31,8 @@ from mo_dots import (
     to_data,
     dict_to_data,
 )
-from mo_future import text
+from mo_future import is_text
 from mo_logs import Log
-import mo_math
 
 DEFAULT_LIMIT = 10
 

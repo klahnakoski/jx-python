@@ -13,8 +13,8 @@ from copy import copy
 from importlib import import_module
 
 import mo_math
-from jx_base.facts import Facts
-from jx_base.dimensions import Dimension
+from jx_base.expressions.filter_op import _normalize_where
+from jx_base.models.dimensions import Dimension
 from jx_base.domains import DefaultDomain, Domain, SetDomain
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.expression import Expression
@@ -25,14 +25,11 @@ from jx_base.expressions.literal import ZERO
 from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import (
     SelectOp,
-    select_self,
-    select_nothing,
+    _normalize_selects,
 )
 from mo_imports import export
-from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_expression, is_op
-from jx_base.table import Table
 from jx_base.utils import is_variable_name, coalesce
 from mo_dots import (
     Data,
@@ -42,9 +39,8 @@ from mo_dots import (
     listwrap,
     is_data,
     is_list,
-    is_not_null,
     set_default,
-    unwrap,
+    from_data,
     unwraplist,
     is_many,
     dict_to_data,
@@ -71,13 +67,8 @@ DEFAULT_SELECT = SelectOp([dict(
 class QueryOp(Expression):
     __slots__ = [
         "frum",
-        "select",
         "edges",
-        "groupby",
-        "where",
         "window",
-        "sort",
-        "limit",
         "format",
         "chunk_size",
         "destination",
@@ -88,20 +79,20 @@ class QueryOp(Expression):
     def __init__(
         self,
         frum,
-        select: SelectOp = None,
+        select=None,
         edges=None,
         groupby=None,
-        window=None,
         where=None,
         sort=None,
         limit=None,
+        window=None,
         format=None,
         chunk_size=None,
         destination=None,
     ):
         Expression.__init__(self, None)
         self.frum = frum
-        self.select: SelectOp = select if select is not None else select_self
+        self.select: SelectOp = select if select is not None else SelectOp(frum, {"name":".", "value": Variable(".")})
         self.edges = edges
         self.groupby = groupby
         self.window = window
@@ -129,7 +120,7 @@ class QueryOp(Expression):
             Log.error("Expecting limit >= 0")
         output.limit = jx_expression(limit)
 
-        select = unwrap(expr).get('select')
+        select = from_data(expr).get("select")
         if expr.groupby and expr.edges:
             raise Log.error(
                 "You can not use both the `groupby` and `edges` clauses in the same"
@@ -143,9 +134,7 @@ class QueryOp(Expression):
             else:
                 select = [expr.select]
 
-            output.edges = _normalize_edges(
-                expr.edges, limit=output.limit
-            )
+            output.edges = _normalize_edges(expr.edges, limit=output.limit)
             output.groupby = Null
         elif expr.groupby:
             if select is None:
@@ -156,27 +145,21 @@ class QueryOp(Expression):
                 select = [expr.select]
 
             output.edges = Null
-            output.groupby = _normalize_groupby(
-                expr.groupby, limit=output.limit
-            )
+            output.groupby = _normalize_groupby(expr.groupby, limit=output.limit)
         else:
             output.edges = Null
             output.groupby = Null
 
         if is_many(select):
-            output.select = _normalize_selects(
-                select, frum, expr.format
-            )
+            output.select = _normalize_selects(frum, select)
         elif select or is_data(select):
-            output.select = SelectOp.normalize_one(
-                select, frum, expr.format
-            )
+            output.select = normalize_one(select, frum, expr.format)
             if expr.format == "list":
                 output.select.terms[0]["name"] = "."
         elif expr.edges or expr.groupby:
             output.select = DEFAULT_SELECT
         else:
-            output.select = SelectOp.normalize_one(".", frum, expr.format)
+            output.select = normalize_one(".", frum, expr.format)
 
         output.where = _normalize_where(expr.where)
         output.window = [_normalize_window(w) for w in listwrap(expr.window)]
@@ -214,7 +197,7 @@ class QueryOp(Expression):
             Log.error("Expecting limit >= 0")
         output.limit = jx_expression(limit)
 
-        select = unwrap(query).get('select')
+        select = from_data(query).get("select")
         if query.groupby and query.edges:
             raise Log.error(
                 "You can not use both the `groupby` and `edges` clauses in the same"
@@ -249,26 +232,21 @@ class QueryOp(Expression):
             output.groupby = Null
 
         if is_many(select):
-            output.select = _normalize_selects(
-                select, frum, query.format, schema=schema
-            )
+            output.select = _normalize_selects(frum, select)
         elif select or is_data(select):
-            output.select = SelectOp.normalize_one(
-                select, frum, query.format, schema=schema
-            )
+            output.select = normalize_one(frum, select)
             if query.format == "list":
                 output.select.terms[0]["name"] = "."
         elif query.edges or query.groupby:
             output.select = DEFAULT_SELECT
         else:
-            output.select = SelectOp.normalize_one(".", frum, query.format)
+            output.select = SelectOp(frum, {"name":".", "value":Variable(".")})
 
         output.where = _normalize_where(query.where)
         output.window = [_normalize_window(w) for w in listwrap(query.window)]
         output.sort = _normalize_sort(query.sort)
 
         return output
-
 
     def __data__(self):
         return {
@@ -421,50 +399,6 @@ def _import_temper_limit():
         temper_limit = import_module("jx_elasticsearch.es52").temper_limit
     except Exception as e:
         pass
-
-
-def _normalize_selects(selects, frum, format, schema=None) -> SelectOp:
-    if frum == None or is_text(frum) or is_many(frum):
-        if is_many(selects):
-            if len(selects) == 0:
-                return select_nothing
-            else:
-                terms = [
-                    t
-                    for s in selects
-                    for t in SelectOp
-                    .normalize_one(s, frum, format, schema=schema)
-                    .terms
-                ]
-        else:
-            return SelectOp([SelectOp.normalize_one(
-                selects, frum, format, schema=schema
-            )])
-    elif is_many(selects):
-        terms = [
-            ss
-            for s in selects
-            for ss in SelectOp
-            .normalize_one(s, frum=frum, format=format, schema=schema)
-            .terms
-        ]
-    else:
-        Log.error("should not happen")
-        terms = (
-            SelectOp.normalize_one(selects, frum, format=format, schema=schema).terms
-        )
-        t0 = terms[0]
-        t0["column_name"], t0["name"] = t0["name"], "."
-
-    # ENSURE NAMES ARE UNIQUE
-    exists = set()
-    for s in terms:
-        name = s["name"]
-        if name in exists:
-            Log.error("{{name}} has already been defined", name=name)
-        exists.add(name)
-
-    return SelectOp(terms)
 
 
 def _normalize_edges(edges, limit, schema=None):
@@ -676,14 +610,6 @@ def _normalize_range(range):
     )
 
 
-def _normalize_where(where, schema=None):
-    if is_many(where):
-        where = {"and": where}
-    elif not where:
-        where = TRUE
-    return jx_expression(where, schema=schema)
-
-
 def _map_term_using_schema(master, path, term, schema_edges):
     """
     IF THE WHERE CLAUSE REFERS TO FIELDS IN THE SCHEMA, THEN EXPAND THEM
@@ -802,14 +728,14 @@ def _where_terms(master, where, schema):
             return {"and": output}
         elif where["or"]:
             return {"or": [
-                unwrap(_where_terms(master, vv, schema)) for vv in where["or"]
+                from_data(_where_terms(master, vv, schema)) for vv in where["or"]
             ]}
         elif where["and"]:
             return {"and": [
-                unwrap(_where_terms(master, vv, schema)) for vv in where["and"]
+                from_data(_where_terms(master, vv, schema)) for vv in where["and"]
             ]}
         elif where["not"]:
-            return {"not": unwrap(_where_terms(master, where["not"], schema))}
+            return {"not": from_data(_where_terms(master, where["not"], schema))}
     return where
 
 
@@ -833,7 +759,10 @@ def _normalize_sort(sort=None):
             if all(d in sort_direction for d in s.values()):
                 # {field: direction} format:  eg {"machine_name": "desc"}
                 for v, d in s.items():
-                    output.append({"value": jx_expression(v), "sort": sort_direction[d]})
+                    output.append({
+                        "value": jx_expression(v),
+                        "sort": sort_direction[d],
+                    })
             else:
                 Log.error("`sort` clause must have a `value` property")
         else:

@@ -78,7 +78,7 @@ def cube_aggs(frum, query):
                 for c in itertools.product(*coord):
                     acc = mat[c]
                     if acc == None:
-                        acc = windows.name2accumulator.get(agg)
+                        acc = windows.name_to_aggregate.get(agg)
                         if acc == None:
                             Log.error(
                                 "select aggregate {{agg}} is not recognized", agg=agg

@@ -26,7 +26,7 @@ from jx_base.language import is_op
 class SplitOp(Expression):
     has_simple_form = True
 
-    def __init__(self, term, **kwargs):
+    def __init__(self, *term, **kwargs):
         Expression.__init__(self, term)
         self.value, self.find = term
 

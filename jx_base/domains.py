@@ -27,7 +27,7 @@ from mo_dots import (
     list_to_data,
     from_data,
 )
-from mo_json.types import JsonType, T_NUMBER, T_INTEGER, T_TEXT, T_TIME, T_INTERVAL, python_type_to_json_type
+from mo_json.types import JxType, T_NUMBER, T_INTEGER, T_TEXT, T_TIME, T_INTERVAL, python_type_to_jx_type
 from mo_future import text
 from mo_kwargs import override
 from mo_logs import Log
@@ -477,7 +477,7 @@ class SetDomain(Domain):
         self.type = "set"
         self.order = {}
         self.partitions = FlatList()
-        self.element_type = JsonType(name=T_TEXT, value=python_type_to_json_type(partitions[0]), dataIndex=T_INTEGER)
+        self.element_type = JxType(name=T_TEXT, value=python_type_to_jx_type(partitions[0]), dataIndex=T_INTEGER)
         if isinstance(self.key, set):
             Log.error("problem")
 
@@ -595,7 +595,7 @@ class TimeDomain(Domain):
         self.max = Date(self.max)
         self.interval = Duration(self.interval)
         self.sort = Null
-        self.element_type = JsonType(min=T_TIME, max=T_TIME, dataIndex=T_INTEGER)
+        self.element_type = JxType(min=T_TIME, max=T_TIME, dataIndex=T_INTEGER)
 
         if self.partitions:
             # IGNORE THE min, max, interval
@@ -670,7 +670,7 @@ class DurationDomain(Domain):
         partitions=None,
         desc=None,
     ):
-        self.element_type = JsonType(min=T_INTERVAL, max=T_INTERVAL, dataIndex=T_INTEGER)
+        self.element_type = JxType(min=T_INTERVAL, max=T_INTERVAL, dataIndex=T_INTEGER)
         if partitions:
             # IGNORE THE min, max, interval
             if not key:
@@ -832,7 +832,7 @@ class RangeDomain(Domain):
     ):
         Domain.__init__(self, desc)
         self.type = "range"
-        self.element_type = JsonType(min=T_NUMBER, max=T_NUMBER, dataIndex=T_INTEGER)
+        self.element_type = JxType(min=T_NUMBER, max=T_NUMBER, dataIndex=T_INTEGER)
 
         if partitions:
             # IGNORE THE min, max, interval

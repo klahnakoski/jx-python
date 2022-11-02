@@ -327,7 +327,7 @@ def median(*args, **kwargs):
     return Percentile(0.5, *args, **kwargs)
 
 
-name2accumulator = {
+name_to_aggregate = {
     "count": Count,
     "sum": Sum,
     "exists": Exists,

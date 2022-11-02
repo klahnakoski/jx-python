@@ -23,10 +23,10 @@ from mo_json import union_type
 class CoalesceOp(Expression):
     has_simple_form = True
 
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         self.terms = terms
-        self.data_type = union_type(*(t.type for t in terms))
+        self._data_type = union_type(*(t.type for t in terms))
 
     def __data__(self):
         return {"coalesce": [t.__data__() for t in self.terms]}

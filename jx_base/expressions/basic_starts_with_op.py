@@ -22,9 +22,9 @@ class BasicStartsWithOp(Expression):
     PLACEHOLDER FOR BASIC value.startsWith(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, params):
+    def __init__(self, *params):
         Expression.__init__(self, params)
         self.value, self.prefix = params
 

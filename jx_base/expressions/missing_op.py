@@ -20,7 +20,7 @@ from mo_json.types import T_BOOLEAN
 
 
 class MissingOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -33,7 +33,7 @@ class MissingOp(Expression):
         if not is_op(other, MissingOp):
             return False
         else:
-            return self.expr == other.expr
+            return self.expr == other.frum
 
     def vars(self):
         return self.expr.vars()

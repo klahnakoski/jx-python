@@ -22,7 +22,7 @@ from mo_json import value_to_json_type, union_type, T_ARRAY, array_type
 class TupleOp(Expression):
     date_type = T_ARRAY
 
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         if terms == None:
             self.terms = []

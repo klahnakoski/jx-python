@@ -12,10 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import mo_dots
 import mo_math
-from jx_base.container import Container
+from jx_base.models.container import Container
 from jx_base.expressions import FALSE, TRUE
 from jx_base.expressions import QueryOp
-from jx_base.expressions.query_op import _normalize_selects, _normalize_sort
+from jx_base.expressions.query_op import _normalize_sort
+from jx_base.expressions.select_op import _normalize_selects
 from jx_base.language import is_op, value_compare
 from jx_python import expressions as _expressions, flat_list, group_by
 from jx_python.containers.cube import Cube
@@ -40,7 +41,6 @@ from mo_dots import (
     listwrap,
     set_default,
     split_field,
-    unwrap,
     to_data,
     dict_to_data,
     list_to_data,
@@ -250,7 +250,7 @@ def tuple(data, field_name):
     elif is_list(field_name):
         paths = [_select_a_field(f) for f in field_name]
         output = FlatList()
-        _tuple((), unwrap(data), paths, 0, output)
+        _tuple((), from_data(data), paths, 0, output)
         return output
     else:
         paths = [_select_a_field(field_name)]
@@ -301,7 +301,7 @@ def select(data, field_name):
     return list with values from field_name
     """
     if isinstance(data, Cube):
-        return data._select(_normalize_selects(field_name, data, format="cube"))
+        return data._select(_normalize_selects(data, field_name))
 
     if isinstance(data, PartFlatList):
         return data.select(field_name)
@@ -329,10 +329,10 @@ def select(data, field_name):
             return output
     elif is_list(field_name):
         keys = [_select_a_field(to_data(f)) for f in field_name]
-        return _select(Data(), unwrap(data), keys, 0)
+        return _select(Data(), from_data(data), keys, 0)
     else:
         keys = [_select_a_field(field_name)]
-        return _select(Data(), unwrap(data), keys, 0)
+        return _select(Data(), from_data(data), keys, 0)
 
 
 def _select_a_field(field):
@@ -531,8 +531,8 @@ def _deeper_iterator(columns, nested_path, path, data):
             c = columns.get(leaf)
             if not c:
                 c = columns[leaf] = _Column(name=leaf, type=type_to_name[v.__class__], table=None, es_column=leaf)
-            c.jx_type = _merge_type[c.jx_type][type_to_name[v.__class__]]
-            if c.jx_type == "nested" and not nested_path[0].startswith(leaf + "."):
+            c.json_type = _merge_type[c.json_type][type_to_name[v.__class__]]
+            if c.json_type == "nested" and not nested_path[0].startswith(leaf + "."):
                 if leaf.startswith(nested_path[0] + ".") or leaf == nested_path[0] or not nested_path[0]:
                     nested_path[0] = leaf
                 else:
@@ -547,7 +547,7 @@ def _deeper_iterator(columns, nested_path, path, data):
                 for o in _deeper_iterator(columns, nested_path, leaf, [v]):
                     set_default(output, o)
             else:
-                if c.jx_type not in ["object", "nested"]:
+                if c.json_type not in ["object", "nested"]:
                     output[leaf] = v
 
         if deep_leaf:
@@ -669,7 +669,7 @@ def filter(data, where):
         temp = get(where)
         dd = to_data(data)
         return list_to_data([
-            unwrap(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)
+            from_data(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)
         ])
     else:
         Log.error(
@@ -681,7 +681,7 @@ def filter(data, where):
     except Exception as _:
         # WOW!  THIS IS INEFFICIENT!
         return to_data([
-            unwrap(d) for d in drill_filter(where, [DataObject(d) for d in data])
+            from_data(d) for d in drill_filter(where, [DataObject(d) for d in data])
         ])
 
 
@@ -718,7 +718,7 @@ def drill_filter(esfilter, data):
 
     TODO:  FIX THIS MONUMENTALLY BAD IDEA
     """
-    esfilter = unwrap(esfilter)
+    esfilter = from_data(esfilter)
     primary_nested = []  # track if nested, changes if not
     primary_column = []  # only one path allowed
     primary_branch = []  # CONTAINS LISTS OF RECORDS TO ITERATE: constantly changing as we dfs the tree
@@ -980,7 +980,7 @@ def drill_filter(esfilter, data):
 
     if not max:
         # SIMPLE LIST AS RESULT
-        return list_to_data([unwrap(u[0]) for u in uniform_output])
+        return list_to_data([from_data(u[0]) for u in uniform_output])
 
     return PartFlatList(primary_column[0:max], uniform_output)
 
@@ -1131,7 +1131,7 @@ def reverse(vals):
     l = len(vals)
     output = [None] * l
 
-    for v in unwrap(vals):
+    for v in from_data(vals):
         l -= 1
         output[l] = v
 
@@ -1146,5 +1146,5 @@ def countdown(vals):
 from jx_python.lists.aggs import is_aggs, list_aggs
 
 
-export("jx_base.container", run)
+export("jx_base.models.container", run)
 export("jx_python.containers.list", "jx")

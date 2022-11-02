@@ -20,7 +20,7 @@ from mo_future import is_text
 from mo_imports import expect
 from mo_imports import export
 from mo_json.typed_encoder import inserter_type_to_json_type
-from mo_json.types import to_json_type, JsonType
+from mo_json.types import to_jx_type, JxType
 from jx_base.expressions.null_op import NULL
 
 QueryOp, SelectOp = expect("QueryOp", "SelectOp")
@@ -38,10 +38,10 @@ class Variable(Expression):
 
         if type == None:
             # MAYBE THE NAME HAS A HINT TO THE TYPE
-            self.data_type = to_json_type(inserter_type_to_json_type.get(last(split_field(var))))
+            self._data_type = to_jx_type(inserter_type_to_json_type.get(last(split_field(var))))
         else:
-            self.data_type = to_json_type(type)
-        if not isinstance(self.data_type, JsonType):
+            self._data_type = to_jx_type(type)
+        if not isinstance(self._data_type, JxType):
             Log.error("expecting json type")
 
     def __call__(self, row, rownum=None, rows=None):
@@ -87,20 +87,20 @@ class Variable(Expression):
                     "name": self.var,
                     "value": QueryOp(
                         frum=schema.container.get_table(path),
-                        select=SelectOp([
+                        select=SelectOp(schema, (
                             {
                                 "name": rel_name,
-                                "value": Variable(leaf.es_column, leaf.jx_type),
+                                "value": Variable(leaf.es_column, leaf.json_type),
                                 "aggregate": NULL
                             }
                             for rel_name, leaf in leaves
-                        ])
+                        ))
                     ),
                     "aggregate": NULL
                 })
             else:
                 selects.extend(
-                    {"name": concat_field(self.var, rel_name), "value": Variable(leaf.es_column, leaf.jx_type), "aggregate":NULL}
+                    {"name": concat_field(self.var, rel_name), "value": Variable(leaf.es_column, leaf.json_type), "aggregate":NULL}
                     for rel_name, leaf in leaves
                 )
 
@@ -135,3 +135,4 @@ export("jx_base.expressions._utils", Variable)
 export("jx_base.expressions.expression", Variable)
 export("jx_base.expressions.base_binary_op", Variable)
 export("jx_base.expressions.basic_in_op", Variable)
+export("jx_base.expressions.from_op", Variable)

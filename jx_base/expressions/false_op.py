@@ -18,7 +18,7 @@ TRUE = expect("TRUE")
 
 
 class FalseOp(Literal):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls, *args, **kwargs)

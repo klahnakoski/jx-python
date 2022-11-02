@@ -24,10 +24,10 @@ class BasicMultiOp(Expression):
     PLACEHOLDER FOR BASIC OPERATOR (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
     op = None
 
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         self.terms = terms
 

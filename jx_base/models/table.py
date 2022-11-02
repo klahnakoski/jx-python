@@ -21,6 +21,12 @@ class Table:
     def map(self, mapping):
         return self
 
+    def get_relations(self):
+        """
+        RETURN ALL RELATIONS TO THIS TABLE
+        """
+        return []
+
     def __data__(self):
         return self.name
 

@@ -21,7 +21,7 @@ from mo_json.types import T_INTEGER
 
 class CountOp(Expression):
     has_simple_form = False
-    data_type = T_INTEGER
+    _data_type = T_INTEGER
 
     def __init__(self, terms, default=ZERO, **clauses):
         Expression.__init__(self, terms)

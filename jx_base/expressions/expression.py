@@ -15,12 +15,12 @@ from jx_base.expressions._utils import (
     jx_expression,
     _jx_expression,
 )
-from jx_base.language import BaseExpression, ID, is_expression, is_op
-from jx_base.table import Table
-from mo_dots import is_data, is_sequence, is_container
+from jx_base.language import BaseExpression, ID, is_expression
+from jx_base.models.container import Container
+from mo_dots import is_data, is_container
 from mo_future import items as items_
 from mo_imports import expect
-from mo_json import BOOLEAN, value2json, T_IS_NULL
+from mo_json import BOOLEAN, value2json, T_IS_NULL, JxType
 from mo_logs import Log
 
 TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expect(
@@ -37,24 +37,15 @@ TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expe
 
 
 class Expression(BaseExpression):
-    data_type = T_IS_NULL
+    _data_type:JxType = T_IS_NULL
     has_simple_form = False
 
-    def __init__(self, args):
+    def __init__(self, *args):
         self.simplified = False
         # SOME BASIC VERIFICATION THAT THESE ARE REASONABLE PARAMETERS
-        if is_sequence(args):
-            bad = [t for t in args if t != None and not is_expression(t)]
-            if bad:
-                Log.error("Expecting an expression, not {{bad}}", bad=bad)
-        elif is_data(args):
-            if not all(is_op(k, Variable) and is_literal(v) for k, v in args.items()):
-                Log.error("Expecting an {<variable>: <literal>}")
-        elif args == None:
-            pass
-        else:
-            if not is_expression(args):
-                Log.error("Expecting an expression")
+        bad = [t for t in args if t != None and not is_expression(t)]
+        if bad:
+            Log.error("Expecting an expression, not {{bad}}", bad=bad)
 
     @classmethod
     def get_id(cls):
@@ -87,18 +78,18 @@ class Expression(BaseExpression):
                 )
 
             if term == None:
-                return class_([], **clauses)
+                return class_(**clauses)
             elif is_container(term):
                 terms = [jx_expression(t) for t in term]
-                return class_(terms, **clauses)
+                return class_(*terms, **clauses)
             elif is_data(term):
                 items = items_(term)
                 if class_.has_simple_form:
                     if len(items) == 1:
                         k, v = items[0]
-                        return class_([Variable(k), Literal(v)], **clauses)
+                        return class_(Variable(k), Literal(v), **clauses)
                     else:
-                        return class_({k: Literal(v) for k, v in items}, **clauses)
+                        Log.error("add define method to {{op}}}", op=class_.__name__)
                 else:
                     return class_(_jx_expression(term, lang), **clauses)
             else:
@@ -171,9 +162,19 @@ class Expression(BaseExpression):
         """
         return self
 
+    def apply(self, container: Container, group_by):
+        """
+        Apply this expression over the container of data
+
+        q.apply(c) <=> c.query(q)
+
+        :return: data, depending on the expression
+        """
+        return container.query(self, group_by)
+
     @property
-    def type(self):
-        return self.data_type
+    def type(self) -> JxType:
+        return self._data_type
 
     def __eq__(self, other):
         try:

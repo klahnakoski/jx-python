@@ -31,10 +31,10 @@ from mo_logs import Log
 
 class SuffixOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __init__(self, expr, suffix):
-        Expression.__init__(self, (expr, suffix))
+        Expression.__init__(self, expr, suffix)
         self.expr = expr
         self.suffix = suffix
 

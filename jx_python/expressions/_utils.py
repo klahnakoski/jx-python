@@ -1,3 +1,4 @@
+
 # encoding: utf-8
 #
 #
@@ -80,7 +81,7 @@ def _inequality_to_python(self, not_null=False, boolean=False):
 
     output = (
         WhenOp(
-            OrOp([self.lhs.missing(Python), self.rhs.missing(Python)]),
+            OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
                 "else": PythonScript(type=T_BOOLEAN, expr=script, frum=self),

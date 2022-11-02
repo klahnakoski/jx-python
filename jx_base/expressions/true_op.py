@@ -17,7 +17,7 @@ from mo_json.types import T_BOOLEAN
 
 
 class TrueOp(Literal):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)

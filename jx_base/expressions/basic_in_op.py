@@ -27,7 +27,7 @@ EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect(
 
 class BasicInOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __new__(cls, terms):
         if is_op(terms[0], Variable) and is_op(terms[1], Literal):
@@ -36,7 +36,7 @@ class BasicInOp(Expression):
                 return EqOp([name, Literal([value.value])])
         return object.__new__(cls)
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.value, self.superset = term
         if self.value is None:

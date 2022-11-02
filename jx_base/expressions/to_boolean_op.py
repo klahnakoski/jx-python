@@ -19,10 +19,10 @@ from mo_json.types import T_BOOLEAN, T_INTEGER
 
 
 class ToBooleanOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __init__(self, term):
-        Expression.__init__(self, [term])
+        Expression.__init__(self, term)
         self.term = term
 
     def __data__(self):

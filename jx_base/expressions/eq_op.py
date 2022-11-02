@@ -10,18 +10,20 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from mo_imports import export
+from jx_base.expressions._utils import _jx_expression
 from jx_base.expressions.and_op import AndOp
-from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.basic_eq_op import BasicEqOp
+from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import is_literal
+from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import Variable
+from jx_base.language import JX
 from jx_base.language import is_op, value_compare
-from mo_dots import is_many
+from mo_dots import is_many, is_data
 from mo_imports import expect
+from mo_imports import export
 from mo_json.types import T_BOOLEAN
 
 InOp, WhenOp = expect("InOp", "WhenOp")
@@ -29,9 +31,9 @@ InOp, WhenOp = expect("InOp", "WhenOp")
 
 class EqOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __new__(cls, terms):
+    def __new__(cls, *terms):
         if is_many(terms):
             return object.__new__(cls)
 
@@ -49,9 +51,33 @@ class EqOp(Expression):
                 else:
                     acc.append(EqOp([Variable(lhs), rhs]))
             return AndOp(acc)
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
-        self.lhs, self.rhs = terms
+
+    @classmethod
+    def define(cls, expr):
+        items = list(expr.items())
+        if len(items) != 1:
+            Log.error("expecting single property")
+        op, terms = items[0]
+        if op != "eq":
+            Log.error("Expecting eq op")
+        if is_many(terms):
+            return EqOp(*(_jx_expression(e, cls.lang) for e in terms))
+        elif is_data(terms):
+            items = list(terms.items())
+            if len(items) == 1:
+                lhs, rhs = items[0]
+                return EqOp(Variable(lhs), Literal(rhs))
+            else:
+                return AndOp(*(
+                    EqOp(Variable(lhs), Literal(rhs))
+                    for lhs, rhs in items
+                ))
+        else:
+            Log.error("do not not know what to do")
+
+    def __init__(self, lhs, rhs):
+        Expression.__init__(self, lhs, rhs)
+        self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
         if is_op(self.lhs, Variable) and is_literal(self.rhs):

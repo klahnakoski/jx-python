@@ -20,10 +20,10 @@ NotOp = expect("NotOp")
 
 
 class ExistsOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __init__(self, term):
-        Expression.__init__(self, [term])
+        Expression.__init__(self, term)
         self.expr = term
 
     def __data__(self):

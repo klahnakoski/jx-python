@@ -19,9 +19,5 @@ class Snowflake(object):
         raise NotImplemented()
 
     @property
-    def query_paths(self):
-        raise NotImplemented()
-
-    @property
     def columns(self):
         raise NotImplemented()

@@ -20,9 +20,9 @@ class UnixOp(Expression):
     """
 
     has_simple_form = True
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.value = term
 

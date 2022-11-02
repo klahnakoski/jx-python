@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import mo_dots as dot
-from jx_base.container import Container
+from jx_base.models.container import Container
 from jx_base.expressions.query_op import _normalize_edge
 from jx_python.cubes.aggs import cube_aggs
 from jx_python.lists.aggs import is_aggs
@@ -130,7 +130,7 @@ class Cube(Container):
 
         Log.error("This is a multicube")
 
-    def query(self, q):
+    def query(self, q, group_by):
         frum = self
         if is_aggs(q):
             return cube_aggs(frum, q)
@@ -543,4 +543,4 @@ class Cube(Container):
         )
 
 
-export("jx_base.container", Cube)
+export("jx_base.models.container", Cube)

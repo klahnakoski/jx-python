@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import math
 
-from jx_base.container import Container
+from jx_base.models.container import Container
 from jx_base.expressions import jx_expression
 from jx_base.language import is_expression
 from mo_dots import Data, FlatList, Null, listwrap
-from mo_dots.lists import sequence_types, list_types
+from mo_dots.lists import list_types
 from mo_future import binary_type, text
 from mo_logs import Log
 from mo_logs.exceptions import Except

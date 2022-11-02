@@ -20,10 +20,10 @@ from mo_json import T_INTEGER
 
 
 class LengthOp(Expression):
-    data_type = T_INTEGER
+    _data_type = T_INTEGER
 
     def __init__(self, term):
-        Expression.__init__(self, [term])
+        Expression.__init__(self, term)
         self.term = term
 
     def __eq__(self, other):

@@ -21,9 +21,9 @@ class BasicEqOp(Expression):
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         self.lhs, self.rhs = terms
 

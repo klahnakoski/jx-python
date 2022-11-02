@@ -22,9 +22,9 @@ from mo_json.types import T_TEXT, T_IS_NULL
 
 
 class ToTextOp(Expression):
-    data_type = T_TEXT
+    _data_type = T_TEXT
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, [term])
         self.term = term
 

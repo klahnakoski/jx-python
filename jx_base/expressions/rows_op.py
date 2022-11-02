@@ -21,7 +21,7 @@ from mo_logs import Log
 class RowsOp(Expression):
     has_simple_form = True
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.var, self.offset = term
         if is_op(self.var, Variable):

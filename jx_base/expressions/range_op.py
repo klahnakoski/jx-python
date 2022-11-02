@@ -24,7 +24,7 @@ class RangeOp(Expression):
     """
 
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __new__(cls, term, *args):
         Expression.__new__(cls, *args)
@@ -34,5 +34,5 @@ class RangeOp(Expression):
             for op, value in comparisons.value.items()
         ])
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Log.error("Should never happen!")

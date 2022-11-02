@@ -57,7 +57,7 @@ def list_aggs(frum, query):
                 len(e.domain.partitions) + (1 if e.allowNulls else 0)
                 for e in query.edges
             ],
-            zeros=lambda: windows.name2accumulator.get(s.aggregate)(**s),
+            zeros=lambda: windows.name_to_aggregate.get(s.aggregate)(**s),
         )
         for s in select
     }

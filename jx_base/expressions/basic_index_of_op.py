@@ -25,9 +25,9 @@ class BasicIndexOfOp(Expression):
     PLACEHOLDER FOR BASIC value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = T_INTEGER
+    _data_type = T_INTEGER
 
-    def __init__(self, params):
+    def __init__(self, *params):
         Expression.__init__(self, params)
         self.value, self.find, self.start = params
 

@@ -12,11 +12,12 @@ from __future__ import absolute_import, division, unicode_literals
 from uuid import uuid4
 
 from jx_base.expressions import jx_expression
-from jx_base.facts import Facts
-from jx_base.namespace import Namespace
-from jx_base.snowflake import Snowflake
-from jx_base.table import Table
-from jx_base.container import Container
+from jx_base.models.facts import Facts
+from jx_base.models.namespace import Namespace
+from jx_base.models.snowflake import Snowflake
+from jx_base.models.table import Table
+from jx_base.models.container import Container
+from jx_base.models.relation import Relation
 from jx_python.expressions import Literal
 from mo_dots import coalesce, listwrap, to_data
 from mo_dots.datas import register_data
@@ -257,11 +258,11 @@ TableDesc = DataClass(
         {"name": "last_updated", "nulls": False},
         "columns",
     ],
-    constraint={"and": [{"eq": [{"last": "query_path"}, {"literal": "."}]}]},
+    constraint={"and": [{"ne": [{"last": "query_path"}, {"literal": "."}]}]},
 )
 
 
-from jx_base.container import Container
+from jx_base.models.container import Container
 
 Column = DataClass(
     "Column",
@@ -270,7 +271,7 @@ Column = DataClass(
         "es_column",
         "es_index",
         "es_type",
-        "jx_type",
+        "json_type",
         "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
         {"name": "count", "nulls": True},
         {"name": "cardinality", "nulls": True},
@@ -282,22 +283,22 @@ Column = DataClass(
         {
             "when": {"ne": {"name": "."}},
             "then": {"or": [
-                {"and": [{"eq": {"jx_type": "object"}}, {"eq": {"multi": 1}}]},
+                {"and": [{"eq": {"json_type": "object"}}, {"eq": {"multi": 1}}]},
                 {"ne": ["name", {"first": "nested_path"}]},
             ]},
             "else": True,
         },
         {
             "when": {"eq": {"es_column": "."}},
-            "then": {"in": {"jx_type": ["nested", "object"]}},
+            "then": {"in": {"json_type": ["nested", "object"]}},
             "else": True,
         },
         {"not": {"find": {"es_column": "null"}}},
         {"not": {"eq": {"es_column": "string"}}},
-        {"not": {"eq": {"es_type": "object", "jx_type": "exists"}}},
+        {"not": {"eq": {"es_type": "object", "json_type": "exists"}}},
         {
             "when": {"suffix": {"es_column": "." + EXISTS_KEY}},
-            "then": {"eq": {"jx_type": EXISTS}},
+            "then": {"eq": {"json_type": EXISTS}},
             "else": True,
         },
         {
@@ -306,28 +307,28 @@ Column = DataClass(
             "else": True,
         },
         {
-            "when": {"eq": {"jx_type": OBJECT}},
+            "when": {"eq": {"json_type": OBJECT}},
             "then": {"in": {"cardinality": [0, 1]}},
             "else": True,
         },
         {
-            "when": {"eq": {"jx_type": ARRAY}},
+            "when": {"eq": {"json_type": ARRAY}},
             "then": {"in": {"cardinality": [0, 1]}},
             "else": True,
         },
         {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
-        {"eq": [{"last": "nested_path"}, {"literal": "."}]},
+        {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
         {
             "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
             "then": {"or": [
                 {"and": [
                     {"gt": {"multi": 1}},
-                    {"eq": {"jx_type": "nested"}},
+                    {"eq": {"json_type": "nested"}},
                     {"eq": {"es_type": "nested"}},
                 ]},
                 {"and": [
                     {"eq": {"multi": 1}},
-                    {"eq": {"jx_type": "object"}},
+                    {"eq": {"json_type": "object"}},
                     {"eq": {"es_type": "object"}},
                 ]},
             ]},

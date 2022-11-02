@@ -25,9 +25,9 @@ from mo_logs import Log
 
 class ConcatOp(Expression):
     has_simple_form = True
-    data_type = T_TEXT
+    _data_type = T_TEXT
 
-    def __init__(self, terms, separator=Literal(""), default=NULL):
+    def __init__(self, *terms, separator=Literal(""), default=NULL):
         if not is_many(terms):
             Log.error("Expecting many terms")
         if not is_literal(separator):

@@ -19,22 +19,21 @@ from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.true_op import TRUE
+from jx_base.expressions.variable import IDENTITY
 from jx_base.language import is_op
 from mo_dots import Null, startswith_field, coalesce, listwrap
 from mo_imports import export, expect
 from mo_json.types import T_BOOLEAN
 
-select_self = expect("select_self")
-
 
 class NestedOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["nested_path", "select", "where", "sort", "limit"]
 
-    def __init__(self, nested_path, select=None, where=TRUE, sort=Null, limit=NULL):
-        select = select or select_self
+    def __init__(self, *frum,  nested_path, select=None, where=TRUE, sort=Null, limit=NULL):
+        select = select or SelectOp(frum, {"name": ".", "value": IDENTITY})
         Expression.__init__(self, [select, where])
         self.nested_path = nested_path
         self.select = select

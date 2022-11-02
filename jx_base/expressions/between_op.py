@@ -31,9 +31,9 @@ from mo_logs import Log
 
 
 class BetweenOp(Expression):
-    data_type = T_TEXT
+    _data_type = T_TEXT
 
-    def __init__(self, value, prefix, suffix, default=NULL, start=NULL):
+    def __init__(self, *value, prefix, suffix, default=NULL, start=NULL):
         Expression.__init__(self, [])
         self.value = value
         self.prefix = coalesce(prefix, NULL)

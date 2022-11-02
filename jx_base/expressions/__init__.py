@@ -8,7 +8,7 @@ from jx_base.expressions._utils import (
 )
 from jx_base.expressions.abs_op import AbsOp
 from jx_base.expressions.add_op import AddOp
-from jx_base.expressions.percentile_op import PercentileOp
+from jx_base.expressions.aggregate_op import AggregateOp
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.avg_op import AvgOp
 from jx_base.expressions.base_binary_op import BaseBinaryOp
@@ -27,9 +27,11 @@ from jx_base.expressions.between_op import BetweenOp
 from jx_base.expressions.cardinality_op import CardinalityOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.coalesce_op import CoalesceOp
+from jx_base.expressions.comment_op import CommentOp
 from jx_base.expressions.concat_op import ConcatOp
 from jx_base.expressions.count_op import CountOp
 from jx_base.expressions.date_op import DateOp
+from jx_base.expressions.default_op import DefaultOp
 from jx_base.expressions.div_op import DivOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.es_script import EsScript
@@ -38,11 +40,15 @@ from jx_base.expressions.exists_op import ExistsOp
 from jx_base.expressions.exp_op import ExpOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FalseOp, FALSE
+from jx_base.expressions.filter_op import FilterOp
 from jx_base.expressions.find_op import FindOp
 from jx_base.expressions.first_op import FirstOp
 from jx_base.expressions.floor_op import FloorOp
+from jx_base.expressions.format_op import FormatOp
+from jx_base.expressions.from_op import FromOp
 from jx_base.expressions.from_unix_op import FromUnixOp
 from jx_base.expressions.get_op import GetOp
+from jx_base.expressions.group_op import GroupOp
 from jx_base.expressions.gt_op import GtOp
 from jx_base.expressions.gte_op import GteOp
 from jx_base.expressions.in_op import InOp
@@ -73,6 +79,7 @@ from jx_base.expressions.null_op import NullOp, NULL
 from jx_base.expressions.offset_op import OffsetOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
+from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.prefix_op import PrefixOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.query_op import QueryOp
@@ -85,10 +92,14 @@ from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.split_op import SplitOp
 from jx_base.expressions.sql_eq_op import SqlEqOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
-from jx_base.expressions.sql_script import SQLScript
+from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
+from jx_base.expressions.sql_script import SqlScript
+from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
+from jx_base.expressions.sql_select_op import SqlSelectOp
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.suffix_op import SuffixOp
+from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.to_number_op import ToNumberOp
 from jx_base.expressions.to_text_op import ToTextOp
@@ -105,8 +116,9 @@ set_default(
     {
         "abs": AbsOp,
         "add": AddOp,
-        "percentile": PercentileOp,
+        "aggregate": AggregateOp,
         "and": AndOp,
+        "array": ToArrayOp,
         "avg": AvgOp,
         "basic.add": BasicAddOp,
         "basic.mul": BasicMulOp,
@@ -114,22 +126,31 @@ set_default(
         "cardinality": CardinalityOp,
         "case": CaseOp,
         "coalesce": CoalesceOp,
+        "comment": CommentOp,
+        "meta": CommentOp,
         "concat": ConcatOp,
         "count": CountOp,
         "date": DateOp,
+        "default": DefaultOp,
         "div": DivOp,
         "divide": DivOp,
         "eq": EqOp,
         "exists": ExistsOp,
         "exp": ExpOp,
+        "filter": FilterOp,
         "find": FindOp,
         "first": FirstOp,
         "floor": FloorOp,
-        "from": QueryOp,
+        "format": FormatOp,
+        "from": FromOp,
         "from_unix": FromUnixOp,
         "get": GetOp,
         "gt": GtOp,
         "gte": GteOp,
+        "ge": GteOp,
+        "group": GroupOp,
+        "groupby": GroupOp,
+        "group by": GroupOp,
         "in": InOp,
         "instr": FindOp,
         "is_number": IsNumberOp,
@@ -140,6 +161,7 @@ set_default(
         "literal": Literal,
         "lt": LtOp,
         "lte": LteOp,
+        "le": LteOp,
         "match_all": TrueOp,
         "max": MaxOp,
         "minus": SubOp,
@@ -157,6 +179,7 @@ set_default(
         "number": ToNumberOp,
         "offset": OffsetOp,
         "or": OrOp,
+        "percentile": PercentileOp,
         "postfix": SuffixOp,
         "prefix": PrefixOp,
         "range": RangeOp,
@@ -179,6 +202,7 @@ set_default(
         "union": UnionOp,
         "unix": UnixOp,
         "when": WhenOp,
+        "where": FilterOp,
     },
 )
 

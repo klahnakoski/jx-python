@@ -12,13 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 import itertools
 
 from jx_base import Column
-from jx_base.container import Container
+from jx_base.models.container import Container
 from jx_base.expressions import TRUE, Variable
 from jx_base.language import is_expression, is_op
 from jx_base.meta_columns import get_schema_from_list
-from jx_base.namespace import Namespace
-from jx_base.schema import Schema
-from jx_base.table import Table
+from jx_base.models.namespace import Namespace
+from jx_base.models.schema import Schema
+from jx_base.models.table import Table
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
 from jx_python.lists.aggs import is_aggs, list_aggs
@@ -29,7 +29,7 @@ from mo_dots import (
     is_data,
     is_list,
     listwrap,
-    unwrap,
+    from_data,
     unwraplist,
     to_data,
     coalesce,
@@ -51,7 +51,7 @@ class ListContainer(Container, Namespace, Table):
 
     def __init__(self, name, data, schema=None):
         # TODO: STORE THIS LIKE A CUBE FOR FASTER ACCESS AND TRANSFORMATION
-        data = list(unwrap(data))
+        data = list(from_data(data))
         Container.__init__(self)
         if schema == None:
             self._schema = get_schema_from_list(name, data)
@@ -82,7 +82,7 @@ class ListContainer(Container, Namespace, Table):
         else:
             return Null
 
-    def query(self, q):
+    def query(self, q, group_by):
         q = to_data(q)
         output = self
         if is_aggs(q):
@@ -207,7 +207,7 @@ class ListContainer(Container, Namespace, Table):
                 output = Data()
                 for n, p in push_and_pull:
                     output[n] = unwraplist(p(to_data(d)))
-                return unwrap(output)
+                return from_data(output)
 
             new_data = list(map(selector, self.data))
         else:
@@ -221,7 +221,7 @@ class ListContainer(Container, Namespace, Table):
                 )
                 column.update({
                     "name": ".",
-                    "jx_type": ARRAY,
+                    "json_type": ARRAY,
                     "es_type": "nested",
                     "multi": 1001,
                     "cardinality": 1,
@@ -329,4 +329,4 @@ DUAL = ListContainer(
 )
 
 
-export("jx_base.container", ListContainer)
+export("jx_base.models.container", ListContainer)

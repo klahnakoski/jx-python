@@ -23,7 +23,6 @@ from mo_dots import (
 from mo_future import is_text
 from mo_imports import expect
 from mo_logs import Log
-from jx_base.expressions import QueryOp
 
 ListContainer, Cube, run = expect("ListContainer", "Cube", "run")
 
@@ -47,8 +46,6 @@ class Container(object):
             return frum
         elif isinstance(frum, Cube):
             return frum
-        elif isinstance(frum, QueryOp):
-            return run(frum)
         elif is_many(frum):
             return ListContainer(frum)
         elif is_text(frum):
@@ -80,7 +77,14 @@ class Container(object):
                 "Do not know how to handle {{type}}", type=frum.__class__.__name__
             )
 
-    def query(self, query):
+    @property
+    def language(self):
+        raise NotImplementedError()
+
+    def get_table(self, name):
+        raise NotImplementedError()
+
+    def query(self, query, group_by):
         if query.frum != self:
             Log.error("not expected")
         raise NotImplementedError()

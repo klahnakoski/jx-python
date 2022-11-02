@@ -16,7 +16,7 @@ from jx_base.expressions.base_multi_op import BaseMultiOp
 class PercentileOp(BaseMultiOp):
     op = "percentile"
 
-    def __init__(self, terms, default=None, nulls=False, **clauses):
+    def __init__(self, *terms, default=None, nulls=False, **clauses):
         BaseMultiOp.__init__(terms, default, nulls, **clauses)
         self.percentile = 0.50
 

@@ -15,7 +15,6 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal, ZERO, ONE, is_literal
 from jx_base.expressions.true_op import TRUE
-from mo_dots import coalesce
 from mo_imports import expect
 from mo_json.types import T_NUMBER
 
@@ -26,20 +25,18 @@ AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
 
 class BaseMultiOp(Expression):
     has_simple_form = True
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
 
-    def __init__(self, terms, default=None, nulls=False, **clauses):
-        Expression.__init__(self, terms)
+    def __init__(self, *terms, nulls=False, **clauses):
+        Expression.__init__(self, *terms)
         self.terms = terms
         # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
         self.decisive = nulls in (True, TRUE)
-        self.default = coalesce(default, NULL)
 
     def __data__(self):
         return {
             self.op: [t.__data__() for t in self.terms],
-            "default": self.default.__data__(),
-            "decisive": self.decisive.__data__(),
+            "decisive": self.decisive,
         }
 
     def vars(self):
@@ -51,7 +48,7 @@ class BaseMultiOp(Expression):
     def map(self, map_):
         return self.__class__(
             [t.map(map_) for t in self.terms],
-            **{"default": self.default, "decisive": self.decisive}
+            **{"decisive": self.decisive}
         )
 
     def missing(self, lang):

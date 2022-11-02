@@ -24,10 +24,10 @@ OrOp, Variable = expect("OrOp", "Variable")
 
 class BaseBinaryOp(Expression):
     has_simple_form = True
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
     op = None
 
-    def __init__(self, terms, default=None):
+    def __init__(self, *terms, default=None):
         Expression.__init__(self, terms)
         self.lhs, self.rhs = terms
         self.default = coalesce(default, NULL)

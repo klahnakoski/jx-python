@@ -21,11 +21,11 @@ from mo_json.types import T_BOOLEAN
 
 class BaseInequalityOp(Expression):
     has_simple_form = True
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
     op = None
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
+    def __init__(self, *terms):
+        Expression.__init__(self, *terms)
         self.lhs, self.rhs = terms
 
     @property

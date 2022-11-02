@@ -21,7 +21,7 @@ from mo_logs import Log
 class LeavesOp(Expression):
     date_type = OBJECT
 
-    def __init__(self, term, prefix=None):
+    def __init__(self, *term, prefix=None):
 
         if prefix == None or prefix is NULL:
             prefix = NULL

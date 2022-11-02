@@ -26,7 +26,7 @@ class NullOp(Literal):
     USE IT TO EXPECT A NULL VALUE IN assertAlmostEqual
     """
 
-    data_type = T_IS_NULL
+    _data_type = T_IS_NULL
 
     @classmethod
     def define(cls, expr):

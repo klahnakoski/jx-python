@@ -17,7 +17,7 @@ from jx_base.expressions.literal import is_literal
 class GetOp(Expression):
     has_simple_form = True
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.var = term[0]
         self.offsets = term[1:]

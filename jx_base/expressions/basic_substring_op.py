@@ -20,9 +20,9 @@ class BasicSubstringOp(Expression):
     PLACEHOLDER FOR BASIC value.substring(start, end) (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = T_TEXT
+    _data_type = T_TEXT
 
-    def __init__(self, terms):
+    def __init__(self, *terms):
         Expression.__init__(self, terms)
         self.value, self.start, self.end = terms
 

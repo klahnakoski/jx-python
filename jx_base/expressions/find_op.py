@@ -26,11 +26,11 @@ class FindOp(Expression):
     """
 
     has_simple_form = True
-    data_type = T_INTEGER
+    _data_type = T_INTEGER
 
-    def __init__(self, term, **kwargs):
-        Expression.__init__(self, term)
-        self.value, self.find = term
+    def __init__(self, value, find, **kwargs):
+        Expression.__init__(self, value, find)
+        self.value, self.find = value, find
         self.default = kwargs.get("default", NULL)
         self.start = kwargs.get("start", ZERO).partial_eval(JX)
         if self.start is NULL:

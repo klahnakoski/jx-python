@@ -28,9 +28,9 @@ from mo_json.types import T_TEXT
 
 class NotRightOp(Expression):
     has_simple_form = True
-    data_type = T_TEXT
+    _data_type = T_TEXT
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         if is_data(term):
             self.value, self.length = term.items()[0]

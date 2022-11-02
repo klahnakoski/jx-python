@@ -18,9 +18,9 @@ from mo_json.types import T_BOOLEAN
 
 
 class BasicNotOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.term = term
 

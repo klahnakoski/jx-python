@@ -18,10 +18,10 @@ from mo_json.types import T_BOOLEAN
 
 
 class SqlEqOp(Expression):
-    data_type = T_BOOLEAN
+    _data_type = T_BOOLEAN
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
+    def __init__(self, *terms):
+        Expression.__init__(self, *terms)
         self.lhs, self.rhs = terms
 
     def __data__(self):

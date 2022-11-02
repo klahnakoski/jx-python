@@ -16,9 +16,9 @@ from mo_json.types import T_NUMBER
 
 
 class AbsOp(Expression):
-    data_type = T_NUMBER
+    _data_type = T_NUMBER
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, term)
         self.term = term
 
