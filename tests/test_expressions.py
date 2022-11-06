@@ -17,8 +17,6 @@ from jx_python.expressions import Python
 class TestOther(FuzzyTestCase):
 
     def test_add(self):
-        from jx_python import jx
-
         expr = jx_expression({"add": [1, 2]})
 
         self.assertEqual(expr(), 3)
