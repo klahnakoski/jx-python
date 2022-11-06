@@ -14,7 +14,7 @@ setup(
     long_description='# jx-python\nPython library for JSON Expressions \n',
     long_description_content_type='text/markdown',
     name='jx-python',
-    packages=["jx_base","jx_base/expressions","jx_python/expressions","jx_python/containers","jx_python/cubes","jx_python/lists","jx_python/namespace","jx_python"],
+    packages=["jx_base","jx_base/expressions","jx_base/models","jx_python/expressions","jx_python/containers","jx_python/cubes","jx_python/lists","jx_python/namespace","jx_python"],
     url='https://github.com/klahnakoski/jx-python',
-    version='4.230.22310'
+    version='4.231.22310'
 )
