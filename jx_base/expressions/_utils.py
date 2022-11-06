@@ -23,7 +23,7 @@ from mo_future import (
 )
 from mo_imports import expect
 from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
-from mo_json.types import union_type, to_jx_type
+from mo_json.types import union_type
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
