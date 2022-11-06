@@ -10,12 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import datetime
-from collections import Mapping
 
-from mo_json.typed_encoder import json_type_to_inserter_type
-
-from jx_base import Column, TableDesc
-from jx_base.models.schema import Schema
 from mo_collections import UniqueIndex
 from mo_dots import (
     Data,
@@ -29,9 +24,14 @@ from mo_dots import (
     unwraplist,
     to_data,
 )
+from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, reduce, text
 from mo_json import INTEGER, NUMBER, STRING, python_type_to_jx_type, OBJECT
+from mo_json.typed_encoder import json_type_to_inserter_type
 from mo_times.dates import Date
+
+from jx_base import Column, TableDesc
+from jx_base.models.schema import Schema
 
 DEBUG = False
 META_TABLES_NAME = "meta.tables"
