@@ -7,23 +7,12 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import WhenOp as WhenOp_
-from jx_python.expressions import _utils
+from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp as _BasicStartsWithOp
 
 
-class WhenOp(WhenOp_):
+class BasicStartsWithOp(_BasicStartsWithOp):
     def to_python(self):
-        return (
-            "("
-            + self.then.to_python()
-            + ") if ("
-            + self.when.to_python()
-            + ") else ("
-            + self.els_.to_python()
-            + ")"
-        )
-
-
-_utils.WhenOp = WhenOp
+        return f"({self.value.to_python()}).startswith({self.prefix.to_python()})"

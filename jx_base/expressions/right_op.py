@@ -43,10 +43,10 @@ class RightOp(Expression):
         return self.value.vars() | self.length.vars()
 
     def map(self, map_):
-        return RightOp([self.value.map(map_), self.length.map(map_)])
+        return RightOp(self.value.map(map_), self.length.map(map_))
 
     def missing(self, lang):
-        return OrOp([self.value.missing(lang), self.length.missing(lang)])
+        return OrOp(self.value.missing(lang), self.length.missing(lang))
 
     def partial_eval(self, lang):
         value = (self.value).partial_eval(lang)
@@ -55,9 +55,9 @@ class RightOp(Expression):
 
         return WhenOp(
             self.missing(lang),
-            **{"else": BasicSubstringOp([
+            **{"else": BasicSubstringOp(
                 value,
-                MaxOp([ZERO, MinOp([max_length, SubOp([max_length, length])])]),
+                MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),
                 max_length,
-            ])}
+            )}
         ).partial_eval(lang)

@@ -23,7 +23,7 @@ class TupleOp(Expression):
     date_type = T_ARRAY
 
     def __init__(self, *terms):
-        Expression.__init__(self, terms)
+        Expression.__init__(self, *terms)
         if terms == None:
             self.terms = []
         elif is_many(terms):
@@ -48,7 +48,7 @@ class TupleOp(Expression):
         return output
 
     def map(self, map_):
-        return TupleOp([t.map(map_) for t in self.terms])
+        return TupleOp(*(t.map(map_) for t in self.terms))
 
     def missing(self, lang):
         return FALSE

@@ -9,10 +9,9 @@
 #
 
 from copy import copy
-from typing import Set, Tuple
 
-import jx_base
 from mo_dots import Null, relative_field, set_default, startswith_field, dict_to_data
+from mo_imports import export
 from mo_json import EXISTS, ARRAY, OBJECT, INTERNAL
 from mo_json.typed_encoder import unnest_path, untype_path
 from mo_logs import Log
@@ -68,7 +67,7 @@ class Schema(object):
         """
         return list(self.lookup_variables.get(unnest_path(name), Null))
 
-    def leaves(self, name) -> Set[Tuple[str, jx_base.Column]]:
+    def leaves(self, name):
         """
         RETURN LEAVES OF GIVEN PATH NAME
         pull leaves, considering query_path and namespace
@@ -168,3 +167,6 @@ def _indexer(columns, query_path):
                 lookup_variables[k] = cs
 
     return relative_lookup, lookup_leaves, lookup_variables
+
+
+# export("jx_base", Schema)

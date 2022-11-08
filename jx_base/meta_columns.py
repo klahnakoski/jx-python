@@ -26,12 +26,12 @@ from mo_dots import (
 )
 from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, reduce, text
+from mo_imports import expect
 from mo_json import INTEGER, NUMBER, STRING, python_type_to_jx_type, OBJECT
 from mo_json.typed_encoder import json_type_to_inserter_type
 from mo_times.dates import Date
 
-from jx_base import Column, TableDesc
-from jx_base.models.schema import Schema
+Column, TableDesc, Schema = expect("Column", "TableDesc", "Schema")
 
 DEBUG = False
 META_TABLES_NAME = "meta.tables"
