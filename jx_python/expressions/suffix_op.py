@@ -14,10 +14,4 @@ from jx_base.expressions import SuffixOp as SuffixOp_
 
 class SuffixOp(SuffixOp_):
     def to_python(self):
-        return (
-            "("
-            + self.expr.to_python()
-            + ").endswith("
-            + (self.suffix).to_python()
-            + ")"
-        )
+        return f"({self.expr.to_python()}).endswith({self.suffix.to_python()})"

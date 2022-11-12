@@ -10,12 +10,12 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from mo_future import is_text
 from jx_base.expressions._utils import value2json
 from jx_base.expressions.expression import Expression
 from mo_dots import Null, is_data
+from mo_future import is_text
 from mo_imports import expect, export
-from mo_json.types import value_to_json_type, value_to_jx_type
+from mo_json.types import value_to_jx_type
 
 DateOp, FALSE, TRUE, NULL = expect("DateOp", "FALSE", "TRUE", "NULL")
 

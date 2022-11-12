@@ -9,9 +9,21 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+
 from uuid import uuid4
 
-from mo_dots import coalesce, listwrap, to_data, from_data
+from jx_base.expressions import jx_expression
+from jx_base.models.container import Container
+from jx_base.models.container import Container
+from jx_base.models.facts import Facts
+from jx_base.models.namespace import Namespace
+from jx_base.models.nested_path import NestedPath
+from jx_base.models.relation import Relation
+from jx_base.models.schema import Schema
+from jx_base.models.snowflake import Snowflake
+from jx_base.models.table import Table
+from jx_python.expressions import Python
+from mo_dots import coalesce, listwrap, to_data
 from mo_dots.datas import register_data
 from mo_dots.lists import last
 from mo_future import is_text, text
@@ -27,17 +39,6 @@ from mo_json import (
 from mo_json.typed_encoder import EXISTS_KEY
 from mo_logs import Log
 from mo_logs.strings import expand_template, quote
-
-from jx_base.expressions import jx_expression
-from jx_base.models.container import Container
-from jx_base.models.container import Container
-from jx_base.models.facts import Facts
-from jx_base.models.namespace import Namespace
-from jx_base.models.relation import Relation
-from jx_base.models.schema import Schema
-from jx_base.models.snowflake import Snowflake
-from jx_base.models.table import Table
-from jx_python.expressions import Python
 
 ENABLE_CONSTRAINTS = True
 
@@ -73,7 +74,7 @@ _ = listwrap, last, true, false, null
 
 
 def _to_python(value):
-    return str(repr(from_data(value)))
+    return value2json(value)
 
 
 def failure(row, rownum, rows, constraint):
@@ -134,7 +135,7 @@ def DataClass(name, columns, constraint=None):
 
     code = expand_template(
         """
-from __future__ import unicode_literals
+import re
 from mo_future import is_text, is_binary, Mapping
 from mo_dots import Null
 from jx_base import failure
@@ -149,6 +150,7 @@ class {{class_name}}(Mapping):
 
     def _constraint(row, rownum, rows):
         code = {{constraint_expr|quote}}
+        import re
         if {{constraint_expr}}:
             return
         failure(row, rownum, rows, {{constraint}})

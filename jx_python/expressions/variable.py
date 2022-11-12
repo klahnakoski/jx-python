@@ -40,5 +40,5 @@ class Variable(Variable_):
         for p in path[:-1]:
             agg = agg + ".get(" + strings.quote(p) + ", EMPTY_DICT)"
         output = agg + ".get(" + strings.quote(path[-1]) + ")"
-        output = "listwrap(" + output + ")"
+        # output = "listwrap(" + output + ")"
         return output

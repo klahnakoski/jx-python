@@ -15,4 +15,5 @@ from jx_base.expressions.basic_substring_op import BasicSubstringOp as _BasicSub
 
 class BasicSubstringOp(_BasicSubstringOp):
     def to_python(self):
-        return f"({self.value.to_python()})[{self.start.to_python()}:{self.end.to_python()}]"
+        value = self.value.to_python()
+        return f"({value})[int({self.start.to_python()}):int({self.end.to_python()})]"

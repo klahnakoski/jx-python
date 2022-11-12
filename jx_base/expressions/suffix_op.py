@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from jx_base.expressions._utils import TYPE_CHECK
+from jx_base.expressions._utils import TYPE_CHECK, jx_expression
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE

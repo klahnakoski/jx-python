@@ -49,9 +49,9 @@ class RightOp(Expression):
         return OrOp(self.value.missing(lang), self.length.missing(lang))
 
     def partial_eval(self, lang):
-        value = (self.value).partial_eval(lang)
-        length = (self.length).partial_eval(lang)
-        max_length = LengthOp(value)
+        value = self.value.partial_eval(lang)
+        length = self.length.partial_eval(lang)
+        max_length = LengthOp(value).partial_eval(lang)
 
         return WhenOp(
             self.missing(lang),
