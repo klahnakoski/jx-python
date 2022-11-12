@@ -4,6 +4,7 @@ from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.basic_eq_op import BasicEqOp
 from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
 from jx_python.expressions.basic_starts_with_op import BasicStartsWithOp
+from jx_python.expressions.basic_substring_op import BasicSubstringOp
 from jx_python.expressions.between_op import BetweenOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.coalesce_op import CoalesceOp
@@ -28,6 +29,7 @@ from jx_python.expressions.length_op import LengthOp
 from jx_python.expressions.literal import Literal
 from jx_python.expressions.lt_op import LtOp
 from jx_python.expressions.lte_op import LteOp
+from jx_python.expressions.min_op import MinOp
 from jx_python.expressions.max_op import MaxOp
 from jx_python.expressions.missing_op import MissingOp
 from jx_python.expressions.mod_op import ModOp
