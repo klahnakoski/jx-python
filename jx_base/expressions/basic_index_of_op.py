@@ -12,12 +12,12 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.integer_op import IntegerOp
+from jx_base.expressions.integer_op import ToIntegerOp
 from jx_base.expressions.literal import ZERO
 from jx_base.expressions.max_op import MaxOp
-from jx_base.expressions.string_op import StringOp
+from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.language import is_op
-from mo_json import INTEGER
+from mo_json import T_INTEGER
 
 
 class BasicIndexOfOp(Expression):
@@ -25,11 +25,13 @@ class BasicIndexOfOp(Expression):
     PLACEHOLDER FOR BASIC value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    data_type = INTEGER
+    _data_type = T_INTEGER
 
-    def __init__(self, params):
-        Expression.__init__(self, params)
-        self.value, self.find, self.start = params
+    def __init__(self, value, find, start):
+        Expression.__init__(self, value, find, start)
+        self.value = value
+        self.find = find
+        self.start = start
 
     def __data__(self):
         return {"basic.indexOf": [
@@ -48,12 +50,12 @@ class BasicIndexOfOp(Expression):
         return FALSE
 
     def partial_eval(self, lang):
-        start = IntegerOp(MaxOp([ZERO, self.start])).partial_eval(lang)
-        return self.lang.BasicIndexOfOp([
-            StringOp(self.value).partial_eval(lang),
-            StringOp(self.find).partial_eval(lang),
-            start,
-        ])
+        start = ToIntegerOp(MaxOp(ZERO, self.start)).partial_eval(lang)
+        return self.lang.BasicIndexOfOp(
+            ToTextOp(self.value).partial_eval(lang),
+            ToTextOp(self.find).partial_eval(lang),
+            start
+        )
 
     def __eq__(self, other):
         if not is_op(other, BasicIndexOfOp):

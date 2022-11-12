@@ -13,11 +13,11 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.expression import Expression
 from jx_base.language import is_op
 from mo_imports import export
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 
 class NotOp(Expression):
-    data_type = BOOLEAN
+    _data_type = T_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -25,6 +25,9 @@ class NotOp(Expression):
 
     def __data__(self):
         return {"not": self.term.__data__()}
+
+    def __call__(self, row, rownum=None, rows=None):
+        return not self.term(row, rownum, rows)
 
     def __eq__(self, other):
         if not is_op(other, NotOp):
@@ -48,5 +51,6 @@ class NotOp(Expression):
 
 
 export("jx_base.expressions.and_op", NotOp)
+export("jx_base.expressions.basic_in_op", NotOp)
 export("jx_base.expressions.exists_op", NotOp)
 export("jx_base.expressions.expression", NotOp)

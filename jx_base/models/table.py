@@ -10,7 +10,10 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
-class Table(object):
+class Table:
+    """
+    POINT TO A SPECIFIC TABLE IN A CONTAINER
+    """
 
     def __init__(self, full_name):
         self.name = full_name
@@ -18,9 +21,14 @@ class Table(object):
     def map(self, mapping):
         return self
 
+    def get_relations(self):
+        """
+        RETURN ALL RELATIONS TO THIS TABLE
+        """
+        return []
+
     def __data__(self):
         return self.name
 
     def partial_eval(self, lang):
         return self
-

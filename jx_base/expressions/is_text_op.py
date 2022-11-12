@@ -11,25 +11,34 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from mo_json import BOOLEAN
+from jx_base.expressions.null_op import NULL
+from mo_json import STRING
+from mo_json.types import T_TEXT
 
 
-class IsStringOp(Expression):
-    data_type = BOOLEAN
+class IsTextOp(Expression):
+    _data_type = T_TEXT
 
-    def __init__(self, term):
+    def __init__(self, *term):
         Expression.__init__(self, [term])
         self.term = term
 
     def __data__(self):
-        return {"is_string": self.term.__data__()}
+        return {"is_text": self.term.__data__()}
 
     def vars(self):
         return self.term.vars()
 
     def map(self, map_):
-        return (IsStringOp(self.term.map(map_)))
+        return IsTextOp(self.term.map(map_))
 
     def missing(self, lang):
-        return FALSE
+        return self.expr.missing()
+
+    def partial_eval(self, lang):
+        term = self.term.partial_eval(lang)
+
+        if term.type is STRING:
+            return term
+        else:
+            return NULL

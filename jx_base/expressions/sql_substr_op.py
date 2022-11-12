@@ -12,13 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from mo_json import INTEGER
+from mo_json import T_INTEGER
 
 
 class SqlSubstrOp(Expression):
-    data_type = INTEGER
+    _data_type = T_INTEGER
 
-    def __init__(self, params):
+    def __init__(self, *params):
         Expression.__init__(self, params)
         self.value, self.start, self.length = params
 

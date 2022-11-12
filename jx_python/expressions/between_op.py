@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions import BetweenOp as BetweenOp_
-from jx_python.expressions._utils import Python
 
 
 class BetweenOp(BetweenOp_):

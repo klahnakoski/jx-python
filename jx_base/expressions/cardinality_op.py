@@ -7,16 +7,15 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import BooleanOp as BooleanOp_
-from jx_python.expressions._utils import with_var, Python
+from jx_base.expressions.base_multi_op import BaseMultiOp
 
 
-class BooleanOp(BooleanOp_):
-    def to_python(self, not_null=False, boolean=False, many=False):
-        return with_var(
-            "f",
-            self.term.to_python(),
-            "bool(f)",
-        )
+class CardinalityOp(BaseMultiOp):
+    op = "cardinality"
+
+    def __call__(self, row, rownum, rows):
+        values = self.terms(row, rownum, rows)
+        return len(set(values))

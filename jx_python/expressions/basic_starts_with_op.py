@@ -7,12 +7,12 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+
 from __future__ import absolute_import, division, unicode_literals
 
-from jx_base.expressions import IntegerOp as IntegerOp_
-from jx_python.expressions._utils import Python
+from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp as _BasicStartsWithOp
 
 
-class IntegerOp(IntegerOp_):
-    def to_python(self, not_null=False, boolean=False, many=False):
-        return "int(" + self.term.to_python() + ")"
+class BasicStartsWithOp(_BasicStartsWithOp):
+    def to_python(self):
+        return f"({self.value.to_python()}).startswith({self.prefix.to_python()})"

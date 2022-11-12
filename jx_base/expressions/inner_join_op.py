@@ -15,21 +15,20 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.language import is_op
 from mo_dots import startswith_field
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 from mo_logs import Log
 from mo_math import UNION
 
 
 class InnerJoinOp(Expression):
-    data_type = BOOLEAN
+    _data_type = T_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["frum", "nests"]
 
-    def __init__(self, frum, nests):
+    def __init__(self, *frum, nests):
         """
         A SEQUENCE OF NESTED (INNER) JOINS FOR A QUERY
         :param frum: THE TABLE OF DOCUMENTS
@@ -40,7 +39,7 @@ class InnerJoinOp(Expression):
         self.nests = nests
         last = "."
         for n in reversed(nests):
-            path = n.path.var
+            path = n.nested_path.var
             if not startswith_field(path, last):
                 Log.error("Expecting nests to be reverse nested order")
             last = path
@@ -53,7 +52,7 @@ class InnerJoinOp(Expression):
 
     def __eq__(self, other):
         return (
-            is_op(other, OuterJoinOp)
+            is_op(other, InnerJoinOp)
             and self.frum == other.frum
             and self.nests == other.nests
         )
@@ -77,10 +76,6 @@ class InnerJoinOp(Expression):
         return OrOp(
             [self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]
         ).partial_eval(lang)
-
-    @property
-    def many(self):
-        return True
 
     def partial_eval(self, lang):
         nests = []

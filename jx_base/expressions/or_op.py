@@ -13,18 +13,19 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_imports import export
-from mo_json import BOOLEAN
+from mo_json.types import T_BOOLEAN
 
 
 class OrOp(Expression):
-    data_type = BOOLEAN
-    zero = FALSE  # ADD THIS TO terms FOR NO EEFECT
+    _data_type = T_BOOLEAN
+    default = FALSE  # ADD THIS TO terms FOR NO EEFECT
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
+    def __init__(self, *terms):
+        Expression.__init__(self, *terms)
         self.terms = terms
 
     def __data__(self):
@@ -37,13 +38,13 @@ class OrOp(Expression):
         return output
 
     def map(self, map_):
-        return (OrOp([t.map(map_) for t in self.terms]))
+        return OrOp(*(t.map(map_) for t in self.terms))
 
     def missing(self, lang):
         return FALSE
 
     def invert(self, lang):
-        return AndOp([t.invert(lang) for t in self.terms]).partial_eval(lang)
+        return AndOp(*(t.invert(lang) for t in self.terms)).partial_eval(lang)
 
     def __call__(self, row=None, rownum=None, rows=None):
         return any(t(row, rownum, rows) for t in self.terms)
@@ -62,10 +63,7 @@ class OrOp(Expression):
         terms = []
         ands = []
         for t in self.terms:
-            simple = (t).partial_eval(lang)
-            if simple.type != BOOLEAN:
-                simple = simple.exists()
-
+            simple = ToBooleanOp(t).partial_eval(lang)
             if simple is TRUE:
                 return TRUE
             elif simple is FALSE:
@@ -89,7 +87,9 @@ class OrOp(Expression):
             return FALSE
         if len(terms) == 1:
             return terms[0]
-        return (OrOp(terms))
+        return OrOp(*terms)
 
 
 export("jx_base.expressions.and_op", OrOp)
+export("jx_base.expressions.base_binary_op", OrOp)
+export("jx_base.expressions.base_multi_op", OrOp)

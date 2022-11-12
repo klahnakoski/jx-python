@@ -10,9 +10,13 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from mo_dots import exists
+
 from jx_base.expressions.base_multi_op import BaseMultiOp
 
 
 class AddOp(BaseMultiOp):
     op = "add"
-    zero = 0
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        return sum(v for t in self.terms for v in [t(row, rownum, rows)] if exists(v))

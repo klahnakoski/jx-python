@@ -26,14 +26,14 @@ from jx_base.expressions.variable import Variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from mo_dots import is_data, is_sequence, to_data, coalesce
-from mo_json import STRING
+from mo_json.types import T_TEXT
 from mo_logs import Log
 
 
 class BetweenOp(Expression):
-    data_type = STRING
+    _data_type = T_TEXT
 
-    def __init__(self, value, prefix, suffix, default=NULL, start=NULL):
+    def __init__(self, *value, prefix, suffix, default=NULL, start=NULL):
         Expression.__init__(self, [])
         self.value = value
         self.prefix = coalesce(prefix, NULL)
@@ -47,6 +47,7 @@ class BetweenOp(Expression):
 
     @classmethod
     def define(cls, expr):
+        expr = to_data(expr)
         term = expr.between
         if is_sequence(term):
             return BetweenOp(
@@ -111,9 +112,9 @@ class BetweenOp(Expression):
                 self.prefix.__data__(),
                 self.suffix.__data__(),
             ]})
-        if self.start:
+        if self.start is not NULL:
             output.start = self.start.__data__()
-        if self.default:
+        if self.default is not NULL:
             output.default = self.default.__data__()
         return output
 
@@ -121,32 +122,29 @@ class BetweenOp(Expression):
         value = self.value.partial_eval(lang)
 
         start_index = CaseOp([
-            WhenOp(self.prefix.missing(lang), **{"then": ZERO}),
-            WhenOp(IsNumberOp(self.prefix), **{"then": MaxOp([ZERO, self.prefix])}),
+            WhenOp(self.prefix.missing(lang), then=ZERO),
+            WhenOp(IsNumberOp(self.prefix), then=MaxOp(ZERO, self.prefix)),
             FindOp([value, self.prefix], start=self.start),
         ]).partial_eval(lang)
 
-        len_prefix = CaseOp([
-            WhenOp(self.prefix.missing(lang), **{"then": ZERO}),
-            WhenOp(IsNumberOp(self.prefix), **{"then": ZERO}),
+        len_prefix = CaseOp(
+            WhenOp(self.prefix.missing(lang), then=ZERO),
+            WhenOp(IsNumberOp(self.prefix), then=ZERO),
             LengthOp(self.prefix),
-        ]).partial_eval(lang)
+        ).partial_eval(lang)
 
         end_index = CaseOp([
-            WhenOp(start_index.missing(lang), **{"then": NULL}),
-            WhenOp(self.suffix.missing(lang), **{"then": LengthOp(value)}),
-            WhenOp(
-                IsNumberOp(self.suffix),
-                **{"then": MinOp([self.suffix, LengthOp(value)])}
-            ),
-            FindOp([value, self.suffix], start=AddOp([start_index, len_prefix])),
+            WhenOp(start_index.missing(lang), then=NULL),
+            WhenOp(self.suffix.missing(lang), then=LengthOp(value)),
+            WhenOp(IsNumberOp(self.suffix), then=MinOp(self.suffix, LengthOp(value))),
+            FindOp([value, self.suffix], start=AddOp(start_index, len_prefix)),
         ]).partial_eval(lang)
 
-        start_index = AddOp([start_index, len_prefix]).partial_eval(lang)
-        substring = BasicSubstringOp([value, start_index, end_index]).partial_eval(lang)
+        start_index = AddOp(start_index, len_prefix).partial_eval(lang)
+        substring = BasicSubstringOp(value, start_index, end_index).partial_eval(lang)
 
         between = WhenOp(
-            end_index.missing(lang), **{"then": self.default, "else": substring}
+            end_index.missing(lang), then=self.default, **{"else": substring}
         ).partial_eval(lang)
 
         return between

@@ -9,20 +9,10 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
+from jx_base.expressions import ToBooleanOp as ToBooleanOp_
+from jx_python.expressions._utils import with_var
 
-class Snowflake(object):
-    """
-    REPRESENT ONE ALIAS, AND ITS NESTED ARRAYS
-    """
 
-    def get_schema(self, query_path):
-        raise NotImplemented()
-
-    @property
-    def query_paths(self):
-        raise NotImplemented()
-
-    @property
-    def columns(self):
-        raise NotImplemented()
-
+class ToBooleanOp(ToBooleanOp_):
+    def to_python(self):
+        return with_var("f", self.term.to_python(), "bool(f)",)

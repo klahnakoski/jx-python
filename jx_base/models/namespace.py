@@ -49,12 +49,14 @@ class Namespace(object):
     def _convert_window(self, clause):
         raise NotImplementedError()
 
+    def get_tables(self):
+        raise NotImplementedError()
+
 
 def convert_list(operator, operand):
-    if operand==None:
+    if operand == None:
         return None
     elif is_data(operand):
         return operator(operand)
     else:
         return list(map(operator, operand))
-

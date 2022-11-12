@@ -18,47 +18,45 @@ from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
-from mo_json import STRING, IS_NULL
+from mo_json.types import T_TEXT, T_IS_NULL
 
 
-class StringOp(Expression):
-    data_type = STRING
+class ToTextOp(Expression):
+    _data_type = T_TEXT
 
     def __init__(self, term):
-        Expression.__init__(self, [term])
+        Expression.__init__(self, term)
         self.term = term
 
     def __data__(self):
-        return {"string": self.term.__data__()}
+        return {"to_text": self.term.__data__()}
 
     def vars(self):
         return self.term.vars()
 
     def map(self, map_):
-        return (StringOp(self.term.map(map_)))
+        return ToTextOp(self.term.map(map_))
 
     def missing(self, lang):
         return self.term.missing(lang)
 
     def partial_eval(self, lang):
         term = self.term
-        if term.type is IS_NULL:
+        if term.type is T_IS_NULL:
             return NULL
         term = (FirstOp(term)).partial_eval(lang)
-        if is_op(term, StringOp):
+        if is_op(term, ToTextOp):
             return term.term.partial_eval(lang)
         elif is_op(term, CoalesceOp):
-            return CoalesceOp([
-                (StringOp(t)).partial_eval(lang) for t in term.terms
-            ])
+            return CoalesceOp(*((ToTextOp(t)).partial_eval(lang) for t in term.terms))
         elif is_literal(term):
-            if term.type == STRING:
+            if term.type == T_TEXT:
                 return term
             else:
-                return (Literal(mo_json.value2json(term.value)))
+                return Literal(mo_json.value2json(term.value))
         return self
 
     def __eq__(self, other):
-        if not is_op(other, StringOp):
+        if not is_op(other, ToTextOp):
             return False
         return self.term == other.term
