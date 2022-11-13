@@ -16,5 +16,5 @@ setup(
     name='jx-python',
     packages=["jx_base","jx_base/expressions","jx_base/models","jx_python/expressions","jx_python/containers","jx_python/cubes","jx_python/lists","jx_python/namespace","jx_python"],
     url='https://github.com/klahnakoski/jx-python',
-    version='4.254.22317'
+    version='4.255.22317'
 )
