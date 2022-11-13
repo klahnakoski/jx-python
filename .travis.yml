@@ -1,0 +1,8 @@
+language: python
+python:
+- 3.9
+install:
+- pip install -r tests/requiements.txt
+- pip install .
+script:
+- python -m unittest discover tests
