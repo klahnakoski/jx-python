@@ -4,7 +4,7 @@ python:
 - 3.8
 - 3.9
 install:
-- pip install -r tests/requiements.txt
+- pip install -r tests/requirements.txt
 - pip install .
 script:
 - python -m unittest discover tests
