@@ -12,10 +12,12 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp, Source
 from jx_base.expressions._utils import TYPE_CHECK
 
+
 class SqlOriginsOp(Expression):
     """
     Point to the particular table in the left-join tree for naming context
     """
+
     def __init__(self, root: SqlLeftJoinsOp, origin: Source):
         if TYPE_CHECK:
             if not isinstance(origin, Source):

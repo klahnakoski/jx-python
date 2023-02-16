@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import builtin_ops, operators
 from jx_base.expressions.expression import Expression
@@ -47,8 +46,7 @@ class BaseMultiOp(Expression):
 
     def map(self, map_):
         return self.__class__(
-            [t.map(map_) for t in self.terms],
-            **{"decisive": self.decisive}
+            [t.map(map_) for t in self.terms], **{"decisive": self.decisive}
         )
 
     def missing(self, lang):

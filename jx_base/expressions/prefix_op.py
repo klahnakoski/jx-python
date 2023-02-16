@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
@@ -65,7 +64,7 @@ class PrefixOp(Expression):
         expr = self.expr(row, rownum, rows)
         if is_missing(expr):
             return None
-        prefix=self.prefix(row, rownum, rows)
+        prefix = self.prefix(row, rownum, rows)
         if is_missing(prefix):
             return None
         return expr.startswith(prefix)

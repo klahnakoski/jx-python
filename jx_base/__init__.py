@@ -7,7 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
 
 
 from uuid import uuid4
@@ -35,7 +34,8 @@ from mo_json import (
     null,
     EXISTS,
     OBJECT,
-    ARRAY, )
+    ARRAY,
+)
 from mo_json.typed_encoder import EXISTS_KEY
 from mo_logs import Log
 from mo_logs.strings import expand_template, quote
@@ -79,17 +79,21 @@ def _to_python(value):
 
 def failure(row, rownum, rows, constraint):
     constraint = to_data(constraint)
-    if constraint['and']:
-        for a in constraint['and']:
+    if constraint["and"]:
+        for a in constraint["and"]:
             failure(row, rownum, rows, a)
         return
     expr = jx_expression(constraint)
 
     try:
         if not expr(row, rownum, row):
-            raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
+            raise Log.error(
+                "{{row}} fails to pass {{req}}", row=row, req=expr.__data__()
+            )
     except Exception as cause:
-        raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__(), cause=cause)
+        raise Log.error(
+            "{{row}} fails to pass {{req}}", row=row, req=expr.__data__(), cause=cause
+        )
 
 
 def DataClass(name, columns, constraint=None):
@@ -244,9 +248,9 @@ class {{class_name}}(Mapping):
             "types": "{"
             + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items())
             + "}",
-            "constraint_expr": jx_expression(
-                not ENABLE_CONSTRAINTS or constraint
-            ).partial_eval(Python).to_python(),
+            "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
+            .partial_eval(Python)
+            .to_python(),
             "constraint": value2json(constraint),
         },
     )
@@ -321,7 +325,10 @@ Column = DataClass(
             "else": True,
         },
         {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
-        {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
+        {"ne": [
+            {"last": "nested_path"},
+            {"literal": "."},
+        ]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
         {
             "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
             "then": {"or": [

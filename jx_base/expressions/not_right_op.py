@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.expression import Expression
@@ -61,8 +60,6 @@ class NotRightOp(Expression):
 
         max_length = LengthOp(value)
         part = BasicSubstringOp(
-            value,
-            ZERO,
-            MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),
+            value, ZERO, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),
         )
         return (WhenOp(self.missing(lang), **{"else": part})).partial_eval(lang)

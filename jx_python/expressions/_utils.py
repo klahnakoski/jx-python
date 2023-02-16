@@ -1,4 +1,3 @@
-
 # encoding: utf-8
 #
 #
@@ -8,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from mo_dots import is_data, is_list, Null
 from mo_future import is_text
@@ -100,8 +99,7 @@ def _binaryop_to_python(self, not_null=False, boolean=False):
     rhs = ToNumberOp(self.rhs).partial_eval(Python).to_python()
     script = "(" + lhs + ") " + op + " (" + rhs + ")"
     missing = OrOp(
-        self.lhs.missing(Python),
-        self.rhs.missing(Python),
+        self.lhs.missing(Python), self.rhs.missing(Python),
     ).partial_eval(Python)
     if missing is FALSE:
         return script

@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from mo_json.types import JX_NUMBER_TYPES
 
@@ -27,9 +27,7 @@ class ToNumberOp(NumberOp_):
                 return value
             return "float(" + value + ")"
         else:
-            return (
-                "float(" + value + ") if (" + exists.to_python() + ") else None"
-            )
+            return "float(" + value + ") if (" + exists.to_python() + ") else None"
 
 
 _utils.ToNumberOp = ToNumberOp

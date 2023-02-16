@@ -27,8 +27,6 @@ def get_attr(value, item):
     return listwrap(value[item])
 
 
-
-
 GLOBALS = {
     "true": True,
     "false": False,
@@ -43,7 +41,7 @@ GLOBALS = {
     "leaves_to_data": leaves_to_data,
     "is_data": is_data,
     "first": first,
-    "get_attr": get_attr
+    "get_attr": get_attr,
 }
 
 

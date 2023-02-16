@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from typing import Dict, Tuple, Iterable
 
@@ -31,7 +30,8 @@ from mo_dots import (
     split_field,
     join_field,
     literal_field,
-    is_missing, is_many,
+    is_missing,
+    is_many,
 )
 from mo_future import is_text, text
 from mo_imports import export
@@ -48,8 +48,8 @@ class SelectOp(Expression):
         :param terms: list OF {"name":name, "value":value} DESCRIPTORS
         """
         if TYPE_CHECK and (
-                not all(isinstance(term, dict) for term in terms[1:])
-                or any(term.get("name") is None for term in terms)
+            not all(isinstance(term, dict) for term in terms[1:])
+            or any(term.get("name") is None for term in terms)
         ):
             Log.error("expecting list of dicts with 'name' and 'aggregate' property")
         Expression.__init__(self, None)
@@ -88,12 +88,20 @@ class SelectOp(Expression):
                         else:
                             terms.append({
                                 "name": t.value,
-                                "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate),
+                                "value": AggregateOp(
+                                    FromOp(_jx_expression(t.value, cls.lang)),
+                                    t.aggregate,
+                                ),
                             })
                     else:
                         Log.error("expecting a name property")
                 else:
-                    terms.append({"name": t.name, "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate)})
+                    terms.append({
+                        "name": t.name,
+                        "value": AggregateOp(
+                            FromOp(_jx_expression(t.value, cls.lang)), t.aggregate
+                        ),
+                    })
             elif t.name == None:
                 if t.value == None:
                     Log.error(
@@ -123,10 +131,7 @@ class SelectOp(Expression):
         for name, expr in self:
             new_expr = expr.partial_eval(lang)
             if new_expr is expr:
-                new_terms.append({
-                    "name": name,
-                    "value": expr
-                })
+                new_terms.append({"name": name, "value": expr})
                 continue
             diff = True
 
@@ -136,13 +141,10 @@ class SelectOp(Expression):
                 for JX_name, JX_value in expr.terms:
                     new_terms.append({
                         "name": concat_field(name, JX_name),
-                        "value": JX_value
+                        "value": JX_value,
                     })
             else:
-                new_terms.append({
-                    "name": name,
-                    "value": new_expr
-                })
+                new_terms.append({"name": name, "value": new_expr})
                 diff = True
         if diff:
             return SelectOp(self.frum, new_terms)
@@ -152,8 +154,7 @@ class SelectOp(Expression):
     def apply(self, container: Container):
         result = self.frum.apply(container)
         results = tuple(
-            {"name": name, "value": value.apply(result)}
-            for name, value in self
+            {"name": name, "value": value.apply(result)} for name, value in self
         )
         # GROUP BY COMMON TABLE
         return SqlSelectOp(result, results)
@@ -166,29 +167,31 @@ class SelectOp(Expression):
             yield term["name"], term["value"]
 
     def __data__(self):
-        return {"select": [self.frum.__data__()] + [
-            {"name": name, "value": value.__data__()}
-            for name, value in self
-        ]}
+        return {
+            "select": [self.frum.__data__()]
+            + [{"name": name, "value": value.__data__()} for name, value in self]
+        }
 
     def vars(self):
-        return set(v for term in self.terms for v in term['value'].vars())
+        return set(v for term in self.terms for v in term["value"].vars())
 
     def map(self, map_):
-        return SelectOp(self.frum, *(
-            {"name": name, "value": value.map(map_), "aggregate": agg.map(map_)}
-            for name, value in self
-        ))
+        return SelectOp(
+            self.frum,
+            *(
+                {"name": name, "value": value.map(map_), "aggregate": agg.map(map_)}
+                for name, value in self
+            )
+        )
 
 
 def normalize_one(frum, select):
     if is_text(select):
         if select == "*":
-            return SelectOp(self.frum, *({
-                "name": ".",
-                "value": LeavesOp(Variable(".")),
-                "aggregate": NULL,
-            }))
+            return SelectOp(
+                self.frum,
+                *({"name": ".", "value": LeavesOp(Variable(".")), "aggregate": NULL,})
+            )
         select = Data(value=select)
     else:
         select = to_data(select)
@@ -283,11 +286,7 @@ def _normalize_selects(frum, selects) -> SelectOp:
                 return select_nothing
             else:
                 terms = [
-                    t
-                    for s in selects
-                    for t in SelectOp
-                    .normalize_one(frum, s)
-                    .terms
+                    t for s in selects for t in SelectOp.normalize_one(frum, s).terms
                 ]
         else:
             return SelectOp(frum, normalize_one(frum, select))

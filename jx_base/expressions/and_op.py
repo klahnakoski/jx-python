@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -107,10 +106,12 @@ class AndOp(Expression):
             else:
                 return AndOp(*and_terms)
 
-        return OrOp(*(
-            AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0]
-            for and_terms in or_terms
-        )).partial_eval(lang)
+        return OrOp(
+            *(
+                AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0]
+                for and_terms in or_terms
+            )
+        ).partial_eval(lang)
 
 
 export("jx_base.expressions.expression", AndOp)

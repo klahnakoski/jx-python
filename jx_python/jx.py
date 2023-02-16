@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 import mo_dots
 import mo_math
@@ -44,7 +43,7 @@ from mo_dots import (
     to_data,
     dict_to_data,
     list_to_data,
-    from_data
+    from_data,
 )
 from mo_dots import _getdefault
 from mo_dots.objects import DataObject

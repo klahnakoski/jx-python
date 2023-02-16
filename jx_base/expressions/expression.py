@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import (
     operators,
@@ -37,7 +36,7 @@ TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expe
 
 
 class Expression(BaseExpression):
-    _data_type:JxType = JX_IS_NULL
+    _data_type: JxType = JX_IS_NULL
     has_simple_form = False
 
     def __init__(self, *args):

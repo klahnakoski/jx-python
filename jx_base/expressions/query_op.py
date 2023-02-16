@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from copy import copy
 from importlib import import_module
@@ -92,7 +92,11 @@ class QueryOp(Expression):
     ):
         Expression.__init__(self, None)
         self.frum = frum
-        self.select: SelectOp = select if select is not None else SelectOp(frum, {"name":".", "value": Variable(".")})
+        self.select: SelectOp = (
+            select
+            if select is not None
+            else SelectOp(frum, {"name": ".", "value": Variable(".")})
+        )
         self.edges = edges
         self.groupby = groupby
         self.window = window
@@ -240,7 +244,7 @@ class QueryOp(Expression):
         elif query.edges or query.groupby:
             output.select = DEFAULT_SELECT
         else:
-            output.select = SelectOp(frum, {"name":".", "value":Variable(".")})
+            output.select = SelectOp(frum, {"name": ".", "value": Variable(".")})
 
         output.where = _normalize_where(query.where)
         output.window = [_normalize_window(w) for w in listwrap(query.window)]

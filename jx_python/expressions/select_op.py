@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from mo_logs.strings import quote
 
@@ -18,8 +18,6 @@ class SelectOp(SelectOp_):
     def to_python(self):
         return (
             "leaves_to_data({"
-            + ",".join(
-                quote(name + ":" + value.to_python()) for name, value in self
-            )
+            + ",".join(quote(name + ":" + value.to_python()) for name, value in self)
             + "})"
         )

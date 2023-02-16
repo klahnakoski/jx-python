@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.eq_op import EqOp
@@ -32,7 +31,9 @@ class NestedOp(Expression):
 
     __slots__ = ["nested_path", "select", "where", "sort", "limit"]
 
-    def __init__(self, *frum,  nested_path, select=None, where=TRUE, sort=Null, limit=NULL):
+    def __init__(
+        self, *frum, nested_path, select=None, where=TRUE, sort=Null, limit=NULL
+    ):
         select = select or SelectOp(frum, {"name": ".", "value": IDENTITY})
         Expression.__init__(self, [select, where])
         self.nested_path = nested_path
@@ -91,12 +92,12 @@ class NestedOp(Expression):
 
     def __eq__(self, other):
         return (
-                is_op(other, NestedOp)
-                and self.nested_path == other.nested_path
-                and self.select == other.select
-                and self.where == other.where
-                and self.sort == other.sort
-                and self.limit == other.limit
+            is_op(other, NestedOp)
+            and self.nested_path == other.nested_path
+            and self.select == other.select
+            and self.where == other.where
+            and self.sort == other.sort
+            and self.limit == other.limit
         )
 
     def vars(self):

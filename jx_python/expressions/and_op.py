@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from jx_base.expressions import AndOp as AndOp_
 from jx_python.expressions.to_boolean_op import ToBooleanOp
@@ -18,6 +18,4 @@ class AndOp(AndOp_):
         if not self.terms:
             return "True"
         else:
-            return " and ".join(
-                f"({ToBooleanOp(t).to_python()})" for t in self.terms
-            )
+            return " and ".join(f"({ToBooleanOp(t).to_python()})" for t in self.terms)

@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -33,7 +32,10 @@ class MaxOp(Expression):
         self.default = default
 
     def __data__(self):
-        return {"max": [t.__data__() for t in self.terms], "default": self.default.__data__()}
+        return {
+            "max": [t.__data__() for t in self.terms],
+            "default": self.default.__data__(),
+        }
 
     def vars(self):
         output = set()

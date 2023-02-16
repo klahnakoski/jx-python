@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from jx_base.expressions import GetOp as GetOp_
 
@@ -19,13 +19,8 @@ class GetOp(GetOp_):
             getting = f"get_attr(v{i}, {o.to_python()})"
             acc.append(f"for v{i+1} in {getting}")
         n = len(self.offsets)
-        return destream(f"[v{n} "+" ".join(acc)+"]")
+        return destream(f"[v{n} " + " ".join(acc) + "]")
 
 
 def destream(code):
     return f"[None if len(c)==0 else c[0] if len(c)==1 else c for c in [{code}]][0]"
-
-
-
-
-

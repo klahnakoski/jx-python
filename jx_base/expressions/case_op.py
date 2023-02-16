@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
@@ -65,9 +64,8 @@ class CaseOp(Expression):
 
     def missing(self, lang):
         whens = [
-            WhenOp(w.when, then=w.then.missing(lang))
-            for w in self.whens[:-1]
-        ]+[self.whens[-1].missing(lang)]
+            WhenOp(w.when, then=w.then.missing(lang)) for w in self.whens[:-1]
+        ] + [self.whens[-1].missing(lang)]
 
         return CaseOp(whens).partial_eval(lang)
 
@@ -109,4 +107,6 @@ class CaseOp(Expression):
 
     @property
     def type(self):
-        return union_type(*(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens))
+        return union_type(
+            *(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens)
+        )

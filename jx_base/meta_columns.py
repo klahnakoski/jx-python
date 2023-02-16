@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 import datetime
 
@@ -78,7 +78,9 @@ def _get_schema_from_list(
                 json_type = native_type_to_json_type[es_type]
 
                 column = Column(
-                    name=concat_field(table_name, json_type_to_inserter_type[json_type]),
+                    name=concat_field(
+                        table_name, json_type_to_inserter_type[json_type]
+                    ),
                     es_column=full_name,
                     es_index=".",
                     es_type=es_type,
@@ -153,6 +155,7 @@ def get_id(column):
     :return: Elasticsearch id for column
     """
     return column.es_index + "|" + column.es_column
+
 
 try:
     META_COLUMNS_DESC = TableDesc(

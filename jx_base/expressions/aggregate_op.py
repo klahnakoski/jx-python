@@ -8,7 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
+
 from mo_imports import DelayedValue
 from jx_base.expressions.expression import Expression
 from mo_future import first
@@ -84,4 +84,3 @@ def canonical_aggregates():
 
 
 canonical_aggregates = DelayedValue(canonical_aggregates)
-

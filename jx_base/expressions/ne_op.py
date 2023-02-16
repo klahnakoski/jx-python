@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.basic_eq_op import BasicEqOp
@@ -74,8 +73,6 @@ class NeOp(Expression):
             ).partial_eval(lang)
 
         output = AndOp(
-            lhs.exists(),
-            rhs.exists(),
-            NotOp(BasicEqOp(lhs, rhs)),
+            lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)),
         ).partial_eval(lang)
         return output

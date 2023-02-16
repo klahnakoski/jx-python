@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from jx_base.expressions import FindOp as FindOp_
 from jx_python.expressions._utils import with_var, Python
@@ -41,11 +41,8 @@ class FindOp(FindOp_):
             OrOp(
                 self.value.missing(Python),
                 self.find.missing(Python),
-                EqOp(
-                    BasicIndexOfOp(self.value, self.find, self.start),
-                    Literal(-1)
-                )
-            )
+                EqOp(BasicIndexOfOp(self.value, self.find, self.start), Literal(-1)),
+            ),
         ).partial_eval(lang)
         return output
 

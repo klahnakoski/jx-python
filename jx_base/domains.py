@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 import itertools
 from numbers import Number
@@ -27,7 +27,15 @@ from mo_dots import (
     list_to_data,
     from_data,
 )
-from mo_json.types import JxType, JX_NUMBER, JX_INTEGER, JX_TEXT, JX_TIME, JX_INTERVAL, python_type_to_jx_type
+from mo_json.types import (
+    JxType,
+    JX_NUMBER,
+    JX_INTEGER,
+    JX_TEXT,
+    JX_TIME,
+    JX_INTERVAL,
+    python_type_to_jx_type,
+)
 from mo_future import text
 from mo_kwargs import override
 from mo_logs import Log
@@ -68,7 +76,7 @@ class Domain(object):
         "where",
         "dimension",
         "primitive",
-        "limit"
+        "limit",
     ]
 
     @override(kwargs="desc")
@@ -320,7 +328,7 @@ class SimpleSetDomain(Domain):
             for i, p in enumerate(partitions):
                 part = {"value": p, "dataIndex": i}
                 if isinstance(p, text):
-                    part['name'] = p
+                    part["name"] = p
                 self.partitions.append(part)
                 self.map[p] = part
                 self.order[p] = i
@@ -477,7 +485,11 @@ class SetDomain(Domain):
         self.type = "set"
         self.order = {}
         self.partitions = FlatList()
-        self.element_type = JxType(name=JX_TEXT, value=python_type_to_jx_type(partitions[0]), dataIndex=JX_INTEGER)
+        self.element_type = JxType(
+            name=JX_TEXT,
+            value=python_type_to_jx_type(partitions[0]),
+            dataIndex=JX_INTEGER,
+        )
         if isinstance(self.key, set):
             Log.error("problem")
 
@@ -670,7 +682,9 @@ class DurationDomain(Domain):
         partitions=None,
         desc=None,
     ):
-        self.element_type = JxType(min=JX_INTERVAL, max=JX_INTERVAL, dataIndex=JX_INTEGER)
+        self.element_type = JxType(
+            min=JX_INTERVAL, max=JX_INTERVAL, dataIndex=JX_INTEGER
+        )
         if partitions:
             # IGNORE THE min, max, interval
             if not key:
@@ -844,7 +858,9 @@ class RangeDomain(Domain):
                 self.min = MIN([min, p.min])
                 self.max = MAX([max, p.max])
                 if p.dataIndex != None and p.dataIndex != i:
-                    Log.error("Expecting `dataIndex` to agree with the order of the parts")
+                    Log.error(
+                        "Expecting `dataIndex` to agree with the order of the parts"
+                    )
                 if p[key] == None:
                     Log.error(
                         "Expecting all parts to have {{key}} as a property", key=key,

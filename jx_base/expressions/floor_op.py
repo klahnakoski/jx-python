@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
@@ -57,7 +56,5 @@ class FloorOp(Expression):
             return FALSE
         else:
             return OrOp(
-                self.lhs.missing(lang),
-                self.rhs.missing(lang),
-                EqOp(self.rhs, ZERO),
+                self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),
             )

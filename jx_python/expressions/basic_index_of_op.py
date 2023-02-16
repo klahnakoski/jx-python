@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 from jx_base.expressions import BasicIndexOfOp as BasicIndexOfOp_
 from jx_python.expressions._utils import with_var

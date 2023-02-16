@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 import re
 
@@ -103,7 +102,6 @@ class SuffixOp(Expression):
             WhenOp(self.expr.missing(lang), then=FALSE),
             WhenOp(self.suffix.missing(lang), then=TRUE),
             RegExpOp(
-                self.expr,
-                Literal(".*" + re.escape(coalesce(self.suffix.value, ""))),
+                self.expr, Literal(".*" + re.escape(coalesce(self.suffix.value, ""))),
             ),
         ).partial_eval(lang)

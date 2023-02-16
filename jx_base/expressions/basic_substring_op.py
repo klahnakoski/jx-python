@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -35,9 +34,7 @@ class BasicSubstringOp(Expression):
 
     def map(self, map_):
         return BasicSubstringOp(
-            self.value.map(map_),
-            self.start.map(map_),
-            self.end.map(map_),
+            self.value.map(map_), self.start.map(map_), self.end.map(map_),
         )
 
     def vars(self):

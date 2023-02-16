@@ -15,7 +15,6 @@ IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
 
 class TestExpressionFactory(TestCase):
-
     def test_deep_iteration(self):
         class Something:
             def __init__(self, value):
@@ -24,7 +23,3 @@ class TestExpressionFactory(TestCase):
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
         result = stream(value).value.props.a.to_list()
         self.assertEqual(result, [1, 2, 3])
-
-
-
-

@@ -6,7 +6,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from mo_testing.fuzzytestcase import FuzzyTestCase
 
@@ -15,7 +14,6 @@ from jx_python.expressions import Python
 
 
 class TestOther(FuzzyTestCase):
-
     def test_add(self):
         expr = jx_expression({"add": [1, 2]})
 

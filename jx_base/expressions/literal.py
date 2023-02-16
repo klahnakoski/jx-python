@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import value2json
 from jx_base.expressions.expression import Expression
@@ -24,6 +23,7 @@ class Literal(Expression):
     """
     A literal JSON document
     """
+
     op = "literal"
 
     def __new__(cls, term):

@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -54,7 +53,7 @@ class BasicIndexOfOp(Expression):
         return self.lang.BasicIndexOfOp(
             ToTextOp(self.value).partial_eval(lang),
             ToTextOp(self.find).partial_eval(lang),
-            start
+            start,
         )
 
     def __eq__(self, other):

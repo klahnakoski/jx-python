@@ -8,14 +8,12 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.null_op import NULL
 
 
 class ToArrayOp(Expression):
-
     def __init__(self, *term):
         Expression.__init__(self, [term])
         self.term = term

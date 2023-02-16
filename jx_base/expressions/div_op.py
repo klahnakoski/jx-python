@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import builtin_ops
 from jx_base.expressions.and_op import AndOp
@@ -24,11 +23,7 @@ class DivOp(BaseBinaryOp):
     def missing(self, lang):
         return AndOp(
             self.default.missing(lang),
-            OrOp(
-                self.lhs.missing(lang),
-                self.rhs.missing(lang),
-                EqOp(self.rhs, ZERO),
-            ),
+            OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),),
         ).partial_eval(lang)
 
     def partial_eval(self, lang):

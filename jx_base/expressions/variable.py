@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -82,25 +81,34 @@ class Variable(Expression):
 
         selects = []
         for path, leaves in paths.items():
-            if startswith_field(path, schema.nested_path[0]) and len(path)>len(schema.nested_path[0]):
+            if startswith_field(
+                path, schema.nested_path[0]
+            ) and len(path) > len(schema.nested_path[0]):
                 selects.append({
                     "name": self.var,
                     "value": QueryOp(
                         frum=schema.container.get_table(path),
-                        select=SelectOp(schema, (
-                            {
-                                "name": rel_name,
-                                "value": Variable(leaf.es_column, leaf.json_type),
-                                "aggregate": NULL
-                            }
-                            for rel_name, leaf in leaves
-                        ))
+                        select=SelectOp(
+                            schema,
+                            (
+                                {
+                                    "name": rel_name,
+                                    "value": Variable(leaf.es_column, leaf.json_type),
+                                    "aggregate": NULL,
+                                }
+                                for rel_name, leaf in leaves
+                            ),
+                        ),
                     ),
-                    "aggregate": NULL
+                    "aggregate": NULL,
                 })
             else:
                 selects.extend(
-                    {"name": concat_field(self.var, rel_name), "value": Variable(leaf.es_column, leaf.json_type), "aggregate":NULL}
+                    {
+                        "name": concat_field(self.var, rel_name),
+                        "value": Variable(leaf.es_column, leaf.json_type),
+                        "aggregate": NULL,
+                    }
                     for rel_name, leaf in leaves
                 )
 

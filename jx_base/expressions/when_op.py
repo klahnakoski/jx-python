@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from mo_imports import export
 from mo_logs import Log
@@ -50,7 +49,11 @@ class WhenOp(Expression):
     def __eq__(self, other):
         if not isinstance(other, WhenOp):
             return False
-        return self.when == other.when and self.then == other.then and self.els_ == other.els_
+        return (
+            self.when == other.when
+            and self.then == other.then
+            and self.els_ == other.els_
+        )
 
     def vars(self):
         return self.when.vars() | self.then.vars() | self.els_.vars()

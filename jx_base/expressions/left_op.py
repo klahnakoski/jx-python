@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.expression import Expression
@@ -50,8 +49,7 @@ class LeftOp(Expression):
 
     def missing(self, lang):
         return OrOp(
-            self.value.missing(lang),
-            self.length.missing(lang),
+            self.value.missing(lang), self.length.missing(lang),
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
@@ -62,8 +60,6 @@ class LeftOp(Expression):
         return WhenOp(
             self.missing(lang),
             **{"else": BasicSubstringOp(
-                value,
-                ZERO,
-                MaxOp(ZERO, MinOp(length, max_length)),
+                value, ZERO, MaxOp(ZERO, MinOp(length, max_length)),
             )}
         ).partial_eval(lang)

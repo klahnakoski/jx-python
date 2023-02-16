@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions._utils import _jx_expression
 from jx_base.expressions.and_op import AndOp
@@ -68,10 +67,7 @@ class EqOp(Expression):
                 lhs, rhs = items[0]
                 return EqOp(Variable(lhs), Literal(rhs))
             else:
-                return AndOp(*(
-                    EqOp(Variable(lhs), Literal(rhs))
-                    for lhs, rhs in items
-                ))
+                return AndOp(*(EqOp(Variable(lhs), Literal(rhs)) for lhs, rhs in items))
         else:
             Log.error("do not not know what to do")
 

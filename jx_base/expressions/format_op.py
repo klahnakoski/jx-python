@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.models.container import Container
@@ -43,7 +42,7 @@ class FormatOp(Expression):
             return JxType(
                 data={h: {ARRAY_KEY: {ARRAY_KEY: JX_JOSN}} for h in head},
                 meta={"format": JX_TEXT},
-                edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_JSON}}
+                edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_JSON}},
             )
 
     def apply(self, container: Container):
@@ -55,9 +54,7 @@ class FormatOp(Expression):
         # DID NOT THINK THIS FAR YET
         if self.format == "container":
             output = QueryTable(new_table, container=container)
-        elif self.format == "cube" or (
-            not self.format and normalized_query.edges
-        ):
+        elif self.format == "cube" or (not self.format and normalized_query.edges):
             column_names = [None] * (
                 max(c.push_column_index for c in index_to_columns.values()) + 1
             )
@@ -73,7 +70,9 @@ class FormatOp(Expression):
                 else:
                     select = {"name": normalized_query.select.name}
 
-                return Data(data=from_data(data), select=select, meta={"format": "cube"})
+                return Data(
+                    data=from_data(data), select=select, meta={"format": "cube"}
+                )
 
             if not result.data:
                 edges = []
@@ -181,8 +180,7 @@ class FormatOp(Expression):
                 edges.append(Data(name=e.name, allowNulls=allowNulls, domain=domain))
 
             data_cubes = {
-                s['name']: Matrix(dims=dims)
-                for s in normalized_query.select.terms
+                s["name"]: Matrix(dims=dims) for s in normalized_query.select.terms
             }
 
             r2c = index_to_coordinate(dims)  # WORKS BECAUSE THE DATABASE SORTED THE EDGES TO CONFORM
@@ -205,9 +203,7 @@ class FormatOp(Expression):
                 select=select,
                 data={k: v.cube for k, v in data_cubes.items()},
             )
-        elif self.format == "table" or (
-            not self.format and normalized_query.groupby
-        ):
+        elif self.format == "table" or (not self.format and normalized_query.groupby):
             column_names = [None] * (
                 max(c.push_column_index for c in index_to_columns.values()) + 1
             )
@@ -240,7 +236,9 @@ class FormatOp(Expression):
             if (
                 not normalized_query.edges
                 and not normalized_query.groupby
-                    and any(s['aggregate'] is not NULL for s in normalized_query.select.terms)
+                and any(
+                    s["aggregate"] is not NULL for s in normalized_query.select.terms
+                )
             ):
                 data = Data()
                 for s in index_to_columns.values():
@@ -248,7 +246,9 @@ class FormatOp(Expression):
                         data[s.push_column_name][s.push_column_child] = s.pull(result.data[0])
                     else:
                         data[s.push_column_name][s.push_column_child] += [s.pull(result.data[0])]
-                output = Data(meta={"format": "value"}, data=unwraplist(from_data(data)))
+                output = Data(
+                    meta={"format": "value"}, data=unwraplist(from_data(data))
+                )
             else:
                 data = []
                 for record in result.data:
