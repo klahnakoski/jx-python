@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from mo_dots import is_data, is_list, Null
 from mo_future import is_text
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 from jx_base.expressions import (
     FALSE,
@@ -84,7 +84,7 @@ def _inequality_to_python(self):
             OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
-                "else": PythonScript(type=T_BOOLEAN, expr=script, frum=self),
+                "else": PythonScript(type=JX_BOOLEAN, expr=script, frum=self),
             }
         )
         .partial_eval(Python)

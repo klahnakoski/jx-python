@@ -16,7 +16,7 @@ from jx_base.expressions.true_op import TRUE
 from jx_base.language import TYPE_ORDER
 from mo_dots import Null
 from mo_imports import export
-from mo_json.types import T_IS_NULL
+from mo_json.types import JX_IS_NULL
 from mo_logs import Log
 
 
@@ -26,7 +26,7 @@ class NullOp(Literal):
     USE IT TO EXPECT A NULL VALUE IN assertAlmostEqual
     """
 
-    _data_type = T_IS_NULL
+    _data_type = JX_IS_NULL
 
     @classmethod
     def define(cls, expr):
@@ -80,7 +80,7 @@ class NullOp(Literal):
 
     @property
     def type(self):
-        return T_IS_NULL
+        return JX_IS_NULL
 
     def __call__(self, row=None, rownum=None, rows=None):
         return Null

@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from mo_json.types import T_TEXT
+from mo_json.types import JX_TEXT
 
 
 class BasicSubstringOp(Expression):
@@ -20,7 +20,7 @@ class BasicSubstringOp(Expression):
     PLACEHOLDER FOR BASIC value.substring(start, end) (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = T_TEXT
+    _data_type = JX_TEXT
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from jx_base.expressions.expression import Expression
-from mo_json.types import T_NUMBER
+from mo_json.types import JX_NUMBER
 
 
 class UnixOp(Expression):
@@ -20,7 +20,7 @@ class UnixOp(Expression):
     """
 
     has_simple_form = True
-    _data_type = T_NUMBER
+    _data_type = JX_NUMBER
 
     def __init__(self, *term):
         Expression.__init__(self, *term)

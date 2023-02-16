@@ -17,11 +17,11 @@ from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_imports import export
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class OrOp(Expression):
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
     default = FALSE  # ADD THIS TO terms FOR NO EEFECT
 
     def __init__(self, *terms):

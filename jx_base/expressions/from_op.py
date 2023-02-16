@@ -30,8 +30,8 @@ class FromOp(Expression):
     def define(cls, expr):
         return FromOp(_jx_expression(to_data(expr)["from"], cls.lang))
 
-    def apply(self, container: Container, group_by):
-        return container.query(self.frum, group_by)
+    def apply(self, container: Container):
+        return container.query(self.frum)
 
     def __data__(self):
         return {"from": self.frum.__data__()}

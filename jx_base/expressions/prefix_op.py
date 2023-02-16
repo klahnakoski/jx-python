@@ -23,12 +23,12 @@ from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from mo_dots import is_data, is_missing
 from mo_future import first
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class PrefixOp(Expression):
     has_simple_form = True
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, expr, prefix):
         Expression.__init__(self, expr, prefix)

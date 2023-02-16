@@ -17,7 +17,7 @@ from jx_base.expressions.literal import ZERO
 from jx_base.expressions.max_op import MaxOp
 from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.language import is_op
-from mo_json import T_INTEGER
+from mo_json import JX_INTEGER
 
 
 class BasicIndexOfOp(Expression):
@@ -25,7 +25,7 @@ class BasicIndexOfOp(Expression):
     PLACEHOLDER FOR BASIC value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = T_INTEGER
+    _data_type = JX_INTEGER
 
     def __init__(self, value, find, start):
         Expression.__init__(self, value, find, start)

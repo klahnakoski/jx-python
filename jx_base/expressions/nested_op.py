@@ -23,11 +23,11 @@ from jx_base.expressions.variable import IDENTITY
 from jx_base.language import is_op
 from mo_dots import Null, startswith_field, coalesce, listwrap
 from mo_imports import export, expect
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class NestedOp(Expression):
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["nested_path", "select", "where", "sort", "limit"]

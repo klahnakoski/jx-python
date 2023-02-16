@@ -16,7 +16,7 @@ from jx_base.expressions.null_op import NULL
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.language import is_op
 from mo_imports import expect
-from mo_json.types import T_NUMBER
+from mo_json.types import JX_NUMBER
 from mo_dots import coalesce
 
 OrOp, Variable = expect("OrOp", "Variable")
@@ -24,7 +24,7 @@ OrOp, Variable = expect("OrOp", "Variable")
 
 class BaseBinaryOp(Expression):
     has_simple_form = True
-    _data_type = T_NUMBER
+    _data_type = JX_NUMBER
     op = None
 
     def __init__(self, *terms, default=None):

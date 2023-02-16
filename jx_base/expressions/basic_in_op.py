@@ -17,7 +17,7 @@ from jx_base.expressions.literal import Literal, is_literal
 from jx_base.expressions.false_op import FALSE
 from jx_base.language import is_op
 from mo_dots import is_many
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 from mo_logs import Log
 
 EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect(
@@ -27,7 +27,7 @@ EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect(
 
 class BasicInOp(Expression):
     has_simple_form = True
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __new__(cls, value, superset):
         if is_op(value, Variable) and is_op(superset, Literal):

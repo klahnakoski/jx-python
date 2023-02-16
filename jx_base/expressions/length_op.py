@@ -16,11 +16,11 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
 from mo_future import is_text
-from mo_json import T_INTEGER
+from mo_json import JX_INTEGER
 
 
 class LengthOp(Expression):
-    _data_type = T_INTEGER
+    _data_type = JX_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, term)

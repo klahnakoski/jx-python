@@ -16,11 +16,11 @@ from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from mo_dots import is_many
 from mo_imports import export
-from mo_json import union_type, T_ARRAY, array_type
+from mo_json import union_type, JX_ARRAY, array_type
 
 
 class TupleOp(Expression):
-    date_type = T_ARRAY
+    date_type = JX_ARRAY
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

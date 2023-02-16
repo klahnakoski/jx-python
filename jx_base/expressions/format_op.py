@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.expression import Expression
 from jx_base.models.container import Container
 from mo_json.typed_encoder import ARRAY_KEY
-from mo_json.types import T_TEXT, T_JSON
+from mo_json.types import JX_TEXT, JX_JSON
 from mo_logs import Log
 
 
@@ -41,13 +41,13 @@ class FormatOp(Expression):
             # TODO: WHAT IS THE CUBE TYPE?
             head = [c.name for c in self.frum.schema.columns]
             return JxType(
-                data={h: {ARRAY_KEY: {ARRAY_KEY: T_JOSN}} for h in head},
-                meta={"format": T_TEXT},
-                edges={ARRAY_KEY: {"name": T_TEXT, "domain": T_JSON}}
+                data={h: {ARRAY_KEY: {ARRAY_KEY: JX_JOSN}} for h in head},
+                meta={"format": JX_TEXT},
+                edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_JSON}}
             )
 
-    def apply(self, container: Container, group_by):
-        result = self.frum.apply(container, group_by)
+    def apply(self, container: Container):
+        result = self.frum.apply(container)
 
         if self.format == "sql":
             return result.to_sql(container.namespace)

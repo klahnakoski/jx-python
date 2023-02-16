@@ -16,7 +16,7 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
-from mo_json.types import T_NUMBER
+from mo_json.types import JX_NUMBER
 
 
 class BasicMultiOp(Expression):
@@ -24,7 +24,7 @@ class BasicMultiOp(Expression):
     PLACEHOLDER FOR BASIC OPERATOR (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = T_NUMBER
+    _data_type = JX_NUMBER
     op = None
 
     def __init__(self, *terms):

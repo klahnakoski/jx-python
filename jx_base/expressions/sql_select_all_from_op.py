@@ -28,7 +28,7 @@ class SqlSelectAllFromOp(Expression):
     @property
     def type(self):
         return {
-            c.es_column: JxType(c.type)
+            c.es_column: str(JxType(c.type))
             for c in self.table.schema.columns
         }
 

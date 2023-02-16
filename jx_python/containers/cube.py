@@ -130,7 +130,7 @@ class Cube(Container):
 
         Log.error("This is a multicube")
 
-    def query(self, q, group_by):
+    def query(self, q):
         frum = self
         if is_aggs(q):
             return cube_aggs(frum, q)

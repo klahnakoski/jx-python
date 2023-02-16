@@ -16,7 +16,7 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_op, JX
-from mo_json import T_INTEGER
+from mo_json import JX_INTEGER
 from mo_dots import is_missing
 
 
@@ -26,7 +26,7 @@ class FindOp(Expression):
     """
 
     has_simple_form = True
-    _data_type = T_INTEGER
+    _data_type = JX_INTEGER
 
     def __init__(self, value, find, **kwargs):
         Expression.__init__(self, value, find)

@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.language import is_op
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class BasicEqOp(Expression):
@@ -21,7 +21,7 @@ class BasicEqOp(Expression):
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

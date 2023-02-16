@@ -15,12 +15,12 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class RegExpOp(Expression):
     has_simple_form = True
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

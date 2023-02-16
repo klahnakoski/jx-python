@@ -26,12 +26,12 @@ from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
 from mo_dots import is_many
 from mo_imports import export
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class InOp(Expression):
     has_simple_form = True
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, value, superset):
         Expression.__init__(self, value, superset)

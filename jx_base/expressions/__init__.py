@@ -91,8 +91,10 @@ from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.split_op import SplitOp
 from jx_base.expressions.sql_eq_op import SqlEqOp
+from jx_base.expressions.sql_group_by_op import SqlGroupByOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
+from jx_base.expressions.sql_origins_op import SqlOriginsOp
 from jx_base.expressions.sql_script import SqlScript
 from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
 from jx_base.expressions.sql_select_op import SqlSelectOp

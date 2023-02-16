@@ -9,7 +9,7 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-from mo_json.types import T_NUMBER_TYPES
+from mo_json.types import JX_NUMBER_TYPES
 
 from jx_base.expressions.to_number_op import ToNumberOp as NumberOp_
 from jx_base.expressions.true_op import TRUE
@@ -23,7 +23,7 @@ class ToNumberOp(NumberOp_):
         value = self.term.to_python()
 
         if exists is TRUE:
-            if term.type in T_NUMBER_TYPES:
+            if term.type in JX_NUMBER_TYPES:
                 return value
             return "float(" + value + ")"
         else:

@@ -81,7 +81,7 @@ class ListContainer(Container, Namespace, Table):
         else:
             return Null
 
-    def query(self, q, group_by):
+    def query(self, q):
         q = to_data(q)
         output = self
         if is_aggs(q):

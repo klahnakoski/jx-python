@@ -15,13 +15,13 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_imports import expect, export
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 
 class AndOp(Expression):
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
     default = TRUE  # ADD THIS TO terms FOR NO EEFECT
 
     def __init__(self, *terms):

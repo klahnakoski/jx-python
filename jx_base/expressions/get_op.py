@@ -17,10 +17,17 @@ from jx_base.expressions.literal import is_literal
 class GetOp(Expression):
     has_simple_form = True
 
-    def __init__(self, *term):
-        Expression.__init__(self, *term)
-        self.var = term[0]
-        self.offsets = term[1:]
+    def __init__(self, var, *offsets):
+        Expression.__init__(self, var, *offsets)
+        self.var = var
+        self.offsets = offsets
+
+    def partial_eval(self, lang):
+        var = self.var.partial_eval(lang)
+        offsets = tuple(o.partial_eval(lang) for o in self.offsets)
+        if var.op == GetOp.op:
+            return GetOp(var.var, *var.offsets + offsets)
+        return GetOp(var, *offsets)
 
     def __data__(self):
         if is_literal(self.var) and len(self.offsets) == 1 and is_literal(self.offset):

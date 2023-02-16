@@ -24,6 +24,10 @@ class AggregateOp(Expression):
         self.frum = frum
         self.op = canonical_aggregates[op]
 
+    def apply(self, container):
+        source = self.frum.apply(container)
+        return source.query(self.op)
+
     def __data__(self):
         return {"aggregate": [
             self.frum.__data__(),

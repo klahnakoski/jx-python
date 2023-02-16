@@ -16,7 +16,7 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal, ZERO, ONE, is_literal
 from jx_base.expressions.true_op import TRUE
 from mo_imports import expect
-from mo_json.types import T_NUMBER
+from mo_json.types import JX_NUMBER
 
 AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
     "AndOp", "CoalesceOp", "NULL", "OrOp", "WhenOp", "ToNumberOp"
@@ -25,7 +25,7 @@ AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
 
 class BaseMultiOp(Expression):
     has_simple_form = True
-    _data_type = T_NUMBER
+    _data_type = JX_NUMBER
 
     def __init__(self, *terms, nulls=False, **clauses):
         Expression.__init__(self, *terms)

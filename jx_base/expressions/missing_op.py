@@ -16,11 +16,11 @@ from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_imports import export
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class MissingOp(Expression):
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)

@@ -20,12 +20,12 @@ from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.language import is_op
-from mo_json.types import T_BOOLEAN
+from mo_json.types import JX_BOOLEAN
 
 
 class NeOp(Expression):
     has_simple_form = True
-    _data_type = T_BOOLEAN
+    _data_type = JX_BOOLEAN
 
     def __init__(self, lhs, rhs):
         Expression.__init__(self, lhs, rhs)

@@ -21,7 +21,7 @@ from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_dots import is_sequence
 from mo_imports import expect
-from mo_json.types import T_BOOLEAN, union_type
+from mo_json.types import JX_BOOLEAN, union_type
 from mo_logs import Log
 
 WhenOp = expect("WhenOp")
@@ -78,7 +78,7 @@ class CaseOp(Expression):
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
-        if self.type is T_BOOLEAN:
+        if self.type is JX_BOOLEAN:
             nots = []
             ors = []
             for w in self.whens[:-1]:

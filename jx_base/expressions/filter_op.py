@@ -19,7 +19,7 @@ class FilterOp(Expression):
     def __init__(self, *terms):
         Expression.__init__(self, *terms)
         self.frum, self.func = terms
-        if self.frum.type != T_ARRAY:
+        if self.frum.type != JX_ARRAY:
             Log.error("expecting an array")
 
     def __data__(self):

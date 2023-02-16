@@ -26,12 +26,12 @@ from jx_base.expressions.variable import Variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from mo_dots import is_data, is_sequence, to_data, coalesce
-from mo_json.types import T_TEXT
+from mo_json.types import JX_TEXT
 from mo_logs import Log
 
 
 class BetweenOp(Expression):
-    _data_type = T_TEXT
+    _data_type = JX_TEXT
 
     def __init__(self, *value, prefix, suffix, default=NULL, start=NULL):
         Expression.__init__(self, [])

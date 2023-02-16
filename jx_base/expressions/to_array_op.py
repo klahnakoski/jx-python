@@ -35,6 +35,6 @@ class ToArrayOp(Expression):
     def partial_eval(self, lang):
         if self.term.missing():
             return NULL
-        if self.term.type == T_ARRAY:
+        if self.term.type == JX_ARRAY:
             return self.term.partial_eval(lang)
         return ToArrayOp(self.term.partial_eval(lang))

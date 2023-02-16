@@ -14,7 +14,18 @@ from jx_base.expressions import GetOp as GetOp_
 
 class GetOp(GetOp_):
     def to_python(self):
-        output = ["(" + (self.var).to_python() + ")"]
-        for o in self.offsets:
-            output.append("[" + (o).to_python() + "]")
-        return "".join(output)
+        acc = [f"for v0 in listwrap({self.var.to_python()})"]
+        for i, o in enumerate(self.offsets):
+            getting = f"get_attr(v{i}, {o.to_python()})"
+            acc.append(f"for v{i+1} in {getting}")
+        n = len(self.offsets)
+        return destream(f"[v{n} "+" ".join(acc)+"]")
+
+
+def destream(code):
+    return f"[None if len(c)==0 else c[0] if len(c)==1 else c for c in [{code}]][0]"
+
+
+
+
+

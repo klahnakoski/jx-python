@@ -84,7 +84,7 @@ class Container(object):
     def get_table(self, name):
         raise NotImplementedError()
 
-    def query(self, query, group_by):
+    def query(self, query):
         if query.frum != self:
             Log.error("not expected")
         raise NotImplementedError()

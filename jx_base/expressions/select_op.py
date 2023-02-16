@@ -133,10 +133,10 @@ class SelectOp(Expression):
             if expr is NULL:
                 continue
             elif is_op(expr, SelectOp):
-                for t_name, t_value in expr.terms:
+                for JX_name, JX_value in expr.terms:
                     new_terms.append({
-                        "name": concat_field(name, t_name),
-                        "value": t_value
+                        "name": concat_field(name, JX_name),
+                        "value": JX_value
                     })
             else:
                 new_terms.append({
@@ -149,10 +149,10 @@ class SelectOp(Expression):
         else:
             return self
 
-    def apply(self, container: Container, group_by):
-        result = self.frum.apply(container, group_by)
+    def apply(self, container: Container):
+        result = self.frum.apply(container)
         results = tuple(
-            {"name": name, "value": value.apply(result, group_by)}
+            {"name": name, "value": value.apply(result)}
             for name, value in self
         )
         # GROUP BY COMMON TABLE
