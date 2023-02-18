@@ -11,6 +11,7 @@
 
 from mo_dots import is_data, is_list, Null
 from mo_future import is_text
+from mo_imports import expect
 from mo_json.types import JX_BOOLEAN
 
 from jx_base.expressions import (
@@ -21,9 +22,8 @@ from jx_base.expressions import (
     jx_expression,
 )
 from jx_base.language import Language, is_expression, is_op
-from jx_python.expression_compiler import compile_expression
 
-ToNumberOp, OrOp, PythonScript, ScriptOp, WhenOp = [None] * 5
+ToNumberOp, OrOp, PythonScript, ScriptOp, WhenOp, compile_expression = expect("ToNumberOp", "OrOp", "PythonScript", "ScriptOp", "WhenOp", "compile_expression")
 
 
 def jx_expression_to_function(expr):

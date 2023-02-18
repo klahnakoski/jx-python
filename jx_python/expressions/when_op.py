@@ -7,10 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_imports import export
 
 from jx_base.expressions import WhenOp as WhenOp_
-from jx_python.expressions import _utils
 
 
 class WhenOp(WhenOp_):
@@ -26,4 +25,4 @@ class WhenOp(WhenOp_):
         )
 
 
-_utils.WhenOp = WhenOp
+export("jx_python.expressions._utils", WhenOp)

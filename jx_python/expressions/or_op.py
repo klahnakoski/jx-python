@@ -7,10 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_imports import export
 
 from jx_base.expressions import OrOp as OrOp_
-from jx_python.expressions import _utils
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
@@ -19,4 +18,4 @@ class OrOp(OrOp_):
         return " or ".join("(" + ToBooleanOp(t).to_python() + ")" for t in self.terms)
 
 
-_utils.OrOp = OrOp
+export("jx_python.expressions._utils", OrOp)

@@ -6,17 +6,21 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_files import File
+from mo_imports import export
+from mo_streams import ByteStream
+from mo_streams.utils import File_usingStream
 
 from mo_json import JxType, JX_IS_NULL
 
 from jx_base.expressions import GetOp, Literal, Variable
-from jx_python.expression_factory import ExpressionFactory
-from jx_python.expression_factory import factory
+from jx_python.streams.expression_factory import ExpressionFactory, factory
+from jx_python.streams.type_utils import Typer, CallableTyper
 
 _get = object.__getattribute__
 
 
-class Streams:
+class Stream:
     """
     A STREAM OF OBJECTS
     """
@@ -38,7 +42,7 @@ class Streams:
 
     def map(self, accessor):
         fact = factory(accessor, self.factory.domain)
-        return Streams(self.values, fact, self.schema)
+        return Stream(self.values, fact, self.schema)
 
     ###########################################################################
     # TERMINATORS
@@ -50,6 +54,14 @@ class Streams:
 
 
 def stream(values):
-    return Streams(
+    return Stream(
         values, ExpressionFactory(Variable("."), Typer(example=values)), JX_IS_NULL
     )
+
+
+ANNOTATIONS = {
+    (str, "encode"): CallableTyper(python_type=bytes),
+}
+
+export("jx_python.streams.type_utils", ANNOTATIONS)
+export("jx_python.streams.type_utils", Stream)

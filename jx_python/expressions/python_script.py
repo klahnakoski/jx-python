@@ -7,8 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
+from mo_imports import export
 from mo_logs import Log
 
 from jx_base.expressions import (
@@ -21,7 +20,7 @@ from jx_base.expressions import (
     Expression,
 )
 from jx_base.utils import coalesce
-from jx_python.expressions import _utils, Python
+from jx_python.expressions import Python
 
 
 class PythonScript(PythonScript_):
@@ -78,4 +77,4 @@ class PythonScript(PythonScript_):
             return False
 
 
-_utils.PythonScript = PythonScript
+export("jx_python.expressions._utils", PythonScript)

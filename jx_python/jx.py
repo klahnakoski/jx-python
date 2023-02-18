@@ -22,7 +22,7 @@ from jx_python.containers.cube import Cube
 from jx_python.containers.list import ListContainer
 from jx_python.convert import list2table, list2cube
 from jx_python.cubes.aggs import cube_aggs
-from jx_python.expression_compiler import compile_expression
+from jx_python.streams.expression_compiler import compile_expression
 from jx_python.expressions import jx_expression_to_function as get
 from jx_python.flat_list import PartFlatList
 from mo_collections.index import Index

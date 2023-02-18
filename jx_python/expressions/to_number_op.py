@@ -7,13 +7,11 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
+from mo_imports import export
 from mo_json.types import JX_NUMBER_TYPES
 
 from jx_base.expressions.to_number_op import ToNumberOp as NumberOp_
 from jx_base.expressions.true_op import TRUE
-from jx_python.expressions import _utils
 
 
 class ToNumberOp(NumberOp_):
@@ -30,4 +28,4 @@ class ToNumberOp(NumberOp_):
             return "float(" + value + ") if (" + exists.to_python() + ") else None"
 
 
-_utils.ToNumberOp = ToNumberOp
+export("jx_python.expressions._utils", ToNumberOp)

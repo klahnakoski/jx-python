@@ -1,10 +1,10 @@
 from jx_base import jx_expression
 from jx_base.expressions import Expression, Variable, GetOp, EqOp, Literal
-from jx_python.expression_compiler import compile_expression
+from jx_python.streams.expression_compiler import compile_expression
 from jx_python.expressions import Python
 from mo_logs import logger
-from mo_streams import Typer
-from mo_streams.type_utils import JxTyper, UnknownTyper, LazyTyper
+from jx_python.streams.type_utils import Typer
+from jx_python.streams.type_utils import UnknownTyper, LazyTyper
 
 
 class ExpressionFactory:

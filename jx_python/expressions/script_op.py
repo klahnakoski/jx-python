@@ -7,10 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_imports import export
 
 from jx_base.expressions import ScriptOp as ScriptOp_
-from jx_python.expressions import _utils
 
 
 class ScriptOp(ScriptOp_):
@@ -18,4 +17,4 @@ class ScriptOp(ScriptOp_):
         return self.script
 
 
-_utils.ScriptOp = ScriptOp
+export("jx_python.expressions._utils", ScriptOp)

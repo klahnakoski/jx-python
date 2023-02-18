@@ -11,6 +11,8 @@ from __future__ import absolute_import, division
 
 import re
 
+from mo_imports import export
+
 from jx_base.utils import listwrap
 from mo_future import first
 from mo_dots import Data, coalesce, is_data, leaves_to_data
@@ -80,3 +82,6 @@ def compile_expression(source, function_name="output"):
         return func
     except Exception as e:
         raise Log.error(u"Bad source: {{source}}", source=source, cause=e)
+
+
+export("jx_python.expressions._utils", compile_expression)
