@@ -10,6 +10,7 @@ import os
 from unittest import TestCase
 
 from jx_python.streams import stream
+from jx_python.streams.expression_factory import it
 
 IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
@@ -22,4 +23,22 @@ class TestExpressionFactory(TestCase):
 
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
         result = stream(value).value.props.a.to_list()
+        self.assertEqual(result, [1, 2, 3])
+
+    def test_iterator(self):
+        class Something:
+            def __init__(self, value):
+                self.value = value
+
+        value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        result = list(stream(value).value.props.a)
+        self.assertEqual(result, [1, 2, 3])
+
+    def test_it_eq(self):
+        class Something:
+            def __init__(self, value):
+                self.value = value
+
+        value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        result = stream(value).value.props.filter(it.a==2).to_value()
         self.assertEqual(result, [1, 2, 3])

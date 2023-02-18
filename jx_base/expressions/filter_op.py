@@ -7,17 +7,19 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_logs import Log
 
-
-from jx_base.expressions.expression import Expression, jx_expression
+from jx_base.expressions.expression import Expression, jx_expression, MissingOp
 from jx_base.expressions.literal import TRUE
 from mo_dots import is_many
 
+from mo_json import JX_ARRAY
+
 
 class FilterOp(Expression):
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.frum, self.func = terms
+    def __init__(self, frum, func):
+        Expression.__init__(self, frum, func)
+        self.frum, self.func = frum, func
         if self.frum.type != JX_ARRAY:
             Log.error("expecting an array")
 
@@ -28,7 +30,7 @@ class FilterOp(Expression):
         return self.frum.vars() | self.func.vars()
 
     def map(self, map_):
-        return FilterOp(self.frum.map(mao_), self.func.map(map_))
+        return FilterOp(self.frum.map(map_), self.func.map(map_))
 
     @property
     def type(self):

@@ -1,10 +1,11 @@
+from mo_logs import logger
+
 from jx_base import jx_expression
 from jx_base.expressions import Expression, Variable, GetOp, EqOp, Literal
-from jx_python.streams.expression_compiler import compile_expression
 from jx_python.expressions import Python
-from mo_logs import logger
-from jx_python.streams.type_utils import Typer
-from jx_python.streams.type_utils import UnknownTyper, LazyTyper
+from jx_python.streams.expression_compiler import compile_expression
+from jx_python.streams.typers import Typer
+from jx_python.streams.typers import UnknownTyper, LazyTyper
 
 
 class ExpressionFactory:
@@ -24,7 +25,7 @@ class ExpressionFactory:
 
     def __eq__(self, other):
         other = factory(other)
-        return ExpressionFactory(EqOp(self, other), Typer(python_type=bool))
+        return ExpressionFactory(EqOp(self.expr, other.expr), Typer(python_type=bool))
 
     def to_list(self):
         self.build()(None)
@@ -39,6 +40,9 @@ def factory(expr, typer=None) -> ExpressionFactory:
 
     if not isinstance(expr, Expression):
         expr = jx_expression(expr)
+
+    if expr.op == Literal.op:
+        return ExpressionFactory(expr, Typer(example=expr.value))
 
     return ExpressionFactory(expr, typer)
 
