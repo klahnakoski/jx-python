@@ -41,8 +41,7 @@ class Literal(Expression):
         return object.__new__(cls)
 
     def __init__(self, value):
-
-        Expression.__init__(self, None)
+        Expression.__init__(self)
         self.simplified = True
         self._value = value
 

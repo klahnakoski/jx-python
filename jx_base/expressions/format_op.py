@@ -7,12 +7,14 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_collections.matrix import Matrix
+from mo_dots import is_list, from_data, Data
 
 from jx_base.expressions.expression import Expression
 from jx_base.models.container import Container
+from jx_base.utils import enlist, delist
 from mo_json.typed_encoder import ARRAY_KEY
-from mo_json.types import JX_TEXT, JX_JSON
+from mo_json.types import JX_TEXT, JX_JSON, JxType
 from mo_logs import Log
 
 
@@ -28,19 +30,19 @@ class FormatOp(Expression):
         return self.frum.vars() | self.format.vars()
 
     def map(self, map_):
-        return FormatOp(self.frum.map(mao_), self.format.map(map_))
+        return FormatOp(self.frum.map(map_), self.format.map(map_))
 
     @property
     def type(self):
         if self.format == "value":
-            return frum.type[ARRAY_KEY]
+            return self.frum.type[ARRAY_KEY]
         elif self.format == "list":
             return self.frum.type
         elif self.format == "cube":
             # TODO: WHAT IS THE CUBE TYPE?
             head = [c.name for c in self.frum.schema.columns]
             return JxType(
-                data={h: {ARRAY_KEY: {ARRAY_KEY: JX_JOSN}} for h in head},
+                data={h: {ARRAY_KEY: {ARRAY_KEY: JX_JSON}} for h in head},
                 meta={"format": JX_TEXT},
                 edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_JSON}},
             )
@@ -110,7 +112,7 @@ class FormatOp(Expression):
                     ))
 
                 data = {}
-                for si, s in enumerate(listwrap(normalized_query.select)):
+                for si, s in enumerate(enlist(normalized_query.select)):
                     if s.aggregate == "count":
                         data[s.name] = Matrix(dims=dims, zeros=0)
                     else:
@@ -247,7 +249,7 @@ class FormatOp(Expression):
                     else:
                         data[s.push_column_name][s.push_column_child] += [s.pull(result.data[0])]
                 output = Data(
-                    meta={"format": "value"}, data=unwraplist(from_data(data))
+                    meta={"format": "value"}, data=delist(from_data(data))
                 )
             else:
                 data = []

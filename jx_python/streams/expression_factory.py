@@ -14,14 +14,12 @@ class ExpressionFactory:
         self.domain: Typer = domain or LazyTyper()
 
     def build(self):
-        return compile_expression(
-            self.expr.partial_eval(Python).to_python(), "some_function"
-        )
+        return compile_expression(self.expr.partial_eval(Python).to_python())
 
     def __getattr__(self, item):
         item_type = getattr(self.domain, item)
 
-        return ExpressionFactory(GetOp(self.expr, factory(item).expr), item_type)
+        return ExpressionFactory(GetOp(self.expr, Literal(item)), item_type)
 
     def __eq__(self, other):
         other = factory(other)

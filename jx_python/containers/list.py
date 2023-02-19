@@ -17,6 +17,7 @@ from jx_base.language import is_expression, is_op
 from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
 from jx_base.models.table import Table
+from jx_base.utils import delist, enlist
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
 from jx_python.lists.aggs import is_aggs, list_aggs
@@ -136,7 +137,7 @@ class ListContainer(Container, Namespace, Table):
         THE where CLAUSE IS A JSON EXPRESSION FILTER
         """
         command = to_data(command)
-        command_clear = listwrap(command["clear"])
+        command_clear = enlist(command["clear"])
         command_set = command.set.items()
         command_where = jx.get(command.where)
 
@@ -178,7 +179,7 @@ class ListContainer(Container, Namespace, Table):
             return [d[select] for d in self.data]
 
     def select(self, select):
-        selects = listwrap(select)
+        selects = enlist(select)
 
         if (
             len(selects) == 1
@@ -205,7 +206,7 @@ class ListContainer(Container, Namespace, Table):
             def selector(d):
                 output = Data()
                 for n, p in push_and_pull:
-                    output[n] = unwraplist(p(to_data(d)))
+                    output[n] = delist(p(to_data(d)))
                 return from_data(output)
 
             new_data = list(map(selector, self.data))
@@ -246,7 +247,7 @@ class ListContainer(Container, Namespace, Table):
 
     def groupby(self, keys, contiguous=False):
         try:
-            keys = listwrap(keys)
+            keys = enlist(keys)
             get_key = jx_expression_to_function(keys)
             if not contiguous:
                 data = sort_using_key(self.data, key=get_key)
@@ -275,7 +276,7 @@ class ListContainer(Container, Namespace, Table):
             return dict_to_data({
                 "meta": {"format": "list"},
                 "data": [
-                    {k: unwraplist(v) for k, v in row.items()} for row in self.data
+                    {k: delist(v) for k, v in row.items()} for row in self.data
                 ],
             })
 

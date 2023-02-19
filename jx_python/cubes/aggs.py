@@ -20,7 +20,7 @@ from mo_logs import Log
 
 
 def cube_aggs(frum, query):
-    select = listwrap(query.select)
+    select = enlist(query.select)
 
     # MATCH EDGES IN QUERY TO ONES IN frum
     for e in query.edges:

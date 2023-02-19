@@ -67,7 +67,7 @@ class Dimension(object):
 
         # ALLOW ACCESS TO SUB-PART BY NAME (IF ONLY THERE IS NO NAME COLLISION)
         self.edges = Data()
-        for e in listwrap(dim.edges):
+        for e in enlist(dim.edges):
             new_e = Dimension(e, self, jx)
             self.edges[new_e.full_name] = new_e
 
@@ -84,7 +84,7 @@ class Dimension(object):
                 for k, v in self.fields.items()
             ])
         else:
-            self.fields = listwrap(fields)
+            self.fields = enlist(fields)
             edges = list_to_data([
                 {"name": f, "value": f, "index": i, "allowNulls": False}
                 for i, f in enumerate(self.fields)

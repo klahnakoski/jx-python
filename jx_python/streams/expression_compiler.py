@@ -13,20 +13,31 @@ import re
 
 from mo_imports import export
 
-from jx_base.utils import listwrap
+from jx_base.utils import enlist, delist
 from mo_future import first
 from mo_dots import Data, coalesce, is_data, leaves_to_data
 from mo_logs import Log, strings
 from mo_times.dates import Date
 
 
-def get_attr(value, item):
-    try:
-        return listwrap(getattr(value, item))
-    except:
-        pass
+def get_attr(value, *items):
+    values = enlist(value)
+    for item in items:
+        result = []
+        for v in values:
+            try:
+                result.extend(enlist(getattr(v, item)))
+                continue
+            except:
+                pass
 
-    return listwrap(value[item])
+            try:
+                result.extend(enlist(v[item]))
+            except:
+                pass
+
+        values = result
+    return delist(values)
 
 
 GLOBALS = {
@@ -35,7 +46,8 @@ GLOBALS = {
     "null": None,
     "EMPTY_DICT": {},
     "coalesce": coalesce,
-    "listwrap": listwrap,
+    "enlist": enlist,
+    "delist": delist,
     "Date": Date,
     "Log": Log,
     "Data": Data,

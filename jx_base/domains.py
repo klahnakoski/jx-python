@@ -853,7 +853,7 @@ class RangeDomain(Domain):
             if not key:
                 Log.error("Must have a key value")
 
-            parts = listwrap(partitions)
+            parts = enlist(partitions)
             for i, p in enumerate(parts):
                 self.min = MIN([min, p.min])
                 self.max = MAX([max, p.max])

@@ -18,7 +18,7 @@ class Record(object):
         self.cube = cube
 
     def __getitem__(self, item):
-        for s in listwrap(self.cube.select):
+        for s in enlist(self.cube.select):
             if s.name == item:
                 return self.cube.data[item]
         for i, e in enumerate(self.cube.edges):

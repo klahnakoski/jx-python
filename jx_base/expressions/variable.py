@@ -7,20 +7,19 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
-from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from jx_base.language import is_op
-from jx_base.utils import get_property_name
 from mo_dots import is_sequence, split_field, startswith_field, concat_field
 from mo_dots.lists import last
 from mo_future import is_text
-from mo_imports import expect
-from mo_imports import export
+from mo_imports import expect, export
+from mo_logs import Log
+
+from jx_base.expressions.expression import Expression, Literal
+from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.null_op import NULL
+from jx_base.language import is_op
+from jx_base.utils import get_property_name
 from mo_json.typed_encoder import inserter_type_to_json_type
 from mo_json.types import to_jx_type, JxType
-from jx_base.expressions.null_op import NULL
 
 QueryOp, SelectOp = expect("QueryOp", "SelectOp")
 
@@ -56,18 +55,44 @@ class Variable(Expression):
     def __data__(self):
         return self.var
 
+    def partial_eval(self, lang):
+        path = split_field(self.var)
+        if len(path) == 1 and path in ["row", "rownum", "rows"]:
+            return self
+
+        base = lang.Variable("row")
+        if not path:
+            return base
+        elif path[0] == "row":
+            path = path[1:]
+        elif path[0] == "rownum":
+            # MAGIC VARIABLES
+            base = lang.Variable("rownum")
+            path = path[1:]
+        elif path[0] == "rows":
+            base = lang.Variable("rows")
+            path = path[1:]
+            if len(path) == 0:
+                return base
+            elif path[0] in ["first", "last"]:
+                base = "rows." + path[0] + "()"
+                path = path[1:]
+            else:
+                Log.error("do not know what {{var}} of `rows` is", var=path[1])
+
+        return lang.GetOp(base, *(Literal(p) for p in path))
+
     def vars(self):
         return {self.var}
 
     def map(self, map_):
         replacement = map_.get(self.var)
-        if replacement != None:
-            if is_text(replacement):
-                return Variable(replacement)
-            else:
-                return replacement
-        else:
+        if replacement is None:
             return self
+        if is_text(replacement):
+            return Variable(replacement)
+        else:
+            return replacement
 
     def to_jx(self, schema):
         paths = {}

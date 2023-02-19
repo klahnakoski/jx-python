@@ -295,10 +295,10 @@ class Cube(Container):
         return self.data.items()
 
     def get_columns(self):
-        return self.edges + listwrap(self.select)
+        return self.edges + enlist(self.select)
 
     def get_leaves(self):
-        return self.edges + listwrap(self.select)
+        return self.edges + enlist(self.select)
 
     def forall(self, method):
         """
@@ -322,7 +322,7 @@ class Cube(Container):
             method(matrix[c], [parts[i][cc] for i, cc in enumerate(c)], self)
 
     def _select(self, select):
-        selects = listwrap(select)
+        selects = enlist(select)
         is_aggregate = OR(
             s.aggregate != None and s.aggregate != "none" for s in selects
         )
@@ -379,7 +379,7 @@ class Cube(Container):
             return output
 
         if is_list(self.select):
-            selects = listwrap(self.select)
+            selects = enlist(self.select)
             index, v = transpose(*self.data[selects[0].name].groupby(selector))
 
             coord = list_to_data([coord2term(c) for c in index])
@@ -445,7 +445,7 @@ class Cube(Container):
             return output
 
         if is_list(self.select):
-            selects = listwrap(self.select)
+            selects = enlist(self.select)
             index, v = transpose(*self.data[selects[0].name].groupby(selector))
 
             coord = list_to_data([coord2term(c) for c in index])

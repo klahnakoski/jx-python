@@ -64,7 +64,7 @@ class NestedOp(Expression):
         elif self.nested_path == other.frum:
             return NestedOp(
                 self.nested_path,
-                listwrap(self.select) + listwrap(other.select),
+                enlist(self.select) + enlist(other.select),
                 AndOp(self.where, other.where),
                 coalesce(self.sort, other.sort),
                 coalesce(self.limit, other.limit),

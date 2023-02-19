@@ -12,7 +12,7 @@
 import operator
 
 from jx_base.language import is_expression, Language
-from jx_base.utils import listwrap
+from jx_base.utils import enlist
 from mo_dots import is_sequence, is_missing, is_data
 from mo_future import (
     get_function_name,
@@ -118,7 +118,7 @@ def _jx_expression(json, lang):
                         # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
                         class_ = language[full_op.get_id()]
 
-                    return class_.define({op: [sub_json] + listwrap(rhs)})
+                    return class_.define({op: [sub_json] + enlist(rhs)})
 
         items = list(json.items())
         for op, term in items:

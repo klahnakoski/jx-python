@@ -142,8 +142,8 @@ def _get_schema_from_list(
                         native_type_to_json_type,
                     )
                 elif es_type in {"list", "FlatList"}:
-                    np = listwrap(nested_path)
-                    newpath = unwraplist([join_field(split_field(np[0]) + [name])] + np)
+                    np = enlist(nested_path)
+                    newpath = delist[join_field(split_field(np[0]) + [name])] + np)
                     _get_schema_from_list(
                         value, table_name, full_name, newpath, columns
                     )

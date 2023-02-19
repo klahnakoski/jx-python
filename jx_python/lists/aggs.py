@@ -16,7 +16,7 @@ from jx_python import windows
 from jx_python.expressions import jx_expression_to_function
 from mo_collections.matrix import Matrix
 from mo_dots import to_data
-from jx_base.utils import coalesce, listwrap
+from jx_base.utils import coalesce, enlist
 from mo_logs import Log
 from mo_math import UNION
 from mo_times.dates import Date
@@ -28,7 +28,7 @@ def is_aggs(query):
     if (
         query.edges
         or query.groupby
-        or any(a != None and a != "none" for a in listwrap(query.select).aggregate)
+        or any(a != None and a != "none" for a in enlist(query.select).aggregate)
     ):
         return True
     return False
@@ -36,7 +36,7 @@ def is_aggs(query):
 
 def list_aggs(frum, query):
     frum = to_data(frum)
-    select = listwrap(query.select)
+    select = enlist(query.select)
 
     for e in query.edges:
         if isinstance(e.domain, DefaultDomain):

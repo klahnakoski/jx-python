@@ -49,8 +49,6 @@ class LastOp(Expression):
         term = self.term.partial_eval(lang)
         if is_op(self.term, LastOp):
             return term
-        elif jx_type_to_json_type(term.type) != OBJECT and not term.many:
-            return term
         elif term is NULL:
             return term
         elif is_literal(term):

@@ -22,7 +22,7 @@ def to_jx_type(value):
     if isinstance(value, JxType):
         return value
     try:
-        return _type_to_json_type[value]
+        return _json_type_to_jx_type[value]
     except Exception:
         return JX_JSON
 
@@ -30,10 +30,7 @@ def to_jx_type(value):
 class JxType(object):
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
-            if isinstance(v, JxType):
-                setattr(self, k, v)
-            else:
-                Log.error("Not allowed")
+            setattr(self, k, v)
 
     def __or__(self, other):
         other = to_jx_type(other)
@@ -114,6 +111,9 @@ class JxType(object):
     def __eq__(self, other):
         if not isinstance(other, JxType):
             return False
+
+        if self is JX_ARRAY and hasattr(other, _A) or other is JX_ARRAY and hasattr(self, _A):
+            return True
 
         if self is JX_INTEGER or self is JX_NUMBER:
             if other is JX_INTEGER or other is JX_NUMBER:
@@ -285,7 +285,7 @@ JX_NUMBER_TYPES.__dict__ = [
     ]
 ][0]
 
-_type_to_json_type = {
+_json_type_to_jx_type = {
     IS_NULL: JX_IS_NULL,
     BOOLEAN: JX_BOOLEAN,
     INTEGER: JX_INTERVAL,

@@ -204,5 +204,5 @@ class Expression(BaseExpression):
         Log.error(
             """{{type}} object has no attribute {{item}}, did you .register_ops() for {{type}}?""",
             type=self.__class__.__name__,
-            item=item,
+            item=item
         )

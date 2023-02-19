@@ -302,8 +302,8 @@ def value_compare(left, right, ordering=1):
             elif right == None:
                 return -ordering
 
-            left = listwrap(left)
-            right = listwrap(right)
+            left = enlist(left)
+            right = enlist(right)
             for a, b in zip(left, right):
                 c = value_compare(a, b) * ordering
                 if c != 0:

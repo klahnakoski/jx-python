@@ -17,6 +17,7 @@ from jx_python.expressions.exists_op import ExistsOp
 from jx_python.expressions.exp_op import ExpOp
 from jx_python.expressions.false_op import FalseOp
 from jx_python.expressions.find_op import FindOp
+from jx_python.expressions.filter_op import FilterOp
 from jx_python.expressions.first_op import FirstOp
 from jx_python.expressions.floor_op import FloorOp
 from jx_python.expressions.get_op import GetOp

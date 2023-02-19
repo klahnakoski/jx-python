@@ -6,17 +6,13 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_dots import unwraplist
-from mo_files import File
 from mo_imports import export
-from mo_streams import ByteStream
-from mo_streams.utils import File_usingStream
-
-from mo_json import JxType, JX_IS_NULL
 
 from jx_base.expressions import GetOp, Literal, Variable, FilterOp
+from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory
 from jx_python.streams.typers import Typer, CallableTyper
+from mo_json import JxType, JX_IS_NULL, array_of, is_many, JX_ARRAY
 
 _get = object.__getattribute__
 
@@ -32,6 +28,11 @@ class Stream:
         self.schema: JxType = schema
 
     def __getattr__(self, item):
+        return self.map(ExpressionFactory(
+            GetOp(self.factory.expr, Literal(item)), self.factory.domain
+        ))
+
+    def __getitem__(self, item):
         if isinstance(item, str):
             return self.map(ExpressionFactory(
                 GetOp(self.factory.expr, Literal(item)), self.factory.domain
@@ -47,8 +48,11 @@ class Stream:
 
     def filter(self, expr):
         expr = factory(expr).expr
-        return ExpressionFactory(
-            FilterOp(self.values, expr), self.factory.domain
+        var = Variable(".", array_of(self.factory.domain.python_type))
+        return Stream(
+            self.values,
+            ExpressionFactory(FilterOp(self.factory.expr, expr), self.factory.domain),
+            self.schema,
         )
 
     ###########################################################################
@@ -65,12 +69,24 @@ class Stream:
 
     def to_value(self):
         func = self.factory.build()
-        return unwraplist(func(self.values))
+        return delist(func(self.values))
 
 
 def stream(values):
+    typer = Typer(example=values)
+    if is_many(values):
+        jx_type = JX_ARRAY
+    elif values == None:
+        jx_type = JX_IS_NULL
+        values = []
+    else:
+        jx_type = array_of(typer.python_type)
+        values = [values]
+
     return Stream(
-        values, ExpressionFactory(Variable("."), Typer(example=values)), JX_IS_NULL
+        values,
+        ExpressionFactory(Variable(".", jx_type), typer),
+        JX_IS_NULL
     )
 
 

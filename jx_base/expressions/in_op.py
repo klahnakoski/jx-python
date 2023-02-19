@@ -67,7 +67,7 @@ class InOp(Expression):
             return FALSE
         elif is_literal(superset):
             if is_literal(value):
-                return Literal(value() in listwrap(superset.value))
+                return Literal(value() in enlist(superset.value))
             elif is_many(superset.value):
                 return InOp(value, superset)
             else:

@@ -20,8 +20,6 @@ class FilterOp(Expression):
     def __init__(self, frum, func):
         Expression.__init__(self, frum, func)
         self.frum, self.func = frum, func
-        if self.frum.type != JX_ARRAY:
-            Log.error("expecting an array")
 
     def __data__(self):
         return {"filter": [self.frum.__data(), self.func.__data__()]}

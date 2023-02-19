@@ -42,3 +42,7 @@ class GetOp(Expression):
 
     def map(self, map_):
         return GetOp(self.var.map(map_), *(o.map(map_) for o in self.offsets))
+
+    def __eq__(self, other):
+        return isinstance(other, GetOp) and other.var == self.var and all(
+            o == s for s, o in zip(self.offsets, other.offsets))

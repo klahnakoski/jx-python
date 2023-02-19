@@ -11,6 +11,8 @@
 
 from mo_dots import unwraplist, dict_to_data
 from mo_future import text
+
+from jx_base.utils import delist
 from mo_json import value2json
 from mo_logs.strings import expand_template
 
@@ -36,7 +38,7 @@ def list2cube(rows, column_names=None):
 
     for r in rows:
         for k in keys:
-            data[k].append(unwraplist(r[k]))
+            data[k].append(delist(r[k]))
 
     return output
 
@@ -50,7 +52,7 @@ def list2table(rows, column_names=None):
             columns |= set(r.keys())
         keys = list(columns)
 
-    output = [[unwraplist(r.get(k)) for k in keys] for r in rows]
+    output = [[delist(r.get(k)) for k in keys] for r in rows]
 
     return dict_to_data({"meta": {"format": "table"}, "header": keys, "data": output})
 

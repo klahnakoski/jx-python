@@ -66,7 +66,7 @@ def coalesce(*args):
     return None
 
 
-def listwrap(value):
+def enlist(value):
     if value == None:
         return []
     elif is_list(value):
@@ -75,3 +75,12 @@ def listwrap(value):
         return list(value)
     else:
         return [value]
+
+
+def delist(values):
+    if len(values) == 0:
+        return None
+    elif len(values) == 1:
+        return values[0]
+    else:
+        return values

@@ -30,7 +30,7 @@ from jx_base.expressions.select_op import (
 from mo_imports import export
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_expression, is_op
-from jx_base.utils import is_variable_name, coalesce
+from jx_base.utils import is_variable_name, coalesce, delist, enlist
 from mo_dots import (
     Data,
     FlatList,
@@ -166,7 +166,7 @@ class QueryOp(Expression):
             output.select = normalize_one(".", frum, expr.format)
 
         output.where = _normalize_where(expr.where)
-        output.window = [_normalize_window(w) for w in listwrap(expr.window)]
+        output.window = [_normalize_window(w) for w in enlist(expr.window)]
         output.sort = _normalize_sort(expr.sort)
 
         return output
@@ -247,7 +247,7 @@ class QueryOp(Expression):
             output.select = SelectOp(frum, {"name": ".", "value": Variable(".")})
 
         output.where = _normalize_where(query.where)
-        output.window = [_normalize_window(w) for w in listwrap(query.window)]
+        output.window = [_normalize_window(w) for w in enlist(query.window)]
         output.sort = _normalize_sort(query.sort)
 
         return output
@@ -308,12 +308,12 @@ class QueryOp(Expression):
             pass
 
         output |= self.select.vars()
-        for s in listwrap(self.edges):
+        for s in enlist(self.edges):
             output |= edges_get_all_vars(s)
-        for s in listwrap(self.groupby):
+        for s in enlist(self.groupby):
             output |= edges_get_all_vars(s)
         output |= self.where.vars()
-        for s in listwrap(self.sort):
+        for s in enlist(self.sort):
             output |= s.value.vars()
 
         try:
@@ -328,7 +328,7 @@ class QueryOp(Expression):
             return set_default({"value": s.value.map(map_)}, s)
 
         def map_edge(e, map_):
-            partitions = unwraplist([
+            partitions = delist([
                 set_default({"where": p.where.map(map_)}, p)
                 for p in e.domain.partitions
             ])
@@ -357,7 +357,7 @@ class QueryOp(Expression):
             groupby=list_to_data([g.map(map_) for g in self.groupby]),
             window=list_to_data([w.map(map_) for w in self.window]),
             where=self.where.map(map_),
-            sort=list_to_data([map_select(s, map_) for s in listwrap(self.sort)]),
+            sort=list_to_data([map_select(s, map_) for s in enlist(self.sort)]),
             limit=self.limit,
             format=self.format,
         )
@@ -367,7 +367,7 @@ class QueryOp(Expression):
 
     @property
     def columns(self):
-        return listwrap(self.select) + coalesce(self.edges, self.groupby)
+        return enlist(self.select) + coalesce(self.edges, self.groupby)
 
     @property
     def query_path(self):
@@ -375,7 +375,7 @@ class QueryOp(Expression):
 
     @property
     def column_names(self):
-        return listwrap(self.select).name + self.edges.name + self.groupby.name
+        return enlist(self.select).name + self.edges.name + self.groupby.name
 
     def __getitem__(self, item):
         if item == "from":
@@ -408,7 +408,7 @@ def _import_temper_limit():
 def _normalize_edges(edges, limit, schema=None):
     return list_to_data([
         n
-        for ie, e in enumerate(listwrap(edges))
+        for ie, e in enumerate(enlist(edges))
         for n in _normalize_edge(e, ie, limit=limit, schema=schema)
     ])
 
@@ -424,7 +424,7 @@ def _normalize_edge(edge, dim_index, limit, schema=None):
         Log.error("Edge has no value, or expression is empty")
     elif is_text(edge):
         if schema:
-            leaves = unwraplist([l for r, l in schema.leaves(edge)])
+            leaves = delist([l for r, l in schema.leaves(edge)])
             if not leaves or is_container(leaves):
                 return [Data(
                     name=edge,
@@ -499,7 +499,7 @@ def _normalize_groupby(groupby, limit, schema=None):
         return None
     output = list_to_data([
         n
-        for e in listwrap(groupby)
+        for e in enlist(groupby)
         for n in _normalize_group(e, None, limit, schema=schema)
     ])
     for i, o in enumerate(output):
@@ -593,7 +593,7 @@ def _normalize_window(window, schema=None):
         value=expr,
         edges=[
             n
-            for i, e in enumerate(listwrap(window.edges))
+            for i, e in enumerate(enlist(window.edges))
             for n in _normalize_edge(e, i, limit=None, schema=schema)
         ],
         sort=_normalize_sort(window.sort),
@@ -752,7 +752,7 @@ def _normalize_sort(sort=None):
         return Null
 
     output = FlatList()
-    for s in listwrap(sort):
+    for s in enlist(sort):
         if is_text(s):
             output.append({"value": jx_expression(s), "sort": 1})
         elif is_expression(s):

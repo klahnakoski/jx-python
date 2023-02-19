@@ -40,5 +40,5 @@ class TestExpressionFactory(TestCase):
                 self.value = value
 
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
-        result = stream(value).value.props.filter(it.a==2).to_value()
-        self.assertEqual(result, [1, 2, 3])
+        result = stream(value).value.props.filter(it.a == 2).to_value()
+        self.assertEqual(result, {"a": 2})

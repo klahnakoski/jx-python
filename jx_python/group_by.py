@@ -39,7 +39,7 @@ def groupby(data, keys=None, contiguous=False):
         if not data:
             return Null
 
-        keys = listwrap(keys)
+        keys = enlist(keys)
         if not contiguous:
             from jx_python import jx
 

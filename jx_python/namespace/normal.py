@@ -224,7 +224,7 @@ class Normal(Namespace):
         return Data(
             name=coalesce(window.name, window.value),
             value=window.value,
-            edges=[self._convert_edge(e) for e in listwrap(window.edges)],
+            edges=[self._convert_edge(e) for e in enlist(window.edges)],
             sort=self._convert_sort(window.sort),
             aggregate=window.aggregate,
             range=self._convert_range(window.range),
@@ -244,7 +244,7 @@ def normalize_sort(sort=None):
         return Null
 
     output = FlatList()
-    for s in listwrap(sort):
+    for s in enlist(sort):
         if is_text(s) or mo_math.is_integer(s):
             output.append({"value": s, "sort": 1})
         elif not s.field and not s.value and s.sort == None:

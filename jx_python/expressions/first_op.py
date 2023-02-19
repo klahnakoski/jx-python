@@ -15,4 +15,4 @@ from jx_base.expressions import FirstOp as FirstOp_
 class FirstOp(FirstOp_):
     def to_python(self):
         value = self.term.to_python()
-        return "listwrap(" + value + ")[0]"
+        return "enlist(" + value + ")[0]"

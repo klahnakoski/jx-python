@@ -9,36 +9,10 @@
 #
 
 
-from mo_dots import split_field
-from mo_logs import Log, strings
-
 from jx_base.expressions import Variable as Variable_
 
 
 class Variable(Variable_):
-    def to_python(self):
-        path = split_field(self.var)
-        agg = "row"
-        if not path:
-            return agg
-        elif path[0] in ["row", "rownum"]:
-            # MAGIC VARIABLES
-            agg = path[0]
-            path = path[1:]
-            if len(path) == 0:
-                return agg
-        elif path[0] == "rows":
-            if len(path) == 1:
-                return "rows"
-            elif path[1] in ["first", "last"]:
-                agg = "rows." + path[1] + "()"
-                path = path[2:]
-            else:
-                Log.error("do not know what {{var}} of `rows` is", var=path[1])
 
-        agg = f"({agg} or EMPTY_DICT)"
-        for p in path[:-1]:
-            agg = agg + ".get(" + strings.quote(p) + ", EMPTY_DICT)"
-        output = agg + ".get(" + strings.quote(path[-1]) + ")"
-        # output = "listwrap(" + output + ")"
-        return output
+    def to_python(self):
+        return self.var
