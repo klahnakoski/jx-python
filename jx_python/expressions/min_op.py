@@ -10,11 +10,11 @@
 
 
 from jx_base.expressions import MinOp as MinOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class MinOp(MinOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {}, "min([" + ",".join((t).to_python() for t in self.terms) + "])"
         )

@@ -10,9 +10,9 @@
 
 
 from jx_base.expressions import LeavesOp as LeavesOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class LeavesOp(LeavesOp_):
     def to_python(self):
-        return PythonSource({}, "Data(" + self.term.to_python() + ").leaves()")
+        return PythonScript({}, "Data(" + self.term.to_python() + ").leaves()")

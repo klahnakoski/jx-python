@@ -12,12 +12,12 @@ import re
 from mo_logs.strings import quote
 
 from jx_base.expressions import RegExpOp as RegExpOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class RegExpOp(RegExpOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {"re": re},
             (
                 "re.match("

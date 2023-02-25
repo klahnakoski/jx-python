@@ -10,12 +10,12 @@
 
 
 from jx_base.expressions import CardinalityOp as CardinalityOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class CardinalityOp(CardinalityOp_):
     def to_python(self):
         if not self.terms:
-            return PythonSource({}, "0")
+            return PythonScript({}, "0")
         else:
-            return PythonSource({}, "len(set(" + self.terms.to_python() + "))")
+            return PythonScript({}, "len(set(" + self.terms.to_python() + "))")

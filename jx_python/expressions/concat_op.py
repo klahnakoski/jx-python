@@ -10,14 +10,14 @@
 
 
 from jx_base.expressions import ConcatOp as ConcatOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class ConcatOp(ConcatOp_):
     def to_python(self):
         v = (self.value).to_python()
         l = (self.length).to_python()
-        return PythonSource(
+        return PythonScript(
             {},
             (
                 "None if "

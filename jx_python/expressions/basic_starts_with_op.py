@@ -12,11 +12,11 @@
 from jx_base.expressions.basic_starts_with_op import (
     BasicStartsWithOp as _BasicStartsWithOp,
 )
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class BasicStartsWithOp(_BasicStartsWithOp):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {}, f"({self.value.to_python()}).startswith({self.prefix.to_python()})"
         )

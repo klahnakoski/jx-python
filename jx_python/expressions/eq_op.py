@@ -10,18 +10,22 @@
 
 
 from jx_base.expressions import EqOp as EqOp_, is_literal, FALSE, TRUE
+from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_base.utils import enlist
-from jx_python.expressions._utils import PythonSource
+from mo_json import JX_BOOLEAN
 
 
 class EqOp(EqOp_):
     def to_python(self):
         lhs = self.lhs.to_python()
         rhs = self.rhs.to_python()
-        return PythonSource(
+        return PythonScript(
             {"enlist": enlist, **rhs.locals, **lhs.locals},
+            JX_BOOLEAN,
             f"({rhs.source}) in enlist({lhs.source})",
+            self,
+            FALSE
         )
 
     def partial_eval(self, lang):

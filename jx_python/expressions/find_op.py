@@ -47,7 +47,7 @@ class FindOp(FindOp_):
         return output
 
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {},
             with_var(
                 "f",

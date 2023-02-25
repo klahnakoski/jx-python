@@ -24,7 +24,7 @@ def to_jx_type(value):
     try:
         return _json_type_to_jx_type[value]
     except Exception:
-        return JX_JSON
+        return JX_ANY
 
 
 class JxType(object):
@@ -258,7 +258,7 @@ JX_TIME = _primitive(_T, TIME)
 JX_INTERVAL = _primitive(_D, INTERVAL)  # d FOR DELTA
 JX_TEXT = _primitive(_S, STRING)
 JX_ARRAY = _primitive(_A, ARRAY)
-JX_JSON = _primitive(_J, JSON)
+JX_ANY = _primitive(_J, JSON)
 
 JX_PRIMITIVE = _new(JxType)
 JX_PRIMITIVE.__dict__ = [
@@ -327,7 +327,7 @@ def value_to_jx_type(value):
 
 
 def python_type_to_jx_type(type):
-    return _python_type_to_jx_type.get(type, JX_JSON)
+    return _python_type_to_jx_type.get(type, JX_ANY)
 
 
 _jx_type_to_json_type = {
@@ -339,7 +339,7 @@ _jx_type_to_json_type = {
     JX_INTERVAL: NUMBER,
     JX_TEXT: STRING,
     JX_ARRAY: ARRAY,
-    JX_JSON: OBJECT,
+    JX_ANY: OBJECT,
 }
 
 

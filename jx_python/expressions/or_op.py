@@ -10,13 +10,13 @@
 from mo_imports import export
 
 from jx_base.expressions import OrOp as OrOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class OrOp(OrOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {}, " or ".join("(" + ToBooleanOp(t).to_python() + ")" for t in self.terms)
         )
 

@@ -24,28 +24,15 @@ from jx_python.expressions import Python
 
 
 class PythonScript(PythonScript_):
-    __slots__ = ("miss", "_data_type", "expr", "frum", "many")
-
-    def __init__(self, type, expr, frum, miss=None, many=False):
-        Expression.__init__(self, None)
-        if miss not in [None, NULL, FALSE, TRUE, ONE, ZERO]:
-            if frum.lang != miss.lang:
-                Log.error("logic error")
-
-        self.miss = coalesce(miss, FALSE)
-        self._data_type = type
-        self.expr = expr
-        self.many = many  # True if script returns multi-value
-        self.frum = frum  # THE ORIGINAL EXPRESSION THAT MADE expr
 
     def __str__(self):
         missing = self.miss.partial_eval(Python)
         if missing is FALSE:
-            return self.partial_eval(Python).to_python().expr
+            return self.partial_eval(Python).to_python().source
         elif missing is TRUE:
             return "None"
 
-        return "None if (" + missing.to_python().expr + ") else (" + self.expr + ")"
+        return "None if (" + missing.to_python().source + ") else (" + self.source + ")"
 
     def __add__(self, other):
         return str(self) + str(other)

@@ -10,12 +10,12 @@
 
 
 from jx_base.expressions.basic_substring_op import BasicSubstringOp as _BasicSubstringOp
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class BasicSubstringOp(_BasicSubstringOp):
     def to_python(self):
         value = self.value.to_python()
-        return PythonSource(
+        return PythonScript(
             {}, f"({value})[int({self.start.to_python()}):int({self.end.to_python()})]"
         )

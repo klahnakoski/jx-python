@@ -18,7 +18,7 @@ class AvgOp(AvgOp_):
 
     def to_python(self):
         default = self.default.to_python()
-        return PythonSource(
+        return PythonScript(
             {},
             with_var(
                 "x", self.terms.to_python(), f"sum(x)/count(x) if x else {default}"

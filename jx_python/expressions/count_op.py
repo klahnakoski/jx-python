@@ -10,12 +10,12 @@
 
 
 from jx_base.expressions import CountOp as CountOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class CountOp(CountOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {},
             "sum(((0 if v==None else 1) for v in " + self.terms.to_python() + "), 0)",
         )

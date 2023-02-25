@@ -9,10 +9,11 @@
 #
 
 
-from jx_base.expressions import TrueOp as TrueOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions import TrueOp as TrueOp_, FALSE
+from jx_base.expressions.python_script import PythonScript
+from mo_json import JX_BOOLEAN
 
 
 class TrueOp(TrueOp_):
     def to_python(self):
-        return PythonSource({}, "True")
+        return PythonScript({}, JX_BOOLEAN, "True", self, FALSE)

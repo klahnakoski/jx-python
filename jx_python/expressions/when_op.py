@@ -10,7 +10,7 @@
 from mo_imports import export
 
 from jx_base.expressions import WhenOp as WhenOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class WhenOp(WhenOp_):
@@ -18,7 +18,7 @@ class WhenOp(WhenOp_):
         when = self.when.to_python()
         then = self.then.to_python()
         els_ = self.els_.to_python()
-        return PythonSource(
+        return PythonScript(
             {**when.locals, **then.locals, **els_.locals},
             (
                 "("

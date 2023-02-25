@@ -11,8 +11,9 @@ from mo_math import randoms
 
 from jx_base.expressions import Expression
 from jx_base.expressions import PythonFunction as PythonFunction_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 from jx_python.utils import wrap_function
+from mo_json import JX_ANY
 
 
 class PythonFunction(PythonFunction_):
@@ -26,7 +27,7 @@ class PythonFunction(PythonFunction_):
         self._name = f"boxed_function{randoms.base64(8)}"
 
     def to_python(self):
-        return PythonSource({self._name: self.func}, f"{self._name}(row, rownum, rows)")
+        return PythonScript({self._name: self.func}, JX_ANY, f"{self._name}(row, rownum, rows)", self)
 
     def __data__(self):
         return {"python_function": {}}

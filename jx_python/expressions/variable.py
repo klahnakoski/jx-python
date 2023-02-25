@@ -10,9 +10,10 @@
 
 
 from jx_base.expressions import Variable as Variable_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
+from mo_json import JX_ANY
 
 
 class Variable(Variable_):
     def to_python(self):
-        return PythonSource({}, self.var)
+        return PythonScript({}, JX_ANY, self.var, self)

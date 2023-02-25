@@ -10,9 +10,10 @@
 
 
 from jx_base.expressions import ToIntegerOp as IntegerOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
+from mo_json import JX_INTEGER
 
 
 class ToIntegerOp(IntegerOp_):
     def to_python(self):
-        return PythonSource({}, "int(" + self.term.to_python() + ")")
+        return PythonScript({}, JX_INTEGER, "int(" + self.term.to_python() + ")", self)

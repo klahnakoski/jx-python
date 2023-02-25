@@ -7,17 +7,20 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from jx_base.expressions.python_script import PythonScript
 
 from jx_base.expressions import ToTextOp as ToTextOp_
-from jx_python.expressions._utils import Python, PythonSource
+from jx_python.expressions._utils import Python
 
 
 class ToTextOp(ToTextOp_):
     def to_python(self):
-        missing = self.term.missing(Python).to_python()
+        missing = self.term.missing(Python)
         value = self.term.to_python()
-        return PythonSource(
-            {**missing.locals, **value.locals},
-            f"null if ({missing.source}) else ({value.source})",
+        return PythonScript(
+            value.locals,
+            value.type,
+            value.source,
+            self,
+            missing
         )

@@ -15,7 +15,7 @@ from jx_python.expressions._utils import with_var, PythonSource
 
 class BasicIndexOfOp(BasicIndexOfOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {},
             with_var(
                 "f",

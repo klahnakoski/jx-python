@@ -10,14 +10,14 @@
 
 
 from jx_base.expressions import NotLeftOp as NotLeftOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class NotLeftOp(NotLeftOp_):
     def to_python(self):
         v = self.value.to_python()
         l = self.length.to_python()
-        return PythonSource(
+        return PythonScript(
             {**v.locals, **l.locals},
             (
                 "None if "

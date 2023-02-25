@@ -10,11 +10,11 @@
 
 
 from jx_base.expressions import NotOp as NotOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class NotOp(NotOp_):
     def to_python(self):
         term = ToBooleanOp(self.term).to_python()
-        return PythonSource(term.locals, "not (" + term.source + ")")
+        return PythonScript(term.locals, "not (" + term.source + ")")

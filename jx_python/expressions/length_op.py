@@ -10,13 +10,13 @@
 
 
 from jx_base.expressions import LengthOp as LengthOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class LengthOp(LengthOp_):
     def to_python(self):
         value = self.term.to_python()
-        return PythonSource(
+        return PythonScript(
             value.locals,
             "len(" + value.source + ") if (" + value.source + ") != None else None",
         )

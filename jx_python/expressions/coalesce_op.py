@@ -10,12 +10,12 @@
 from mo_dots import coalesce
 
 from jx_base.expressions import CoalesceOp as CoalesceOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class CoalesceOp(CoalesceOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {"coalesce": coalesce},
             "coalesce(" + ", ".join((t).to_python() for t in self.terms) + ")",
         )

@@ -12,12 +12,12 @@
 from mo_future import text
 
 from jx_base.expressions import OffsetOp as OffsetOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class OffsetOp(OffsetOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {},
             (
                 "row["

@@ -15,7 +15,7 @@ from mo_future import is_text
 from mo_imports import expect
 from mo_logs import strings
 
-from mo_json.types import JX_BOOLEAN
+from mo_json.types import JX_BOOLEAN, JX_IS_NULL
 
 from jx_base.expressions import (
     FALSE,
@@ -74,27 +74,26 @@ class JXExpression(object):
 
 @extend(NullOp)
 def to_python(self):
-    return PythonSource({}, "None")
+    return PythonScript({}, JX_IS_NULL, "None", NullOp, TrueOp)
 
 
 def _inequality_to_python(self):
     op, identity = _python_operators[self.op]
     lhs = ToNumberOp(self.lhs).partial_eval(Python).to_python()
     rhs = ToNumberOp(self.rhs).partial_eval(Python).to_python()
-    script = "(" + lhs + ") " + op + " (" + rhs + ")"
+    script = f"({lhs.source}) {op} ({rhs.source})"
 
-    output = (
+    return (
         WhenOp(
             OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
-                "else": PythonScript(type=JX_BOOLEAN, expr=script, frum=self),
+                "else": PythonScript({**lhs.locals, **rhs.locals}, script, type=JX_BOOLEAN),
             }
         )
         .partial_eval(Python)
-        .to_python()
+        .to_python().source
     )
-    return output
 
 
 def _binaryop_to_python(self, not_null=False, boolean=False):

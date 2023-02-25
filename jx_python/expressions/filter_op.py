@@ -11,7 +11,7 @@
 from jx_base.expressions import FilterOp as FilterOp_, Variable
 from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class FilterOp(FilterOp_):
@@ -32,8 +32,10 @@ class FilterOp(FilterOp_):
         )
         frum = self.frum.partial_eval(Python).to_python()
 
-        return PythonSource(
+        return PythonScript(
             {"enlist": enlist, **frum.locals, **predicate.locals},
+            frum.type,
             f"[r for rs in [enlist({frum.source})] for rn, r in enumerate(rs) if"
             f" ({predicate.source})]",
+            self
         )

@@ -10,16 +10,16 @@
 
 
 from jx_base.expressions import TupleOp as TupleOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class TupleOp(TupleOp_):
     def to_python(self):
         if len(self.terms) == 0:
-            return PythonSource({}, "tuple()")
+            return PythonScript({}, "tuple()")
         elif len(self.terms) == 1:
-            return PythonSource({}, "(" + (self.terms[0]).to_python() + ",)")
+            return PythonScript({}, "(" + (self.terms[0]).to_python() + ",)")
         else:
-            return PythonSource(
+            return PythonScript(
                 {}, "(" + ",".join((t).to_python() for t in self.terms) + ")"
             )

@@ -12,12 +12,12 @@
 from mo_dots import from_data
 from mo_future import text
 
-from jx_python.expressions._utils import PythonSource
-from mo_json import json2value
+from jx_base.expressions.python_script import PythonScript
+from mo_json import json2value, JX_ANY
 
 from jx_base.expressions import Literal as Literal_
 
 
 class Literal(Literal_):
     def to_python(self):
-        return PythonSource({}, text(repr(from_data(json2value(self.json)))))
+        return PythonScript({}, JX_ANY, text(repr(from_data(json2value(self.json)))), self)

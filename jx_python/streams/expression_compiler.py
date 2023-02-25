@@ -9,26 +9,16 @@
 #
 from __future__ import absolute_import, division
 
-import re
-
-from mo_imports import export
-
-from jx_base.utils import enlist, delist
+from mo_dots import Data, is_data, leaves_to_data
 from mo_future import first
-from mo_dots import Data, coalesce, is_data, leaves_to_data
+from mo_imports import export
 from mo_logs import Log, strings
 from mo_times.dates import Date
 
-from jx_python.expressions import PythonFunction
-from jx_python.expressions._utils import PythonSource
-
+from jx_base.expressions.python_script import PythonScript
+from jx_base.utils import enlist, delist
 
 GLOBALS = {
-    "true": True,
-    "false": False,
-    "null": None,
-    "enlist": enlist,
-    "delist": delist,
     "Date": Date,
     "Log": Log,
     "Data": Data,
@@ -38,7 +28,7 @@ GLOBALS = {
 }
 
 
-def compile_expression(code: PythonSource, function_name="output"):
+def compile_expression(code: PythonScript, function_name="output"):
     """
     THIS FUNCTION IS ON ITS OWN FOR MINIMAL GLOBAL NAMESPACE
 
@@ -56,7 +46,7 @@ def compile_expression(code: PythonSource, function_name="output"):
                 + function_name
                 + "(row, rownum=None, rows=None):\n"
                 + "    _source = "
-                + strings.quote(code)
+                + strings.quote(code.source)
                 + "\n"
                 + "    try:\n"
                 + "        return "
@@ -73,7 +63,7 @@ def compile_expression(code: PythonSource, function_name="output"):
         setattr(func, "_source", code)
         return func
     except Exception as e:
-        raise Log.error("Bad source: {{source}}", source=code, cause=e)
+        raise Log.error("Bad source: {{source}}", source=code.source, cause=e)
 
 
 export("jx_python.expressions._utils", compile_expression)

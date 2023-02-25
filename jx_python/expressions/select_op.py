@@ -12,12 +12,12 @@
 from mo_logs.strings import quote
 
 from jx_base.expressions import SelectOp as SelectOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.python_script import PythonScript
 
 
 class SelectOp(SelectOp_):
     def to_python(self):
-        return PythonSource(
+        return PythonScript(
             {},
             (
                 "leaves_to_data({"

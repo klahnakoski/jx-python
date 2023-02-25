@@ -14,7 +14,7 @@ from jx_base.expressions.expression import Expression
 from jx_base.models.container import Container
 from jx_base.utils import enlist, delist
 from mo_json.typed_encoder import ARRAY_KEY
-from mo_json.types import JX_TEXT, JX_JSON, JxType
+from mo_json.types import JX_TEXT, JX_ANY, JxType
 from mo_logs import Log
 
 
@@ -42,9 +42,9 @@ class FormatOp(Expression):
             # TODO: WHAT IS THE CUBE TYPE?
             head = [c.name for c in self.frum.schema.columns]
             return JxType(
-                data={h: {ARRAY_KEY: {ARRAY_KEY: JX_JSON}} for h in head},
+                data={h: {ARRAY_KEY: {ARRAY_KEY: JX_ANY}} for h in head},
                 meta={"format": JX_TEXT},
-                edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_JSON}},
+                edges={ARRAY_KEY: {"name": JX_TEXT, "domain": JX_ANY}},
             )
 
     def apply(self, container: Container):
