@@ -6,9 +6,11 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_future import sort_using_cmp
 from mo_imports import export
 
 from jx_base.expressions import GetOp, Literal, Variable, FilterOp
+from jx_base.language import value_compare
 from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory
 from jx_python.streams.typers import Typer, CallableTyper
@@ -44,6 +46,10 @@ class Stream:
                 GetOp(self.factory.expr, item.expr), self.factory.domain
             ))
 
+    def __iter__(self):
+        func = self.factory.build()
+        return iter(func(self.values))
+
     def map(self, accessor):
         fact = factory(accessor, self.factory.domain)
         return Stream(self.values, fact, self.schema)
@@ -57,16 +63,43 @@ class Stream:
         )
 
     def distinct(self):
-        return Stream(distinct(self), ExpressionFactory(Variable("."), self.factory.typer), self._schema)
+        return Stream(
+            distinct(self),
+            ExpressionFactory(Variable("."), self.factory.typer),
+            self._schema,
+        )
+
+    def reverse(self):
+        return Stream(
+            list(reversed(list(self))),
+            ExpressionFactory(Variable("."), self.factory.typer),
+            self._schema,
+        )
+
+    def sort(self):
+        return Stream(
+            list(sort_using_cmp(self, value_compare)),
+            ExpressionFactory(Variable("."), self.factory.typer),
+            self._schema,
+        )
+
+    def limit(self, num):
+        def limit():
+            for i, v in enumerate(self):
+                if i >= num:
+                    break
+                yield v
+
+        return Stream(
+            list(limit()),
+            ExpressionFactory(Variable("."), self.factory.typer),
+            self._schema,
+        )
 
 
     ###########################################################################
     # TERMINATORS
     ###########################################################################
-
-    def __iter__(self):
-        func = self.factory.build()
-        return iter(func(self.values))
 
     def to_list(self):
         func = self.factory.build()
@@ -89,11 +122,7 @@ def stream(values):
         jx_type = array_of(typer.python_type)
         values = [values]
 
-    return Stream(
-        values,
-        ExpressionFactory(Variable(".", jx_type), typer),
-        JX_IS_NULL
-    )
+    return Stream(values, ExpressionFactory(Variable(".", jx_type), typer), JX_IS_NULL)
 
 
 ANNOTATIONS = {
