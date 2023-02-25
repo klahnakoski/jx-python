@@ -10,9 +10,9 @@
 
 
 from jx_base.expressions import Variable as Variable_
+from jx_python.expressions._utils import PythonSource
 
 
 class Variable(Variable_):
-
     def to_python(self):
-        return self.var
+        return PythonSource({}, self.var)

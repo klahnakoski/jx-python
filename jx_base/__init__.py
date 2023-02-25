@@ -11,8 +11,13 @@
 
 from uuid import uuid4
 
+from mo_dots import coalesce, listwrap, to_data, last
+from mo_dots.datas import register_data
+from mo_future import is_text, text
+from mo_logs import Log
+from mo_logs.strings import expand_template, quote
+
 from jx_base.expressions import jx_expression
-from jx_base.models.container import Container
 from jx_base.models.container import Container
 from jx_base.models.facts import Facts
 from jx_base.models.namespace import Namespace
@@ -22,23 +27,12 @@ from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_python.expressions import Python
-from mo_dots import coalesce, listwrap, to_data
-from mo_dots.datas import register_data
-from mo_dots.lists import last
-from mo_future import is_text, text
-from mo_imports import export
 from mo_json import (
     value2json,
     true,
     false,
     null,
-    EXISTS,
-    OBJECT,
-    ARRAY,
 )
-from mo_json.typed_encoder import EXISTS_KEY
-from mo_logs import Log
-from mo_logs.strings import expand_template, quote
 
 ENABLE_CONSTRAINTS = True
 
@@ -258,102 +252,3 @@ class {{class_name}}(Mapping):
     output = _exec(code, name)
     register_data(output)
     return output
-
-
-TableDesc = DataClass(
-    "Table",
-    [
-        "name",
-        {"name": "url", "nulls": true},
-        "query_path",
-        {"name": "last_updated", "nulls": False},
-        "columns",
-    ],
-    constraint={"and": [{"ne": [{"last": "query_path"}, {"literal": "."}]}]},
-)
-
-Column = DataClass(
-    "Column",
-    [
-        "name",
-        "es_column",
-        "es_index",
-        "es_type",
-        "json_type",
-        "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
-        {"name": "count", "nulls": True},
-        {"name": "cardinality", "nulls": True},
-        {"name": "multi", "nulls": False},
-        {"name": "partitions", "nulls": True},
-        "last_updated",
-    ],
-    constraint={"and": [
-        {
-            "when": {"ne": {"name": "."}},
-            "then": {"or": [
-                {"and": [{"eq": {"json_type": "object"}}, {"eq": {"multi": 1}}]},
-                {"ne": ["name", {"first": "nested_path"}]},
-            ]},
-            "else": True,
-        },
-        {
-            "when": {"eq": {"es_column": "."}},
-            "then": {"in": {"json_type": ["nested", "object"]}},
-            "else": True,
-        },
-        {"not": {"find": {"es_column": "null"}}},
-        {"not": {"eq": {"es_column": "string"}}},
-        {"not": {"eq": {"es_type": "object", "json_type": "exists"}}},
-        {
-            "when": {"suffix": {"es_column": "." + EXISTS_KEY}},
-            "then": {"eq": {"json_type": EXISTS}},
-            "else": True,
-        },
-        {
-            "when": {"suffix": {"es_column": "." + EXISTS_KEY}},
-            "then": {"exists": "cardinality"},
-            "else": True,
-        },
-        {
-            "when": {"eq": {"json_type": OBJECT}},
-            "then": {"in": {"cardinality": [0, 1]}},
-            "else": True,
-        },
-        {
-            "when": {"eq": {"json_type": ARRAY}},
-            "then": {"in": {"cardinality": [0, 1]}},
-            "else": True,
-        },
-        {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
-        {"ne": [
-            {"last": "nested_path"},
-            {"literal": "."},
-        ]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
-        {
-            "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
-            "then": {"or": [
-                {"and": [
-                    {"gt": {"multi": 1}},
-                    {"eq": {"json_type": "nested"}},
-                    {"eq": {"es_type": "nested"}},
-                ]},
-                {"and": [
-                    {"eq": {"multi": 1}},
-                    {"eq": {"json_type": "object"}},
-                    {"eq": {"es_type": "object"}},
-                ]},
-            ]},
-            "else": True,
-        },
-        {
-            "when": {"gte": [{"count": "nested_path"}, 2]},
-            "then": {"ne": [
-                {"first": {"right": {"nested_path": 2}}},
-                {"literal": "."},
-            ]},  # SECOND-LAST ELEMENT
-            "else": True,
-        },
-    ]},
-)
-
-export("jx_base.expressions.query_op", Column)

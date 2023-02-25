@@ -10,11 +10,14 @@
 
 
 from jx_base.expressions import ToTextOp as ToTextOp_
-from jx_python.expressions._utils import Python
+from jx_python.expressions._utils import Python, PythonSource
 
 
 class ToTextOp(ToTextOp_):
     def to_python(self):
         missing = self.term.missing(Python).to_python()
         value = self.term.to_python()
-        return "null if (" + missing + ") else text(" + value + ")"
+        return PythonSource(
+            {**missing.locals, **value.locals},
+            f"null if ({missing.source}) else ({value.source})",
+        )

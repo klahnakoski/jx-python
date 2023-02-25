@@ -1,9 +1,10 @@
 from mo_logs import logger
 
 from jx_base import jx_expression
-from jx_base.expressions import Expression, Variable, GetOp, EqOp, Literal
-from jx_python.expressions import Python
+from jx_base.expressions import Expression, Variable, GetOp, EqOp, Literal, AndOp, OrOp, NeOp
+from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
+from jx_python.streams.inspects import is_function
 from jx_python.streams.typers import Typer
 from jx_python.streams.typers import UnknownTyper, LazyTyper
 
@@ -25,6 +26,18 @@ class ExpressionFactory:
         other = factory(other)
         return ExpressionFactory(EqOp(self.expr, other.expr), Typer(python_type=bool))
 
+    def __ne__(self, other):
+        other = factory(other)
+        return ExpressionFactory(NeOp(self.expr, other.expr), Typer(python_type=bool))
+
+    def __and__(self, other):
+        other = factory(other)
+        return ExpressionFactory(AndOp(self.expr, other.expr), Typer(python_type=bool))
+
+    def __or__(self, other):
+        other = factory(other)
+        return ExpressionFactory(OrOp(self.expr, other.expr), Typer(python_type=bool))
+
     def to_list(self):
         self.build()(None)
 
@@ -35,6 +48,9 @@ def factory(expr, typer=None) -> ExpressionFactory:
     """
     if isinstance(expr, ExpressionFactory):
         return ExpressionFactory(expr.expr, typer)
+
+    if is_function(expr):
+        return ExpressionFactory(PythonFunction(expr), typer)
 
     if not isinstance(expr, Expression):
         expr = jx_expression(expr)

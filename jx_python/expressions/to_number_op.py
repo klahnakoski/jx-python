@@ -8,6 +8,8 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_imports import export
+
+from jx_python.expressions._utils import PythonSource
 from mo_json.types import JX_NUMBER_TYPES
 
 from jx_base.expressions.to_number_op import ToNumberOp as NumberOp_
@@ -23,9 +25,12 @@ class ToNumberOp(NumberOp_):
         if exists is TRUE:
             if term.type in JX_NUMBER_TYPES:
                 return value
-            return "float(" + value + ")"
+            return PythonSource({**value.locals}, "float(" + value.source + ")")
         else:
-            return "float(" + value + ") if (" + exists.to_python() + ") else None"
+            return PythonSource(
+                {**value.locals},
+                "float(" + value + ") if (" + exists.to_python().source + ")",
+            )
 
 
 export("jx_python.expressions._utils", ToNumberOp)

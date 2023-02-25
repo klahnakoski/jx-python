@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from typing import Tuple
 
 from jx_base.expressions._utils import builtin_ops, operators
 from jx_base.expressions.expression import Expression
@@ -28,7 +28,7 @@ class BaseMultiOp(Expression):
 
     def __init__(self, *terms, nulls=False, **clauses):
         Expression.__init__(self, *terms)
-        self.terms = terms
+        self.terms : Tuple[Expression] = terms
         # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
         self.decisive = nulls in (True, TRUE)
 

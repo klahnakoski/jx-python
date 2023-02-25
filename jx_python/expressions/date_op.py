@@ -9,12 +9,12 @@
 #
 
 
-from mo_future import text
 from mo_times.dates import Date
 
 from jx_base.expressions import DateOp as DateOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class DateOp(DateOp_):
     def to_python(self):
-        return text(Date(self.value).unix)
+        return PythonSource({}, str(Date(self.value).unix))

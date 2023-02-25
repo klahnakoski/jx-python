@@ -10,7 +10,7 @@
 
 
 from jx_base.expressions import RightOp as RightOp_
-from jx_python.expressions._utils import with_var
+from jx_python.expressions._utils import with_var, PythonSource
 
 
 class RightOp(RightOp_):
@@ -18,6 +18,9 @@ class RightOp(RightOp_):
         v = (self.value).to_python()
         l = (self.length).to_python()
 
-        return with_var(
-            "v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]"
+        return PythonSource(
+            {},
+            with_var(
+                "v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]"
+            ),
         )

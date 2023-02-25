@@ -16,8 +16,8 @@ from jx_python.expressions.eq_op import EqOp
 from jx_python.expressions.exists_op import ExistsOp
 from jx_python.expressions.exp_op import ExpOp
 from jx_python.expressions.false_op import FalseOp
-from jx_python.expressions.find_op import FindOp
 from jx_python.expressions.filter_op import FilterOp
+from jx_python.expressions.find_op import FindOp
 from jx_python.expressions.first_op import FirstOp
 from jx_python.expressions.floor_op import FloorOp
 from jx_python.expressions.get_op import GetOp
@@ -30,8 +30,8 @@ from jx_python.expressions.length_op import LengthOp
 from jx_python.expressions.literal import Literal
 from jx_python.expressions.lt_op import LtOp
 from jx_python.expressions.lte_op import LteOp
-from jx_python.expressions.min_op import MinOp
 from jx_python.expressions.max_op import MaxOp
+from jx_python.expressions.min_op import MinOp
 from jx_python.expressions.missing_op import MissingOp
 from jx_python.expressions.mod_op import ModOp
 from jx_python.expressions.mul_op import MulOp
@@ -42,6 +42,7 @@ from jx_python.expressions.not_right_op import NotRightOp
 from jx_python.expressions.offset_op import OffsetOp
 from jx_python.expressions.or_op import OrOp
 from jx_python.expressions.prefix_op import PrefixOp
+from jx_python.expressions.python_function import PythonFunction
 from jx_python.expressions.python_script import PythonScript
 from jx_python.expressions.range_op import RangeOp
 from jx_python.expressions.reg_exp_op import RegExpOp

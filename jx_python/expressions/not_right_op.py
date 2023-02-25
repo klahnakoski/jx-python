@@ -10,22 +10,26 @@
 
 
 from jx_base.expressions import NotRightOp as NotRightOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class NotRightOp(NotRightOp_):
     def to_python(self):
-        v = (self.value).to_python()
-        l = (self.length).to_python()
-        return (
-            "None if "
-            + v
-            + " == None or "
-            + l
-            + " == None else "
-            + v
-            + "[0:max(0, len("
-            + v
-            + ")-("
-            + l
-            + "))]"
+        v = self.value.to_python()
+        l = self.length.to_python()
+        return PythonSource(
+            {**v.locals, **l.locals},
+            (
+                "None if "
+                + v.source
+                + " == None or "
+                + l.source
+                + " == None else "
+                + v.source
+                + "[0:max(0, len("
+                + v.source
+                + ")-("
+                + l.source
+                + "))]"
+            ),
         )

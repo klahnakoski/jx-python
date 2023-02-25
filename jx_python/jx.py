@@ -11,20 +11,6 @@
 
 import mo_dots
 import mo_math
-from jx_base.models.container import Container
-from jx_base.expressions import FALSE, TRUE
-from jx_base.expressions import QueryOp
-from jx_base.expressions.query_op import _normalize_sort
-from jx_base.expressions.select_op import _normalize_selects
-from jx_base.language import is_op, value_compare
-from jx_python import expressions as _expressions, flat_list, group_by
-from jx_python.containers.cube import Cube
-from jx_python.containers.list import ListContainer
-from jx_python.convert import list2table, list2cube
-from jx_python.cubes.aggs import cube_aggs
-from jx_python.streams.expression_compiler import compile_expression
-from jx_python.expressions import jx_expression_to_function as get
-from jx_python.flat_list import PartFlatList
 from mo_collections.index import Index
 from mo_collections.unique_index import UniqueIndex
 from mo_dots import (
@@ -37,7 +23,6 @@ from mo_dots import (
     is_list,
     is_many,
     join_field,
-    listwrap,
     set_default,
     split_field,
     to_data,
@@ -51,6 +36,23 @@ from mo_future import is_text, sort_using_cmp
 from mo_imports import export
 from mo_logs import Log
 from mo_math import MIN, UNION
+
+from jx_base.expressions import FALSE, TRUE
+from jx_base.expressions import QueryOp
+from jx_base.expressions.query_op import _normalize_sort
+from jx_base.expressions.select_op import _normalize_selects
+from jx_base.language import is_op, value_compare
+from jx_base.models.container import Container
+from jx_base.utils import enlist
+from jx_python import expressions as _expressions, flat_list, group_by
+from jx_python.containers.cube import Cube
+from jx_python.containers.list import ListContainer
+from jx_python.convert import list2table, list2cube
+from jx_python.cubes.aggs import cube_aggs
+from jx_python.expressions import jx_expression_to_function as get
+from jx_python.flat_list import PartFlatList
+from jx_python.streams.expression_compiler import compile_expression
+from jx_python.utils import wrap_function as _wrap_function
 
 # A COLLECTION OF DATABASE OPERATORS (RELATIONAL ALGEBRA OPERATORS)
 # JSON QUERY EXPRESSION DOCUMENTATION: https://github.com/klahnakoski/jx/tree/master/docs
@@ -991,27 +993,7 @@ def wrap_function(func):
     if is_text(func):
         return compile_expression(func)
 
-    numarg = func.__code__.co_argcount
-    if numarg == 0:
-
-        def temp(row, rownum, rows):
-            return func()
-
-        return temp
-    elif numarg == 1:
-
-        def temp(row, rownum, rows):
-            return func(row)
-
-        return temp
-    elif numarg == 2:
-
-        def temp(row, rownum, rows):
-            return func(row, rownum)
-
-        return temp
-    elif numarg == 3:
-        return func
+    return _wrap_function(func)
 
 
 def window(data, param):

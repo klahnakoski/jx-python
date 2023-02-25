@@ -10,8 +10,9 @@
 
 
 from jx_base.expressions import ExistsOp as ExistsOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class ExistsOp(ExistsOp_):
     def to_python(self):
-        return self.expr.to_python() + " != None"
+        return PythonSource({}, self.expr.to_python() + " != None")

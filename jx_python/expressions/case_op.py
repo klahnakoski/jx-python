@@ -10,6 +10,7 @@
 
 
 from jx_base.expressions import CaseOp as CaseOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class CaseOp(CaseOp_):
@@ -25,4 +26,4 @@ class CaseOp(CaseOp_):
                 + acc
                 + ")"
             )
-        return acc
+        return PythonSource({}, acc)

@@ -10,11 +10,12 @@
 from mo_imports import export
 
 from jx_base.expressions import ScriptOp as ScriptOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class ScriptOp(ScriptOp_):
     def to_python(self):
-        return self.script
+        return PythonSource({}, self.script)
 
 
 export("jx_python.expressions._utils", ScriptOp)

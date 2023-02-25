@@ -10,9 +10,10 @@
 
 
 from jx_base.expressions import LastOp as LastOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class LastOp(LastOp_):
     def to_python(self):
         term = self.term.to_python()
-        return "last(" + term + ")"
+        return PythonSource({}, "last(" + term + ")")

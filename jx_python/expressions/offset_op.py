@@ -12,14 +12,18 @@
 from mo_future import text
 
 from jx_base.expressions import OffsetOp as OffsetOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class OffsetOp(OffsetOp_):
     def to_python(self):
-        return (
-            "row["
-            + text(self.var)
-            + "] if 0<="
-            + text(self.var)
-            + "<len(row) else None"
+        return PythonSource(
+            {},
+            (
+                "row["
+                + text(self.var)
+                + "] if 0<="
+                + text(self.var)
+                + "<len(row) else None"
+            ),
         )

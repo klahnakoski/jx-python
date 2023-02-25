@@ -10,14 +10,18 @@
 
 
 from jx_base.expressions import FloorOp as FloorOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class FloorOp(FloorOp_):
     def to_python(self):
-        return (
-            "mo_math.floor("
-            + (self.lhs).to_python()
-            + ", "
-            + (self.rhs).to_python()
-            + ")"
+        return PythonSource(
+            {},
+            (
+                "mo_math.floor("
+                + (self.lhs).to_python()
+                + ", "
+                + (self.rhs).to_python()
+                + ")"
+            ),
         )

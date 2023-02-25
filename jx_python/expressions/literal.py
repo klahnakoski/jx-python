@@ -11,6 +11,8 @@
 
 from mo_dots import from_data
 from mo_future import text
+
+from jx_python.expressions._utils import PythonSource
 from mo_json import json2value
 
 from jx_base.expressions import Literal as Literal_
@@ -18,4 +20,4 @@ from jx_base.expressions import Literal as Literal_
 
 class Literal(Literal_):
     def to_python(self):
-        return text(repr(from_data(json2value(self.json))))
+        return PythonSource({}, text(repr(from_data(json2value(self.json)))))

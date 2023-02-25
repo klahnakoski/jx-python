@@ -11,16 +11,17 @@
 
 from jx_base.expressions import EqOp as EqOp_, is_literal, FALSE, TRUE
 from jx_base.language import value_compare
+from jx_base.utils import enlist
+from jx_python.expressions._utils import PythonSource
 
 
 class EqOp(EqOp_):
     def to_python(self):
-        return (
-            "("
-            + self.rhs.to_python()
-            + ") in enlist("
-            + self.lhs.to_python()
-            + ")"
+        lhs = self.lhs.to_python()
+        rhs = self.rhs.to_python()
+        return PythonSource(
+            {"enlist": enlist, **rhs.locals, **lhs.locals},
+            f"({rhs.source}) in enlist({lhs.source})",
         )
 
     def partial_eval(self, lang):

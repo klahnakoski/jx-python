@@ -10,9 +10,9 @@
 
 
 from jx_base.expressions import ToBooleanOp as ToBooleanOp_
-from jx_python.expressions._utils import with_var
+from jx_python.expressions._utils import with_var, PythonSource
 
 
 class ToBooleanOp(ToBooleanOp_):
     def to_python(self):
-        return with_var("f", self.term.to_python(), "bool(f)",)
+        return PythonSource({}, with_var("f", self.term.to_python(), "bool(f)"))

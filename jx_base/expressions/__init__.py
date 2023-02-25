@@ -81,6 +81,7 @@ from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.prefix_op import PrefixOp
+from jx_base.expressions.python_function import PythonFunction
 from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.query_op import QueryOp
 from jx_base.expressions.range_op import RangeOp

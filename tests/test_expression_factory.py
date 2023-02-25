@@ -42,3 +42,36 @@ class TestExpressionFactory(TestCase):
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
         result = stream(value).value.props.filter(it.a == 2).to_value()
         self.assertEqual(result, {"a": 2})
+
+    def test_lambda(self):
+        def func(x):
+            return x + 2
+
+        result = stream([1, 2, 3]).map(func).to_list()
+        self.assertEqual(result, [3, 4, 5])
+
+    def test_sort(self):
+        result = stream([2, 3, 1]).sort().to_list()
+        self.assertEqual(result, [1, 2, 3])
+
+    def test_reverse(self):
+        result = stream([2, 3, 1]).reverse().to_list()
+        self.assertEqual(result, [1, 3, 2])
+
+    def test_distinct(self):
+        result = stream([2, 2, 2, 1, 4, 3, 1]).distinct().to_list()
+        self.assertEqual(result, [2, 1, 4, 3])
+
+    def test_limit_under(self):
+        result = stream(range(200)).limit(10).to_list()
+        self.assertEqual(result, list(range(10)))
+
+    def test_limit_over(self):
+        result = stream(range(5)).limit(10).to_list()
+        self.assertEqual(result, list(range(5)))
+
+    def test_limit_match(self):
+        result = stream(range(10)).limit(10).to_list()
+        self.assertEqual(result, list(range(10)))
+
+

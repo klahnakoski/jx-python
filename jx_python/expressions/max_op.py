@@ -10,8 +10,11 @@
 
 
 from jx_base.expressions import MaxOp as MaxOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class MaxOp(MaxOp_):
     def to_python(self):
-        return "max([" + ",".join((t).to_python() for t in self.terms) + "])"
+        return PythonSource(
+            {}, "max([" + ",".join((t).to_python() for t in self.terms) + "])"
+        )

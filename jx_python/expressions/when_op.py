@@ -10,18 +10,25 @@
 from mo_imports import export
 
 from jx_base.expressions import WhenOp as WhenOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class WhenOp(WhenOp_):
     def to_python(self):
-        return (
-            "("
-            + self.then.to_python()
-            + ") if ("
-            + self.when.to_python()
-            + ") else ("
-            + self.els_.to_python()
-            + ")"
+        when = self.when.to_python()
+        then = self.then.to_python()
+        els_ = self.els_.to_python()
+        return PythonSource(
+            {**when.locals, **then.locals, **els_.locals},
+            (
+                "("
+                + then.source
+                + ") if ("
+                + when.source
+                + ") else ("
+                + els_.source
+                + ")"
+            ),
         )
 
 

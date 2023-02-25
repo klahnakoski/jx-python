@@ -10,14 +10,18 @@
 
 
 from jx_base.expressions import PrefixOp as PrefixOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class PrefixOp(PrefixOp_):
     def to_python(self):
-        return (
-            "("
-            + self.expr.to_python()
-            + ").startswith("
-            + (self.prefix).to_python()
-            + ")"
+        return PythonSource(
+            {},
+            (
+                "("
+                + self.expr.to_python()
+                + ").startswith("
+                + (self.prefix).to_python()
+                + ")"
+            ),
         )

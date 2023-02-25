@@ -10,8 +10,11 @@
 
 
 from jx_base.expressions import SuffixOp as SuffixOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class SuffixOp(SuffixOp_):
     def to_python(self):
-        return f"({self.expr.to_python()}).endswith({self.suffix.to_python()})"
+        return PythonSource(
+            {}, f"({self.expr.to_python()}).endswith({self.suffix.to_python()})"
+        )

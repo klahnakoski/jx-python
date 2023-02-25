@@ -12,9 +12,11 @@ from jx_base.expressions import GetOp, Literal, Variable, FilterOp
 from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory
 from jx_python.streams.typers import Typer, CallableTyper
+from jx_python.utils import distinct
 from mo_json import JxType, JX_IS_NULL, array_of, is_many, JX_ARRAY
 
 _get = object.__getattribute__
+row = Variable(".")
 
 
 class Stream:
@@ -48,12 +50,15 @@ class Stream:
 
     def filter(self, expr):
         expr = factory(expr).expr
-        var = Variable(".", array_of(self.factory.domain.python_type))
         return Stream(
             self.values,
             ExpressionFactory(FilterOp(self.factory.expr, expr), self.factory.domain),
             self.schema,
         )
+
+    def distinct(self):
+        return Stream(distinct(self), ExpressionFactory(Variable("."), self.factory.typer), self._schema)
+
 
     ###########################################################################
     # TERMINATORS
@@ -65,7 +70,8 @@ class Stream:
 
     def to_list(self):
         func = self.factory.build()
-        return func(self.values)
+        rows = self.values
+        return [func(row, rownum, rows) for rownum, row in enumerate(rows)]
 
     def to_value(self):
         func = self.factory.build()

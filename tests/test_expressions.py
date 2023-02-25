@@ -18,4 +18,4 @@ class TestOther(FuzzyTestCase):
         expr = jx_expression({"add": [1, 2]})
 
         self.assertEqual(expr(), 3)
-        self.assertEqual(expr.partial_eval(Python).to_python(), "3.0")
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "3.0")

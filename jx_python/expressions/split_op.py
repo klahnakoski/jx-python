@@ -10,10 +10,18 @@
 
 
 from jx_base.expressions import SplitOp as SplitOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class SplitOp(SplitOp_):
     def to_python(self):
-        return (
-            "(" + (self.value).to_python() + ").split(" + (self.find).to_python() + ")"
+        return PythonSource(
+            {},
+            (
+                "("
+                + (self.value).to_python()
+                + ").split("
+                + (self.find).to_python()
+                + ")"
+            ),
         )

@@ -10,7 +10,7 @@
 
 
 from jx_base.expressions import AvgOp as AvgOp_
-from jx_python.expressions._utils import multiop_to_python, with_var
+from jx_python.expressions._utils import multiop_to_python, with_var, PythonSource
 
 
 class AvgOp(AvgOp_):
@@ -18,6 +18,9 @@ class AvgOp(AvgOp_):
 
     def to_python(self):
         default = self.default.to_python()
-        return with_var(
-            "x", self.terms.to_python(), f"sum(x)/count(x) if x else {default}"
+        return PythonSource(
+            {},
+            with_var(
+                "x", self.terms.to_python(), f"sum(x)/count(x) if x else {default}"
+            ),
         )

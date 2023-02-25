@@ -7,11 +7,14 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from dataclasses import dataclass
+from typing import Any, Dict
 
 from mo_dots import is_data, is_list, Null
 from mo_future import is_text
 from mo_imports import expect
+from mo_logs import strings
+
 from mo_json.types import JX_BOOLEAN
 
 from jx_base.expressions import (
@@ -23,7 +26,9 @@ from jx_base.expressions import (
 )
 from jx_base.language import Language, is_expression, is_op
 
-ToNumberOp, OrOp, PythonScript, ScriptOp, WhenOp, compile_expression = expect("ToNumberOp", "OrOp", "PythonScript", "ScriptOp", "WhenOp", "compile_expression")
+ToNumberOp, OrOp, PythonScript, ScriptOp, WhenOp, compile_expression = expect(
+    "ToNumberOp", "OrOp", "PythonScript", "ScriptOp", "WhenOp", "compile_expression"
+)
 
 
 def jx_expression_to_function(expr):
@@ -69,7 +74,7 @@ class JXExpression(object):
 
 @extend(NullOp)
 def to_python(self):
-    return "None"
+    return PythonSource({}, "None")
 
 
 def _inequality_to_python(self):
@@ -136,6 +141,18 @@ def with_var(var, expression, eval):
 
 
 Python = Language("Python")
+
+
+@dataclass
+class PythonSource:
+    locals: Dict[str, Any]
+    source: str
+
+    def __str__(self):
+        return self.source
+
+    def __data__(self):
+        return strings.quote(self.source)
 
 
 _python_operators = {

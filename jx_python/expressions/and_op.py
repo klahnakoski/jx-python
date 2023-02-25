@@ -10,12 +10,15 @@
 
 
 from jx_base.expressions import AndOp as AndOp_
+from jx_python.expressions._utils import PythonSource
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class AndOp(AndOp_):
     def to_python(self):
         if not self.terms:
-            return "True"
+            return PythonSource({}, "True")
         else:
-            return " and ".join(f"({ToBooleanOp(t).to_python()})" for t in self.terms)
+            return PythonSource(
+                {}, " and ".join(f"({ToBooleanOp(t).to_python()})" for t in self.terms)
+            )

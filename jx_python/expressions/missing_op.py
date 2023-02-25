@@ -10,8 +10,10 @@
 
 
 from jx_base.expressions import MissingOp as MissingOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class MissingOp(MissingOp_):
     def to_python(self):
-        return self.expr.to_python() + " == None"
+        expr = self.expr.to_python()
+        return PythonSource(expr.locals, expr.source + " == None")

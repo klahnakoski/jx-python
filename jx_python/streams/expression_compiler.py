@@ -19,55 +19,35 @@ from mo_dots import Data, coalesce, is_data, leaves_to_data
 from mo_logs import Log, strings
 from mo_times.dates import Date
 
-
-def get_attr(value, *items):
-    values = enlist(value)
-    for item in items:
-        result = []
-        for v in values:
-            try:
-                result.extend(enlist(getattr(v, item)))
-                continue
-            except:
-                pass
-
-            try:
-                result.extend(enlist(v[item]))
-            except:
-                pass
-
-        values = result
-    return delist(values)
+from jx_python.expressions import PythonFunction
+from jx_python.expressions._utils import PythonSource
 
 
 GLOBALS = {
     "true": True,
     "false": False,
     "null": None,
-    "EMPTY_DICT": {},
-    "coalesce": coalesce,
     "enlist": enlist,
     "delist": delist,
     "Date": Date,
     "Log": Log,
     "Data": Data,
-    "re": re,
     "leaves_to_data": leaves_to_data,
     "is_data": is_data,
     "first": first,
-    "get_attr": get_attr,
 }
 
 
-def compile_expression(source, function_name="output"):
+def compile_expression(code: PythonSource, function_name="output"):
     """
     THIS FUNCTION IS ON ITS OWN FOR MINIMAL GLOBAL NAMESPACE
 
-    :param source:  PYTHON SOURCE CODE
+    :param code:  PYTHON SOURCE CODE
     :param function_name:  OPTIONAL NAME TO GIVE TO OUTPUT FUNCTION
     :return:  PYTHON FUNCTION
     """
 
+    fake_globals = {**GLOBALS, **code.locals}
     fake_locals = {}
     try:
         exec(
@@ -76,24 +56,24 @@ def compile_expression(source, function_name="output"):
                 + function_name
                 + "(row, rownum=None, rows=None):\n"
                 + "    _source = "
-                + strings.quote(source)
+                + strings.quote(code)
                 + "\n"
                 + "    try:\n"
                 + "        return "
-                + source
+                + code.source
                 + "\n"
                 + "    except Exception as e:\n"
-                + "        Log.error(u'Problem with dynamic function {{func|quote}}', "
+                + "        Log.error('Problem with dynamic function {{func|quote}}', "
                 " func=_source, cause=e)\n"
             ),
-            GLOBALS,
+            fake_globals,
             fake_locals,
         )
         func = fake_locals[function_name]
-        setattr(func, "_source", source)
+        setattr(func, "_source", code)
         return func
     except Exception as e:
-        raise Log.error(u"Bad source: {{source}}", source=source, cause=e)
+        raise Log.error("Bad source: {{source}}", source=code, cause=e)
 
 
 export("jx_python.expressions._utils", compile_expression)

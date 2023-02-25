@@ -10,9 +10,36 @@
 
 
 from jx_base.expressions import GetOp as GetOp_
+from jx_base.utils import enlist, delist
+from jx_python.expressions._utils import PythonSource
 
 
 class GetOp(GetOp_):
     def to_python(self):
-        offsets = ", ".join(o.to_python() for o in self.offsets)
-        return f"get_attr({self.var.to_python()}, {offsets})"
+        offsets, locals = zip(*((c.source, c.locals) for o in self.offsets for c in [o.to_python()]))
+        offsets = ", ".join(offsets)
+        locals = locals+ ({"get_attr": get_attr},)
+        return PythonSource({k: v for l in locals for k, v in l.items()}, f"get_attr({self.var.to_python()}, {offsets})")
+
+
+def get_attr(value, *items):
+    values = enlist(value)
+    for item in items:
+        result = []
+        for v in values:
+            try:
+                result.extend(enlist(getattr(v, item)))
+                continue
+            except:
+                pass
+
+            try:
+                result.extend(enlist(v[item]))
+            except:
+                pass
+
+        values = result
+    return delist(values)
+
+
+

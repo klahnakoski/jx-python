@@ -10,8 +10,9 @@
 
 
 from jx_base.expressions import TrueOp as TrueOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class TrueOp(TrueOp_):
     def to_python(self):
-        return "True"
+        return PythonSource({}, "True")

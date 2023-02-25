@@ -10,7 +10,7 @@
 
 
 from jx_base.expressions import FindOp as FindOp_
-from jx_python.expressions._utils import with_var, Python
+from jx_python.expressions._utils import with_var, Python, PythonSource
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.basic_eq_op import BasicEqOp
 from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
@@ -47,13 +47,16 @@ class FindOp(FindOp_):
         return output
 
     def to_python(self):
-        return with_var(
-            "f",
-            "("
-            + (self.value).to_python()
-            + ").find"
-            + "("
-            + (self.find).to_python()
-            + ")",
-            "None if f==-1 else f",
+        return PythonSource(
+            {},
+            with_var(
+                "f",
+                "("
+                + (self.value).to_python()
+                + ").find"
+                + "("
+                + (self.find).to_python()
+                + ")",
+                "None if f==-1 else f",
+            ),
         )

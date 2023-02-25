@@ -10,8 +10,11 @@
 
 
 from jx_base.expressions import InOp as InOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class InOp(InOp_):
     def to_python(self):
-        return self.value.to_python() + " in " + self.superset.to_python()
+        return PythonSource(
+            {}, self.value.to_python() + " in " + self.superset.to_python()
+        )

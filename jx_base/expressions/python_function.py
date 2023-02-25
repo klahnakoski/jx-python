@@ -9,10 +9,12 @@
 #
 
 
-from jx_base.expressions import ToIntegerOp as IntegerOp_
-from jx_python.expressions._utils import PythonSource
+from jx_base.expressions.expression import Expression
 
 
-class ToIntegerOp(IntegerOp_):
-    def to_python(self):
-        return PythonSource({}, "int(" + self.term.to_python() + ")")
+class PythonFunction(Expression):
+    """
+    REPRESENT A Python FUNCTION
+    """
+
+    pass

@@ -10,8 +10,11 @@
 
 
 from jx_base.expressions import BasicEqOp as BasicEqOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class BasicEqOp(BasicEqOp_):
     def to_python(self):
-        return "(" + self.rhs.to_python() + ") == (" + self.lhs.to_python() + ")"
+        return PythonSource(
+            {}, "(" + self.rhs.to_python() + ") == (" + self.lhs.to_python() + ")"
+        )

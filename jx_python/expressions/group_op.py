@@ -8,13 +8,12 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import FilterOp as FilterOp_, Variable
-from jx_base.utils import enlist
+from jx_base.expressions import GroupOp as GroupOp_, Variable
 from jx_python.expressions import Python
 from jx_python.expressions._utils import PythonSource
 
 
-class FilterOp(FilterOp_):
+class GroupOp(GroupOp_):
     def to_python(self):
         r = Variable("r")
         r.simplified = True
@@ -23,9 +22,9 @@ class FilterOp(FilterOp_):
         rs = Variable("rs")
         rs.simplified = True
 
-        predicate = (
+        func = (
             self
-            .predicate
+            .select
             .partial_eval(Python)
             .map({"row": r, "rownum": rn, "rows": rs})
             .to_python()
@@ -33,7 +32,5 @@ class FilterOp(FilterOp_):
         frum = self.frum.partial_eval(Python).to_python()
 
         return PythonSource(
-            {"enlist": enlist, **frum.locals, **predicate.locals},
-            f"[r for rs in [enlist({frum.source})] for rn, r in enumerate(rs) if"
-            f" ({predicate.source})]",
+            {}, f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]"
         )

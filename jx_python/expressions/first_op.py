@@ -10,9 +10,10 @@
 
 
 from jx_base.expressions import FirstOp as FirstOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class FirstOp(FirstOp_):
     def to_python(self):
         value = self.term.to_python()
-        return "enlist(" + value + ")[0]"
+        return PythonSource({}, "enlist(" + value + ")[0]")

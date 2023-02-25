@@ -7,15 +7,19 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_logs import Log
 
-
-from jx_base.expressions.expression import Expression
+from jx_base.expressions.expression import Expression, MissingOp
+from mo_json import JX_ARRAY, JxType, array_of
 
 
 class GroupOp(Expression):
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.frum, self.select = terms
+    """
+    return a series of {"group": group, "part": list_of_rows_for_group}
+    """
+    def __init__(self, frum, select):
+        Expression.__init__(self, frum, select)
+        self.frum, self.select = frum, select
         if self.frum.type != JX_ARRAY:
             Log.error("expecting an array")
 
@@ -30,7 +34,7 @@ class GroupOp(Expression):
 
     @property
     def type(self):
-        return self.frum.type
+        return array_of(self.frum.type) | JxType(group=self.select.type)
 
     def missing(self, lang):
         return MissingOp(self)

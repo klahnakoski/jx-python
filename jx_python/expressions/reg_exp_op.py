@@ -7,19 +7,23 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+import re
 
 from mo_logs.strings import quote
 
 from jx_base.expressions import RegExpOp as RegExpOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class RegExpOp(RegExpOp_):
     def to_python(self):
-        return (
-            "re.match("
-            + quote(self.pattern.value + "$")
-            + ", "
-            + self.expr.to_python()
-            + ")"
+        return PythonSource(
+            {"re": re},
+            (
+                "re.match("
+                + quote(self.pattern.value + "$")
+                + ", "
+                + self.expr.to_python()
+                + ")"
+            ),
         )

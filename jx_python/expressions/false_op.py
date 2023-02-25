@@ -10,8 +10,9 @@
 
 
 from jx_base.expressions import FalseOp as FalseOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class FalseOp(FalseOp_):
     def to_python(self):
-        return "False"
+        return PythonSource({}, "False")

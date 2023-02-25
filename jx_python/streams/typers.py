@@ -11,7 +11,7 @@ import inspect
 from mo_imports import expect, export
 from mo_logs import logger
 
-from jx_python.streams._utils import arg_spec
+from jx_python.streams.inspects import arg_spec
 from jx_python.streams.type_parser import parse
 from mo_json import JxType, JX_TEXT, JX_IS_NULL, array_of
 

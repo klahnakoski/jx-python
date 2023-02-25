@@ -10,14 +10,17 @@
 
 
 from jx_base.expressions import NeOp as NeOp_
-from jx_python.expressions._utils import with_var
+from jx_python.expressions._utils import with_var, PythonSource
 
 
 class NeOp(NeOp_):
     def to_python(self):
-        lhs = (self.lhs).to_python()
-        rhs = (self.rhs).to_python()
+        lhs = self.lhs.to_python()
+        rhs = self.rhs.to_python()
 
-        return with_var(
-            "r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"
+        return PythonSource(
+            {**lhs.locals, **rhs.locals},
+            with_var(
+                "r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"
+            ),
         )

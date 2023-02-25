@@ -10,6 +10,8 @@
 
 
 from mo_dots import split_field
+
+from jx_python.expressions._utils import PythonSource
 from mo_json import json2value
 from mo_logs import strings
 
@@ -22,8 +24,8 @@ class RowsOp(RowsOp_):
         agg = "rows[rownum+" + (ToIntegerOp(self.offset)).to_python() + "]"
         path = split_field(json2value(self.var.json))
         if not path:
-            return agg
+            return PythonSource({}, agg)
 
         for p in path[:-1]:
             agg = agg + ".get(" + strings.quote(p) + ", EMPTY_DICT)"
-        return agg + ".get(" + strings.quote(path[-1]) + ")"
+        return PythonSource({"EMPTY_DICT": {}}, agg + ".get(" + strings.quote(path[-1]) + ")")

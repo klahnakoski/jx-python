@@ -10,12 +10,15 @@
 from mo_imports import export
 
 from jx_base.expressions import OrOp as OrOp_
+from jx_python.expressions._utils import PythonSource
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class OrOp(OrOp_):
     def to_python(self):
-        return " or ".join("(" + ToBooleanOp(t).to_python() + ")" for t in self.terms)
+        return PythonSource(
+            {}, " or ".join("(" + ToBooleanOp(t).to_python() + ")" for t in self.terms)
+        )
 
 
 export("jx_python.expressions._utils", OrOp)

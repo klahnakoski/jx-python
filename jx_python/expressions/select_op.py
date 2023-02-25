@@ -12,12 +12,18 @@
 from mo_logs.strings import quote
 
 from jx_base.expressions import SelectOp as SelectOp_
+from jx_python.expressions._utils import PythonSource
 
 
 class SelectOp(SelectOp_):
     def to_python(self):
-        return (
-            "leaves_to_data({"
-            + ",".join(quote(name + ":" + value.to_python()) for name, value in self)
-            + "})"
+        return PythonSource(
+            {},
+            (
+                "leaves_to_data({"
+                + ",".join(
+                    quote(name + ":" + value.to_python()) for name, value in self
+                )
+                + "})"
+            ),
         )
