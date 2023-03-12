@@ -1,26 +1,43 @@
 from mo_logs import logger
 
 from jx_base import jx_expression
-from jx_base.expressions import Expression, Variable, GetOp, EqOp, Literal, AndOp, OrOp, NeOp
+from jx_base.expressions import (
+    Expression,
+    Variable,
+    GetOp,
+    EqOp,
+    Literal,
+    AndOp,
+    OrOp,
+    NeOp,
+    CallOp,
+)
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
-from jx_python.streams.typers import Typer
+from jx_python.streams.typers import Typer, JxTyper
 from jx_python.streams.typers import UnknownTyper, LazyTyper
+from mo_json import JX_ANY
+
+Any = Typer(python_type=JX_ANY)
 
 
 class ExpressionFactory:
     def __init__(self, expr, domain):
         self.expr: Expression = expr
-        self.domain: Typer = domain or LazyTyper()
+        self.codomain: Typer = domain or LazyTyper()
 
     def build(self):
         return compile_expression(self.expr.partial_eval(Python).to_python())
 
     def __getattr__(self, item):
-        item_type = getattr(self.domain, item)
-
+        item_type = getattr(self.codomain, item)
         return ExpressionFactory(GetOp(self.expr, Literal(item)), item_type)
+
+    def __call__(self, *args, **kwargs):
+        args = [factory(a).build() for a in args]
+        kwargs = {k: factory(v).build() for k, v in kwargs.items()}
+        return ExpressionFactory(CallOp(self.expr, *args, **kwargs), JxTyper(JX_ANY))
 
     def __eq__(self, other):
         other = factory(other)
@@ -38,11 +55,8 @@ class ExpressionFactory:
         other = factory(other)
         return ExpressionFactory(OrOp(self.expr, other.expr), Typer(python_type=bool))
 
-    def to_list(self):
-        self.build()(None)
 
-
-def factory(expr, typer=None) -> ExpressionFactory:
+def factory(expr, typer=Any) -> ExpressionFactory:
     """
     assemble the expression
     """
@@ -71,9 +85,7 @@ class TopExpressionFactory(ExpressionFactory):
         if isinstance(value, ExpressionFactory):
             logger.error("don't do this")
 
-        return ExpressionFactory(
-            Literal("."), Typer(python_type=type(value)), f"{value}"
-        )
+        return ExpressionFactory(Literal("."), Typer(python_type=type(value)))
 
     def __str__(self):
         return "it"

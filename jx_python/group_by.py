@@ -20,6 +20,7 @@ from mo_future import binary_type, text
 from mo_logs import Log
 from mo_logs.exceptions import Except
 
+from jx_base.utils import enlist
 from jx_python.expressions import jx_expression_to_function
 
 

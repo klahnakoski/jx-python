@@ -24,7 +24,6 @@ from jx_python.expressions import Python
 
 
 class PythonScript(PythonScript_):
-
     def __str__(self):
         missing = self.miss.partial_eval(Python)
         if missing is FALSE:

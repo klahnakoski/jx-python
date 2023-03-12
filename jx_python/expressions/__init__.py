@@ -6,6 +6,7 @@ from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
 from jx_python.expressions.basic_starts_with_op import BasicStartsWithOp
 from jx_python.expressions.basic_substring_op import BasicSubstringOp
 from jx_python.expressions.between_op import BetweenOp
+from jx_python.expressions.call_op import CallOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.coalesce_op import CoalesceOp
 from jx_python.expressions.concat_op import ConcatOp

@@ -20,7 +20,17 @@ class AndOp(AndOp_):
         if not self.terms:
             return PythonScript({}, JX_BOOLEAN, "True", self, FALSE)
         else:
-            sources, locals = zip(*((c.source, c.locals) for t in self.terms for c in [ToBooleanOp(t).to_python()]))
+            sources, locals = zip(
+                *(
+                    (c.source, c.locals)
+                    for t in self.terms
+                    for c in [ToBooleanOp(t).to_python()]
+                )
+            )
             return PythonScript(
-                {k:v for l in locals for k, v in l.items()}, JX_BOOLEAN, " and ".join(sources), self, FALSE
+                {k: v for l in locals for k, v in l.items()},
+                JX_BOOLEAN,
+                " and ".join(sources),
+                self,
+                FALSE,
             )

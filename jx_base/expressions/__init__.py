@@ -24,6 +24,7 @@ from jx_base.expressions.basic_not_op import BasicNotOp
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.between_op import BetweenOp
+from jx_base.expressions.call_op import CallOp
 from jx_base.expressions.cardinality_op import CardinalityOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.coalesce_op import CoalesceOp

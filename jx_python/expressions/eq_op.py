@@ -25,7 +25,7 @@ class EqOp(EqOp_):
             JX_BOOLEAN,
             f"({rhs.source}) in enlist({lhs.source})",
             self,
-            FALSE
+            FALSE,
         )
 
     def partial_eval(self, lang):

@@ -6,6 +6,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+import itertools
 
 
 def distinct(values):
@@ -17,6 +18,10 @@ def distinct(values):
         acc.add(v)
         result.append(v)
     return result
+
+
+def group(values, func):
+    yield from itertools.groupby(sorted(values, key=func), func)
 
 
 def wrap_function(func):
@@ -44,3 +49,18 @@ def wrap_function(func):
         return temp
     elif numarg == 3:
         return func
+
+
+def merge_locals(*locals, **kwargs):
+    """
+    return the merge of tuples-of-dicts, dicts and kwargs
+    """
+    output = {}
+    for l in locals:
+        if isinstance(l, dict):
+            output.update(l)
+        else:
+            for ll in l:
+                output.update(ll)
+    output.update(kwargs)
+    return output

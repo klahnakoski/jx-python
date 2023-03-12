@@ -21,13 +21,16 @@ class PythonFunction(PythonFunction_):
     Box a Python function, source unknown
     """
 
-    def __init__(self, func):
+    def __init__(self, func, type=JX_ANY):
         Expression.__init__(self, None)
         self.func = wrap_function(func)
+        self._data_type = type
         self._name = f"boxed_function{randoms.base64(8)}"
 
     def to_python(self):
-        return PythonScript({self._name: self.func}, JX_ANY, f"{self._name}(row, rownum, rows)", self)
+        return PythonScript(
+            {self._name: self.func}, self.type, f"{self._name}(row, rownum, rows)", self
+        )
 
     def __data__(self):
         return {"python_function": {}}

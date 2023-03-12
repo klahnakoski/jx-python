@@ -12,16 +12,23 @@
 from jx_base.expressions import GetOp as GetOp_
 from jx_base.utils import enlist, delist
 from jx_base.expressions.python_script import PythonScript
+from jx_python.utils import merge_locals
 from mo_json import JX_ANY
 
 
 class GetOp(GetOp_):
     def to_python(self):
-        offsets, locals = zip(*((c.source, c.locals) for o in self.offsets for c in [o.to_python()]))
+        offsets, locals = zip(
+            *((c.source, c.locals) for o in self.offsets for c in [o.to_python()])
+        )
         offsets = ", ".join(offsets)
         var = self.var.to_python()
-        locals = locals + ({"get_attr": get_attr, **var.locals},)
-        return PythonScript({k: v for l in locals for k, v in l.items()}, JX_ANY, f"get_attr({var.source}, {offsets})", self)
+        return PythonScript(
+            merge_locals(locals, var.locals, get_attr=get_attr),
+            JX_ANY,
+            f"get_attr({var.source}, {offsets})",
+            self,
+        )
 
 
 def get_attr(value, *items):
@@ -42,6 +49,3 @@ def get_attr(value, *items):
 
         values = result
     return delist(values)
-
-
-

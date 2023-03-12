@@ -275,9 +275,7 @@ class ListContainer(Container, Namespace, Table):
         else:
             return dict_to_data({
                 "meta": {"format": "list"},
-                "data": [
-                    {k: delist(v) for k, v in row.items()} for row in self.data
-                ],
+                "data": [{k: delist(v) for k, v in row.items()} for row in self.data],
             })
 
     def get_columns(self, table_name=None):

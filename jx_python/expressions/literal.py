@@ -20,4 +20,6 @@ from jx_base.expressions import Literal as Literal_
 
 class Literal(Literal_):
     def to_python(self):
-        return PythonScript({}, JX_ANY, text(repr(from_data(json2value(self.json)))), self)
+        return PythonScript(
+            {}, JX_ANY, text(repr(from_data(json2value(self.json)))), self
+        )

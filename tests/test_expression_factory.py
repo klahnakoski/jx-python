@@ -7,10 +7,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 import os
-from unittest import TestCase
+from unittest import TestCase, skip
 
-from jx_python.streams import stream
+from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
+from jx_python.streams.typers import ANNOTATIONS
 
 IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
@@ -22,8 +23,19 @@ class TestExpressionFactory(TestCase):
                 self.value = value
 
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        # attribute access will flatten
         result = stream(value).value.props.a.to_list()
         self.assertEqual(result, [1, 2, 3])
+
+    def test_deep_iteration2(self):
+        class Something:
+            def __init__(self, value):
+                self.value = value
+
+        value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        # attribute access will flatten
+        result = stream(value).value.props.map(it.a).to_list()
+        self.assertEqual(result, [[1, 2, 3]])
 
     def test_iterator(self):
         class Something:
@@ -74,4 +86,45 @@ class TestExpressionFactory(TestCase):
         result = stream(range(10)).limit(10).to_list()
         self.assertEqual(result, list(range(10)))
 
+    @skip('not supported yet')
+    def test_group1(self):
+        result = (
+            stream([1, 2, 3])
+            .group(lambda v: v % 2)
+            .map(lambda v: {"group": v.group, "value": v.to_list()})
+            .to_list()
+        )
+        self.assertEqual(
+            result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}]
+        )
 
+    @skip('not supported yet')
+    def test_group2(self):
+        result = (
+            stream([1, 2, 3])
+            .group(lambda v: v % 2)
+            .map(it.sum())
+            .map(lambda v, a: {"group": a["group"], "value": v})
+            .to_list()
+        )
+        self.assertEqual(result, [{"group": 0, "value": 2}, {"group": 1, "value": 4}])
+
+    def test_first(self):
+        result = stream([1, 2, 3]).first()
+        self.assertEqual(result, 1)
+
+    def test_map_it(self):
+        class SomeClass:
+            num = 0
+
+            def __init__(self):
+                self.value = SomeClass.num
+                SomeClass.num += 1
+
+        ANNOTATIONS[(SomeClass, "value")] = Typer(python_type=int)
+        result = (
+            stream([SomeClass(), SomeClass(), SomeClass()])
+            .map(it.value)
+            .last()
+        )
+        self.assertEqual(result, 2)

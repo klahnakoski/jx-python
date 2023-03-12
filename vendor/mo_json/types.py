@@ -36,6 +36,8 @@ class JxType(object):
         other = to_jx_type(other)
         if self is JX_IS_NULL:
             return other
+        if self is JX_ANY:
+            return self
 
         sd = self.__dict__.copy()
         od = other.__dict__
@@ -80,6 +82,8 @@ class JxType(object):
         return output
 
     def __getitem__(self, item):
+        if self is JX_ANY:
+            return self
         return self.__dict__.get(item)
 
     def __hash__(self):

@@ -7,23 +7,58 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
+from mo_dots import leaves_to_data
 from mo_logs.strings import quote
 
 from jx_base.expressions import SelectOp as SelectOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_base.expressions.select_op import SelectOne
+from jx_base.utils import enlist, delist
+from jx_python.expressions import Python
+from jx_python.utils import merge_locals
+from mo_json import array_of
 
 
 class SelectOp(SelectOp_):
     def to_python(self):
+        frum = self.frum.partial_eval(Python).to_python()
+        selects = tuple(
+            SelectOne(
+                t.name,
+                t
+                .value
+                .partial_eval(Python)
+                .map(dict(row="r", rows="rs", rownum="rn"))
+                .to_python(),
+            )
+            for t in self.terms
+        )
+
+        if len(selects) == 1 and selects[0].name == ".":
+            # value selection
+            source = (
+                f"[{selects[0].value.source} for rs in [enlist({frum.source})] for rn,"
+                " r in enumerate(rs)]"
+            )
+        else:
+            # structure selection
+            select_sources = ",".join(
+                quote(s.name) + ":" + s.value.source for s in selects
+            )
+            source = (
+                f"[leaves_to_data({{{select_sources}}}) for rs in"
+                f" [enlist({frum.source})] for rn, r in enumerate(rs)]"
+            )
+
         return PythonScript(
-            {},
-            (
-                "leaves_to_data({"
-                + ",".join(
-                    quote(name + ":" + value.to_python()) for name, value in self
-                )
-                + "})"
+            merge_locals(
+                [s.value.locals for s in selects],
+                frum.locals,
+                leaves_to_data=leaves_to_data,
+                enlist=enlist,
+                delist=delist,
             ),
+            array_of(self.type),
+            source,
+            self,
         )

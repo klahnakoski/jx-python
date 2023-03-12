@@ -11,6 +11,7 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import is_literal
+from mo_json import JX_ANY
 
 
 class GetOp(Expression):
@@ -32,7 +33,19 @@ class GetOp(Expression):
         if is_literal(self.var) and len(self.offsets) == 1 and is_literal(self.offset):
             return {"get": {self.var.json, self.offsets[0].value}}
         else:
-            return {"get": [self.var.__data__()] + [o.__data__() for o in self.offsets]}
+            return {"get": [self.var.__data__(), *(o.__data__() for o in self.offsets)]}
+
+    @property
+    def type(self):
+        output = self.var.type
+        for o in self.offsets:
+            if is_literal(o):
+                output = output[o.value]
+            else:
+                output = JX_ANY
+        return output
+
+
 
     def vars(self):
         output = self.var.vars()

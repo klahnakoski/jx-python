@@ -25,7 +25,7 @@ from jx_base.expressions.literal import ZERO
 from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import (
     SelectOp,
-    _normalize_selects,
+    _normalize_selects, SelectOne,
 )
 from mo_imports import export
 from jx_base.expressions.variable import Variable
@@ -59,9 +59,7 @@ Column = expect("Column")
 BAD_SELECT = "Expecting `value` or `aggregate` in select clause not {{select}}"
 DEFAULT_LIMIT = 10
 MAX_LIMIT = 10000
-DEFAULT_SELECT = SelectOp(dict(
-    name="count", value=Variable("."), aggregate=CountOp(Variable(".")), default=ZERO
-))
+DEFAULT_SELECT = (SelectOne(".", Variable(".")),)
 
 
 class QueryOp(Expression):
@@ -95,7 +93,7 @@ class QueryOp(Expression):
         self.select: SelectOp = (
             select
             if select is not None
-            else SelectOp(frum, {"name": ".", "value": Variable(".")})
+            else SelectOp(frum, DEFAULT_SELECT)
         )
         self.edges = edges
         self.groupby = groupby

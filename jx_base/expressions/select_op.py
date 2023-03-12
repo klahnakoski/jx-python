@@ -7,22 +7,10 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from collections import namedtuple
+from dataclasses import dataclass
+from typing import Tuple, Iterable, Dict
 
-
-from typing import Dict, Tuple, Iterable
-
-from jx_base.expressions._utils import TYPE_CHECK, simplified
-from jx_base.expressions.aggregate_op import AggregateOp
-from jx_base.expressions.expression import jx_expression, Expression, _jx_expression
-from jx_base.expressions.from_op import FromOp
-from jx_base.expressions.leaves_op import LeavesOp
-from jx_base.expressions.sql_select_op import SqlSelectOp
-from jx_base.expressions.literal import Literal
-from jx_base.expressions.null_op import NULL
-from jx_base.expressions.variable import Variable
-from jx_base.language import is_op
-from jx_base.models.container import Container
-from jx_base.utils import is_variable_name
 from mo_dots import (
     to_data,
     coalesce,
@@ -31,31 +19,50 @@ from mo_dots import (
     join_field,
     literal_field,
     is_missing,
-    is_many,
+    is_many, concat_field,
 )
 from mo_future import is_text, text
 from mo_imports import export
-from mo_json import union_type
 from mo_logs import Log
 from mo_math import is_number
+
+from jx_base.expressions._utils import TYPE_CHECK, simplified
+from jx_base.expressions.aggregate_op import AggregateOp
+from jx_base.expressions.expression import jx_expression, Expression, _jx_expression
+from jx_base.expressions.from_op import FromOp
+from jx_base.expressions.leaves_op import LeavesOp
+from jx_base.expressions.literal import Literal
+from jx_base.expressions.null_op import NULL
+from jx_base.expressions.sql_select_op import SqlSelectOp
+from jx_base.expressions.variable import Variable
+from jx_base.language import is_op
+from jx_base.models.container import Container
+from jx_base.utils import is_variable_name
+from mo_json import union_type, JX_IS_NULL
+
+
+@dataclass
+class SelectOne:
+    name: str
+    value: Expression
 
 
 class SelectOp(Expression):
     has_simple_form = True
 
-    def __init__(self, frum, *terms: Tuple[Dict[str, Expression]]):
+    def __init__(self, frum, terms: Tuple[SelectOne], **kwargs: Dict[str, Expression]):
         """
-        :param terms: list OF {"name":name, "value":value} DESCRIPTORS
+        :param terms: list OF SelectOne DESCRIPTORS
         """
         if TYPE_CHECK and (
-            not all(isinstance(term, dict) for term in terms[1:])
-            or any(term.get("name") is None for term in terms)
+            not all(isinstance(term, SelectOne) for term in terms)
+            or any(term.name is None for term in terms)
         ):
-            Log.error("expecting list of dicts with 'name' and 'aggregate' property")
+            Log.error("expecting list of SelectOne")
         Expression.__init__(self, None)
         self.frum = frum
-        self.terms = terms
-        self._data_type = union_type(*(t["name"] + t["value"].type for t in terms))
+        self.terms = terms + tuple(*(SelectOne(k, v) for k, v in kwargs.items()))
+        self._data_type = union_type(*(t.name + t.value.type for t in terms))
 
     @classmethod
     def define(cls, expr):
@@ -131,31 +138,33 @@ class SelectOp(Expression):
         for name, expr in self:
             new_expr = expr.partial_eval(lang)
             if new_expr is expr:
-                new_terms.append({"name": name, "value": expr})
+                new_terms.append(SelectOne(name, expr))
                 continue
             diff = True
 
             if expr is NULL:
                 continue
             elif is_op(expr, SelectOp):
-                for JX_name, JX_value in expr.terms:
-                    new_terms.append({
-                        "name": concat_field(name, JX_name),
-                        "value": JX_value,
-                    })
+                for child_name, child_value in expr.terms:
+                    new_terms.append(SelectOne(
+                        concat_field(name, child_name),
+                        child_value,
+                    ))
             else:
-                new_terms.append({"name": name, "value": new_expr})
-                diff = True
+                new_terms.append(SelectOne(name, new_expr))
+
         if diff:
-            return SelectOp(self.frum, new_terms)
+            return SelectOp(self.frum.partial_eval(lang), tuple(new_terms))
         else:
-            return self
+            return SelectOp(self.frum.partial_eval(lang), self.terms)
+
+    @property
+    def type(self):
+        return union_type(*(t.value.type for t in self.terms))
 
     def apply(self, container: Container):
         result = self.frum.apply(container)
-        results = tuple(
-            {"name": name, "value": value.apply(result)} for name, value in self
-        )
+        results = tuple(*(SelectOne(name, value.apply(result)) for name, value in self))
         # GROUP BY COMMON TABLE
         return SqlSelectOp(result, results)
 
@@ -164,7 +173,7 @@ class SelectOp(Expression):
         :return:  return iterator of (name, value) tuples
         """
         for term in self.terms:
-            yield term["name"], term["value"]
+            yield term.name, term.value
 
     def __data__(self):
         return {
@@ -173,13 +182,13 @@ class SelectOp(Expression):
         }
 
     def vars(self):
-        return set(v for term in self.terms for v in term["value"].vars())
+        return set(v for term in self.terms for v in term.value.vars())
 
     def map(self, map_):
         return SelectOp(
             self.frum,
             *(
-                {"name": name, "value": value.map(map_), "aggregate": agg.map(map_)}
+                SelectOne(name, value.map(map_))
                 for name, value in self
             )
         )

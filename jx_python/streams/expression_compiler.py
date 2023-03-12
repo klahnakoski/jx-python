@@ -16,7 +16,6 @@ from mo_logs import Log, strings
 from mo_times.dates import Date
 
 from jx_base.expressions.python_script import PythonScript
-from jx_base.utils import enlist, delist
 
 GLOBALS = {
     "Date": Date,
@@ -60,7 +59,7 @@ def compile_expression(code: PythonScript, function_name="output"):
             fake_locals,
         )
         func = fake_locals[function_name]
-        setattr(func, "_source", code)
+        setattr(func, "_source", code.source)
         return func
     except Exception as e:
         raise Log.error("Bad source: {{source}}", source=code.source, cause=e)

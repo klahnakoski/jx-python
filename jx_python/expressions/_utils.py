@@ -88,11 +88,14 @@ def _inequality_to_python(self):
             OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
-                "else": PythonScript({**lhs.locals, **rhs.locals}, script, type=JX_BOOLEAN),
-            }
+                "else": PythonScript(
+                    {**lhs.locals, **rhs.locals}, script, type=JX_BOOLEAN
+                ),
+            },
         )
         .partial_eval(Python)
-        .to_python().source
+        .to_python()
+        .source
     )
 
 

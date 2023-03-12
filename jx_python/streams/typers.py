@@ -13,7 +13,7 @@ from mo_logs import logger
 
 from jx_python.streams.inspects import arg_spec
 from jx_python.streams.type_parser import parse
-from mo_json import JxType, JX_TEXT, JX_IS_NULL, array_of
+from mo_json import JxType, JX_TEXT, JX_IS_NULL, array_of as _array_of, JX_ANY
 
 ANNOTATIONS, Stream = expect("ANNOTATIONS", "Stream")
 
@@ -23,8 +23,10 @@ class Typer:
     Smooth out the lumps of Python type manipulation
     """
 
-    def __init__(self, *, example=None, python_type=None, function=None):
-        if function:
+    def __init__(self, *, example=None, python_type=None, function=None, array_of=None):
+        if array_of:
+            self.python_type = _array_of(array_of.python_type)
+        elif function:
             # find function return type
             inspect.signature(function)
         elif example:
@@ -74,24 +76,22 @@ class JxTyper:
     """
 
     def __init__(self, type_):
-         self.type_ : JxType = type_
+        self.type_: JxType = type_
 
     def __getattr__(self, item):
+        if self.type_ is JX_ANY:
+            return self
         attribute_type = self.type_[item]
+        if isinstance(attribute_type, JxType):
+            return JxTyper(attribute_type)
         return Typer(python_type=attribute_type)
-
-        # logger.error(
-        #     """expecting {{type}} to have attribute {{item|quote}}""",
-        #     type=self.type_,
-        #     item=item,
-        # )
 
     __getitem__ = __getattr__
 
     def __add__(self, other):
         if self.type_ != other.typer:
             logger.error("Can not add two different types")
-        if self.type_==JX_TEXT:
+        if self.type_ == JX_TEXT:
             # ADDING STRINGS RESULTS IN AN ARRAY OF STRINGS
             return array_of(JX_TEXT)
         return self

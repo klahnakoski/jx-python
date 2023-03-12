@@ -37,5 +37,5 @@ class FilterOp(FilterOp_):
             frum.type,
             f"[r for rs in [enlist({frum.source})] for rn, r in enumerate(rs) if"
             f" ({predicate.source})]",
-            self
+            self,
         )

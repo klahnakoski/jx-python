@@ -26,5 +26,3 @@ def arg_spec(type_, item):
         if name != item:
             continue
         return inspect.getfullargspec(func)
-
-
