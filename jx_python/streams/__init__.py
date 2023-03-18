@@ -34,22 +34,16 @@ class Stream:
         self.factory = factory
 
     def __getattr__(self, item):
-        accessor = ExpressionFactory(
-            GetOp(self.factory.expr, Literal(item)), self.factory.codomain
-        )
-        fact = factory(accessor, self.factory.codomain[item])
+        accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
+        fact = factory(accessor)
         return Stream(self.values, fact)
 
     def __getitem__(self, item):
         if isinstance(item, str):
-            accessor = ExpressionFactory(
-                GetOp(self.factory.expr, Literal(item)), self.factory.codomain
-            )
+            accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
         if isinstance(item, ExpressionFactory):
-            accessor = ExpressionFactory(
-                GetOp(self.factory.expr, item.expr), self.factory.codomain
-            )
-        fact = factory(accessor, self.factory.codomain)
+            accessor = ExpressionFactory(GetOp(self.factory.expr, item.expr))
+        fact = factory(accessor)
         return Stream(self.values, fact)
 
     def __iter__(self):
@@ -62,25 +56,21 @@ class Stream:
         # Stream(v).map(it.filter())...
         # it.filter()... .__call__(v)
 
-
-        accessor = factory(accessor, self.factory.codomain)
-        fact = ExpressionFactory(
-            SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)),
-            self.factory.codomain,
-        )
+        accessor = factory(accessor)
+        fact = ExpressionFactory(SelectOp(
+            self.factory.expr, (SelectOne(".", accessor.expr),)
+        ))
         return Stream(self.values, fact)
 
     def filter(self, expr):
         expr = factory(expr).expr
         return Stream(
-            self.values,
-            ExpressionFactory(FilterOp(self.factory.expr, expr), self.factory.codomain),
+            self.values, ExpressionFactory(FilterOp(self.factory.expr, expr)),
         )
 
     def distinct(self):
         return Stream(
-            distinct(self),
-            ExpressionFactory(Variable("."), self.factory.typer),
+            distinct(self), ExpressionFactory(Variable("."), self.factory.typer),
         )
 
     def reverse(self):
@@ -102,38 +92,22 @@ class Stream:
                     break
                 yield v
 
-        return Stream(
-            list(limit()),
-            ExpressionFactory(Variable("."), self.factory.typer),
-        )
+        return Stream(list(limit()), ExpressionFactory(Variable(".")),)
 
     def group(self, expr):
         fact = factory(expr)
-        sup_codomain = Typer(
-            python_type=array_of(self.factory.codomain.python_type)
-            | JxType(group=fact.codomain.python_type)
-        )
         func = fact.build()
-        sub_factory = ExpressionFactory(
-            Variable(".", self.factory.codomain.python_type), self.factory.codomain
-        )
+        sub_factory = ExpressionFactory(Variable("."))
         this = self
 
         def nested():
             for g, rows in group(this, func):
                 yield {
-                    _A: Stream(
-                        list(rows), sub_factory, array_of(this.factory.codomain)
-                    ),
+                    _A: Stream(list(rows), sub_factory),
                     "group": g,
                 }
 
-        return Stream(
-            list(nested()),
-            ExpressionFactory(
-                Variable(".", sup_codomain.python_type), Typer(array_of=sup_codomain)
-            ),
-        )
+        return Stream(list(nested()), ExpressionFactory(Variable(".")))
 
     ###########################################################################
     # TERMINATORS
@@ -177,10 +151,7 @@ def stream(values):
         typer = Typer(example=values)
         values = [values]
 
-    return Stream(
-        values,
-        it,
-    )
+    return Stream(values, it,)
 
 
 ANNOTATIONS = {

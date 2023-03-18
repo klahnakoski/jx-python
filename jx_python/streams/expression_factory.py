@@ -23,56 +23,54 @@ Any = Typer(python_type=JX_ANY)
 
 
 class ExpressionFactory:
-    def __init__(self, expr, codomain):
+    def __init__(self, expr):
         self.expr: Expression = expr
-        self.codomain: Typer = codomain or LazyTyper()
 
     def build(self):
         return compile_expression(self.expr.partial_eval(Python).to_python())
 
     def __getattr__(self, item):
-        item_type = getattr(self.codomain, item)
-        return ExpressionFactory(GetOp(self.expr, Literal(item)), item_type)
+        return ExpressionFactory(GetOp(self.expr, Literal(item)))
 
     def __call__(self, *args, **kwargs):
         args = [factory(a).build() for a in args]
         kwargs = {k: factory(v).build() for k, v in kwargs.items()}
-        return ExpressionFactory(CallOp(self.expr, *args, **kwargs), JxTyper(JX_ANY))
+        return ExpressionFactory(CallOp(self.expr, *args, **kwargs))
 
     def __eq__(self, other):
         other = factory(other)
-        return ExpressionFactory(EqOp(self.expr, other.expr), Typer(python_type=bool))
+        return ExpressionFactory(EqOp(self.expr, other.expr))
 
     def __ne__(self, other):
         other = factory(other)
-        return ExpressionFactory(NeOp(self.expr, other.expr), Typer(python_type=bool))
+        return ExpressionFactory(NeOp(self.expr, other.expr))
 
     def __and__(self, other):
         other = factory(other)
-        return ExpressionFactory(AndOp(self.expr, other.expr), Typer(python_type=bool))
+        return ExpressionFactory(AndOp(self.expr, other.expr))
 
     def __or__(self, other):
         other = factory(other)
-        return ExpressionFactory(OrOp(self.expr, other.expr), Typer(python_type=bool))
+        return ExpressionFactory(OrOp(self.expr, other.expr))
 
 
-def factory(expr, codomain=Any) -> ExpressionFactory:
+def factory(expr) -> ExpressionFactory:
     """
     assemble the expression
     """
     if isinstance(expr, ExpressionFactory):
-        return ExpressionFactory(expr.expr, codomain)
+        return ExpressionFactory(expr.expr)
 
     if is_function(expr):
-        return ExpressionFactory(PythonFunction(expr), codomain)
+        return ExpressionFactory(PythonFunction(expr))
 
     if not isinstance(expr, Expression):
         expr = jx_expression(expr)
 
     if expr.op == Literal.op:
-        return ExpressionFactory(expr, Typer(example=expr.value))
+        return ExpressionFactory(expr)
 
-    return ExpressionFactory(expr, codomain)
+    return ExpressionFactory(expr)
 
 
 class TopExpressionFactory(ExpressionFactory):
