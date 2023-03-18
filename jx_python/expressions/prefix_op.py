@@ -14,14 +14,15 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class PrefixOp(PrefixOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             (
                 "("
-                + self.expr.to_python()
+                + self.expr.to_python(loop_depth)
                 + ").startswith("
-                + (self.prefix).to_python()
+                + (self.prefix).to_python(loop_depth)
                 + ")"
             ),
         )

@@ -14,11 +14,15 @@ from mo_json import JX_ANY
 
 
 class CallOp(CallOp_):
-    def to_python(self):
-        func = self.func.to_python()
+    def to_python(self, loop_depth):
+        func = self.func.to_python(loop_depth)
         if self.args:
             arg_source, arg_locals = zip(
-                *((c.source, c.locals) for a in self.args for c in [a.to_python()])
+                *(
+                    (c.source, c.locals)
+                    for a in self.args
+                    for c in [a.to_python(loop_depth)]
+                )
             )
         else:
             arg_source, arg_locals = tuple(), tuple()
@@ -27,7 +31,7 @@ class CallOp(CallOp_):
                 *(
                     (k, c.source, c.locals)
                     for k, v in self.kwargs
-                    for c in [v.to_python()]
+                    for c in [v.to_python(loop_depth)]
                 )
             )
         else:
@@ -38,6 +42,7 @@ class CallOp(CallOp_):
 
         return PythonScript(
             merge_locals(arg_locals, kwargs_locals, func.locals),
+            loop_depth,
             JX_ANY,
             f"{func.source}({args})",
             self,

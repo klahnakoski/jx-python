@@ -25,11 +25,15 @@ class PythonFunction(PythonFunction_):
         Expression.__init__(self, None)
         self.func = wrap_function(func)
         self._data_type = type
-        self._name = f"boxed_function{randoms.base64(8)}"
+        self._name = f"boxed_function{randoms.string(8)}"
 
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
-            {self._name: self.func}, self.type, f"{self._name}(row, rownum, rows)", self
+            {self._name: self.func},
+            loop_depth,
+            self.type,
+            f"{self._name}(row{loop_depth}, rownum{loop_depth}, rows{loop_depth})",
+            self,
         )
 
     def __data__(self):

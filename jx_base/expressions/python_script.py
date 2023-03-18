@@ -19,9 +19,9 @@ class PythonScript(Expression):
     REPRESENT A Python SCRIPT
     """
 
-    __slots__ = ("locals", "miss", "_data_type", "source", "frum", "many")
+    __slots__ = ("locals", "loop_depth", "miss", "_data_type", "source", "frum", "many")
 
-    def __init__(self, locals, type, source, frum, miss=None, many=False):
+    def __init__(self, locals, loop_depth, type, source, frum, miss=None, many=False):
         if isinstance(type, str):
             Log.error("expecting JX type, not code")
 
@@ -31,6 +31,7 @@ class PythonScript(Expression):
 
         Expression.__init__(self, None)
         self.locals = locals  # Python locals for compilation to real python function
+        self.loop_depth = loop_depth  # number of inner loops
         self.miss = coalesce(miss, FALSE)
         self._data_type = type
         self.source = source

@@ -16,5 +16,5 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class DateOp(DateOp_):
-    def to_python(self):
-        return PythonScript({}, str(Date(self.value).unix))
+    def to_python(self, loop_depth):
+        return PythonScript({}, loop_depth, str(Date(self.value).unix))

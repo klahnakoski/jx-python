@@ -20,14 +20,16 @@ from jx_python.expressions.to_integer_op import ToIntegerOp
 
 
 class RowsOp(RowsOp_):
-    def to_python(self):
-        agg = "rows[rownum+" + (ToIntegerOp(self.offset)).to_python() + "]"
+    def to_python(self, loop_depth):
+        agg = "rows[rownum+" + (ToIntegerOp(self.offset)).to_python(loop_depth) + "]"
         path = split_field(json2value(self.var.json))
         if not path:
-            return PythonScript({}, agg)
+            return PythonScript({}, loop_depth, agg)
 
         for p in path[:-1]:
             agg = agg + ".get(" + strings.quote(p) + ", EMPTY_DICT)"
         return PythonScript(
-            {"EMPTY_DICT": {}}, agg + ".get(" + strings.quote(path[-1]) + ")"
+            {"EMPTY_DICT": {}},
+            loop_depth,
+            agg + ".get(" + strings.quote(path[-1]) + ")",
         )

@@ -14,8 +14,8 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class ScriptOp(ScriptOp_):
-    def to_python(self):
-        return PythonScript({}, self.script)
+    def to_python(self, loop_depth):
+        return PythonScript({}, loop_depth, self.script)
 
 
 export("jx_python.expressions._utils", ScriptOp)

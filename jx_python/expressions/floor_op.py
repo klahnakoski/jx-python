@@ -14,14 +14,15 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class FloorOp(FloorOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             (
                 "mo_math.floor("
-                + (self.lhs).to_python()
+                + (self.lhs).to_python(loop_depth)
                 + ", "
-                + (self.rhs).to_python()
+                + (self.rhs).to_python(loop_depth)
                 + ")"
             ),
         )

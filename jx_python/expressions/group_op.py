@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class GroupOp(GroupOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         r = Variable("r")
         r.simplified = True
         rn = Variable("rn")
@@ -26,11 +26,17 @@ class GroupOp(GroupOp_):
             self
             .select
             .partial_eval(Python)
-            .map({"row": r, "rownum": rn, "rows": rs})
-            .to_python()
+            .map(dict(
+                row=f"row{loop_depth}",
+                rownum=f"rownum{loop_depth}",
+                rows=f"rows{loop_depth}",
+            ))
+            .to_python(loop_depth)
         )
-        frum = self.frum.partial_eval(Python).to_python()
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
-            {}, f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]"
+            {},
+            loop_depth,
+            f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]",
         )

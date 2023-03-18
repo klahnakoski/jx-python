@@ -38,12 +38,13 @@ def compile_expression(code: PythonScript, function_name="output"):
 
     fake_globals = {**GLOBALS, **code.locals}
     fake_locals = {}
+    loop_depth = 0
     try:
         exec(
             (
                 "def "
                 + function_name
-                + "(row, rownum=None, rows=None):\n"
+                + f"(row{loop_depth}, rownum{loop_depth}=None, rows{loop_depth}=None):\n"
                 + "    _source = "
                 + strings.quote(code.source)
                 + "\n"

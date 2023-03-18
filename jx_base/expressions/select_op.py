@@ -7,7 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from collections import namedtuple
 from dataclasses import dataclass
 from typing import Tuple, Iterable, Dict
 
@@ -38,7 +37,7 @@ from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
 from jx_base.models.container import Container
 from jx_base.utils import is_variable_name
-from mo_json import union_type, JX_IS_NULL
+from mo_json import union_type
 
 
 @dataclass
@@ -59,7 +58,7 @@ class SelectOp(Expression):
             or any(term.name is None for term in terms)
         ):
             Log.error("expecting list of SelectOne")
-        Expression.__init__(self, None)
+        Expression.__init__(self, frum, *[t.value for t in terms], *kwargs.values())
         self.frum = frum
         self.terms = terms + tuple(*(SelectOne(k, v) for k, v in kwargs.items()))
         self._data_type = union_type(*(t.name + t.value.type for t in terms))

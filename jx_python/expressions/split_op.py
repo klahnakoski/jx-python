@@ -14,14 +14,15 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class SplitOp(SplitOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             (
                 "("
-                + (self.value).to_python()
+                + (self.value).to_python(loop_depth)
                 + ").split("
-                + (self.find).to_python()
+                + (self.find).to_python(loop_depth)
                 + ")"
             ),
         )

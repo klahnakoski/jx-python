@@ -14,8 +14,10 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class BasicSubstringOp(_BasicSubstringOp):
-    def to_python(self):
-        value = self.value.to_python()
+    def to_python(self, loop_depth):
+        value = self.value.to_python(loop_depth)
         return PythonScript(
-            {}, f"({value})[int({self.start.to_python()}):int({self.end.to_python()})]"
+            {},
+            loop_depth,
+            f"({value})[int({self.start.to_python(loop_depth)}):int({self.end.to_python(loop_depth)})]",
         )

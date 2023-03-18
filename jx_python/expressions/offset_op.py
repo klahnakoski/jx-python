@@ -16,9 +16,10 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class OffsetOp(OffsetOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             (
                 "row["
                 + text(self.var)

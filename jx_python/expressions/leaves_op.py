@@ -14,5 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class LeavesOp(LeavesOp_):
-    def to_python(self):
-        return PythonScript({}, "Data(" + self.term.to_python() + ").leaves()")
+    def to_python(self, loop_depth):
+        return PythonScript(
+            {}, loop_depth, "Data(" + self.term.to_python(loop_depth) + ").leaves()"
+        )

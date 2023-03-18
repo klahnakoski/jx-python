@@ -15,19 +15,21 @@ from jx_base.expressions import (
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
-from jx_python.streams.typers import Typer, JxTyper
-from jx_python.streams.typers import UnknownTyper, LazyTyper
+from jx_python.streams.typers import Typer
 from mo_json import JX_ANY
 
 Any = Typer(python_type=JX_ANY)
 
 
 class ExpressionFactory:
+    """
+    USE PYTHON MAGIC METHODS TO BUILD EXPRESSIONS
+    """
     def __init__(self, expr):
         self.expr: Expression = expr
 
     def build(self):
-        return compile_expression(self.expr.partial_eval(Python).to_python())
+        return compile_expression(self.expr.partial_eval(Python).to_python(0))
 
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))
@@ -53,13 +55,16 @@ class ExpressionFactory:
         other = factory(other)
         return ExpressionFactory(OrOp(self.expr, other.expr))
 
+    def __data__(self):
+        return str(self.expr)
+
 
 def factory(expr) -> ExpressionFactory:
     """
     assemble the expression
     """
     if isinstance(expr, ExpressionFactory):
-        return ExpressionFactory(expr.expr)
+        return expr
 
     if is_function(expr):
         return ExpressionFactory(PythonFunction(expr))
@@ -83,10 +88,10 @@ class TopExpressionFactory(ExpressionFactory):
         if isinstance(value, ExpressionFactory):
             logger.error("don't do this")
 
-        return ExpressionFactory(Literal("."), Typer(python_type=type(value)))
+        return ExpressionFactory(PythonFunction(lambda: value))
 
     def __str__(self):
         return "it"
 
 
-it = TopExpressionFactory(Variable("."), UnknownTyper(Exception("unknonwn type")))
+it = TopExpressionFactory(Variable("."))

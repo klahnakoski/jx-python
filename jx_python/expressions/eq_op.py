@@ -17,11 +17,12 @@ from mo_json import JX_BOOLEAN
 
 
 class EqOp(EqOp_):
-    def to_python(self):
-        lhs = self.lhs.to_python()
-        rhs = self.rhs.to_python()
+    def to_python(self, loop_depth):
+        lhs = self.lhs.to_python(loop_depth)
+        rhs = self.rhs.to_python(loop_depth)
         return PythonScript(
             {"enlist": enlist, **rhs.locals, **lhs.locals},
+            loop_depth,
             JX_BOOLEAN,
             f"({rhs.source}) in enlist({lhs.source})",
             self,

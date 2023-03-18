@@ -14,7 +14,11 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class InOp(InOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
-            {}, self.value.to_python() + " in " + self.superset.to_python()
+            {},
+            loop_depth,
+            self.value.to_python(loop_depth)
+            + " in "
+            + self.superset.to_python(loop_depth),
         )

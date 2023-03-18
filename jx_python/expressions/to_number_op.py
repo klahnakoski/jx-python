@@ -17,22 +17,23 @@ from jx_base.expressions.true_op import TRUE
 
 
 class ToNumberOp(NumberOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         term = self.term
         exists = self.term.exists()
-        value = self.term.to_python()
+        value = self.term.to_python(loop_depth)
 
         if exists is TRUE:
             if term.type in JX_NUMBER_TYPES:
                 return value
             return PythonScript(
-                {**value.locals}, JX_NUMBER, "float(" + value.source + ")"
+                {**value.locals}, loop_depth, JX_NUMBER, "float(" + value.source + ")"
             )
         else:
             return PythonScript(
                 {**value.locals},
+                loop_depth,
                 JX_NUMBER,
-                "float(" + value + ") if (" + exists.to_python().source + ")",
+                "float(" + value + ") if (" + exists.to_python(loop_depth).source + ")",
             )
 
 

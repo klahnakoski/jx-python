@@ -244,7 +244,7 @@ class {{class_name}}(Mapping):
             + "}",
             "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
             .partial_eval(Python)
-            .to_python(),
+            .to_python(loop_depth),
             "constraint": value2json(constraint),
         },
     )

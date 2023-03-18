@@ -17,14 +17,19 @@ from mo_json import JX_ANY
 
 
 class GetOp(GetOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         offsets, locals = zip(
-            *((c.source, c.locals) for o in self.offsets for c in [o.to_python()])
+            *(
+                (c.source, c.locals)
+                for o in self.offsets
+                for c in [o.to_python(loop_depth)]
+            )
         )
         offsets = ", ".join(offsets)
-        var = self.var.to_python()
+        var = self.var.to_python(loop_depth)
         return PythonScript(
             merge_locals(locals, var.locals, get_attr=get_attr),
+            loop_depth,
             JX_ANY,
             f"get_attr({var.source}, {offsets})",
             self,

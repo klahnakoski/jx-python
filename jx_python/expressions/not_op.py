@@ -15,6 +15,6 @@ from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class NotOp(NotOp_):
-    def to_python(self):
-        term = ToBooleanOp(self.term).to_python()
-        return PythonScript(term.locals, "not (" + term.source + ")")
+    def to_python(self, loop_depth):
+        term = ToBooleanOp(self.term).to_python(loop_depth)
+        return PythonScript(term.locals, loop_depth, "not (" + term.source + ")")

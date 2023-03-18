@@ -14,8 +14,10 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class CardinalityOp(CardinalityOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         if not self.terms:
-            return PythonScript({}, "0")
+            return PythonScript({}, loop_depth, "0")
         else:
-            return PythonScript({}, "len(set(" + self.terms.to_python() + "))")
+            return PythonScript(
+                {}, loop_depth, "len(set(" + self.terms.to_python(loop_depth) + "))"
+            )

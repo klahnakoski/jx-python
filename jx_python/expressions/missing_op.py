@@ -14,6 +14,6 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class MissingOp(MissingOp_):
-    def to_python(self):
-        expr = self.expr.to_python()
-        return PythonScript(expr.locals, expr.source + " == None")
+    def to_python(self, loop_depth):
+        expr = self.expr.to_python(loop_depth)
+        return PythonScript(expr.locals, loop_depth, expr.source + " == None")

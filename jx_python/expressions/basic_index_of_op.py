@@ -10,20 +10,21 @@
 
 
 from jx_base.expressions import BasicIndexOfOp as BasicIndexOfOp_
-from jx_python.expressions._utils import with_var, PythonSource
+from jx_python.expressions._utils import with_var, PythonScript
 
 
 class BasicIndexOfOp(BasicIndexOfOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             with_var(
                 "f",
                 "("
-                + (self.value).to_python()
+                + (self.value).to_python(loop_depth)
                 + ").find"
                 + "("
-                + (self.find).to_python()
+                + (self.find).to_python(loop_depth)
                 + ")",
                 "None if f==-1 else f",
             ),

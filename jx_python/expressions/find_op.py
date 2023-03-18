@@ -10,7 +10,7 @@
 
 
 from jx_base.expressions import FindOp as FindOp_
-from jx_python.expressions._utils import with_var, Python, PythonSource
+from jx_python.expressions._utils import with_var, Python, PythonScript
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.basic_eq_op import BasicEqOp
 from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
@@ -46,16 +46,17 @@ class FindOp(FindOp_):
         ).partial_eval(lang)
         return output
 
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
             {},
+            loop_depth,
             with_var(
                 "f",
                 "("
-                + (self.value).to_python()
+                + (self.value).to_python(loop_depth)
                 + ").find"
                 + "("
-                + (self.find).to_python()
+                + (self.find).to_python(loop_depth)
                 + ")",
                 "None if f==-1 else f",
             ),

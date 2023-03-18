@@ -16,7 +16,9 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class BasicStartsWithOp(_BasicStartsWithOp):
-    def to_python(self):
+    def to_python(self, loop_depth):
         return PythonScript(
-            {}, f"({self.value.to_python()}).startswith({self.prefix.to_python()})"
+            {},
+            loop_depth,
+            f"({self.value.to_python(loop_depth)}).startswith({self.prefix.to_python(loop_depth)})",
         )

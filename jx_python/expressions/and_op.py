@@ -16,15 +16,15 @@ from mo_json import JX_BOOLEAN
 
 
 class AndOp(AndOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         if not self.terms:
-            return PythonScript({}, JX_BOOLEAN, "True", self, FALSE)
+            return PythonScript({}, loop_depth, JX_BOOLEAN, "True", self, FALSE)
         else:
             sources, locals = zip(
                 *(
                     (c.source, c.locals)
                     for t in self.terms
-                    for c in [ToBooleanOp(t).to_python()]
+                    for c in [ToBooleanOp(t).to_python(loop_depth)]
                 )
             )
             return PythonScript(

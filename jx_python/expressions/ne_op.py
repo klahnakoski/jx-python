@@ -14,12 +14,13 @@ from jx_python.expressions._utils import with_var, PythonSource
 
 
 class NeOp(NeOp_):
-    def to_python(self):
-        lhs = self.lhs.to_python()
-        rhs = self.rhs.to_python()
+    def to_python(self, loop_depth):
+        lhs = self.lhs.to_python(loop_depth)
+        rhs = self.rhs.to_python(loop_depth)
 
         return PythonScript(
             {**lhs.locals, **rhs.locals},
+            loop_depth,
             with_var(
                 "r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"
             ),

@@ -6,6 +6,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+
 from mo_dots import exists
 from mo_future import sort_using_cmp
 from mo_imports import export
@@ -13,12 +14,11 @@ from mo_imports import export
 from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
-from jx_base.utils import delist
+from jx_base.utils import delist, enlist
 from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct, group
-from mo_json import JxType, JX_IS_NULL, array_of, is_many
-from mo_json.types import _A, JX_ANY
+from mo_json.types import _A
 
 _get = object.__getattribute__
 row = Variable(".")
@@ -29,11 +29,19 @@ class Stream:
     A STREAM OF OBJECTS
     """
 
-    def __init__(self, values, factory):
+    __slots__ = ["factory", "values"]
+
+    def __init__(self, values, factory: ExpressionFactory):
+        if not isinstance(factory, ExpressionFactory):
+            raise Exception("not allowed")
         self.values = values
         self.factory = factory
 
     def __getattr__(self, item):
+        if item in Stream.__slots__:
+            return None
+
+        print(item)
         accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
         fact = factory(accessor)
         return Stream(self.values, fact)
@@ -41,8 +49,8 @@ class Stream:
     def __getitem__(self, item):
         if isinstance(item, str):
             accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
-        if isinstance(item, ExpressionFactory):
-            accessor = ExpressionFactory(GetOp(self.factory.expr, item.expr))
+        else:
+            accessor = ExpressionFactory(GetOp(self.factory.expr, factory(item)))
         fact = factory(accessor)
         return Stream(self.values, fact)
 
@@ -51,11 +59,6 @@ class Stream:
         return iter(func(self.values))
 
     def map(self, accessor):
-
-        # Stream(v).filter()...
-        # Stream(v).map(it.filter())...
-        # it.filter()... .__call__(v)
-
         accessor = factory(accessor)
         fact = ExpressionFactory(SelectOp(
             self.factory.expr, (SelectOne(".", accessor.expr),)
@@ -141,17 +144,9 @@ class Stream:
 
 
 def stream(values):
-    if values == None:
-        typer = Typer(python_type=JX_IS_NULL)
-        return Stream([], ExpressionFactory(Variable(".", JX_IS_NULL), typer))
-
-    if is_many(values):
-        typer = Typer(python_type=array_of(JX_ANY))
-    else:
-        typer = Typer(example=values)
-        values = [values]
-
-    return Stream(values, it,)
+    return Stream(
+        values, ExpressionFactory(SelectOp(it.expr, (SelectOne(".", Variable(".")),)))
+    )
 
 
 ANNOTATIONS = {

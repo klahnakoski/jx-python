@@ -14,5 +14,5 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class FalseOp(FalseOp_):
-    def to_python(self):
-        return PythonScript({}, "False")
+    def to_python(self, loop_depth):
+        return PythonScript({}, loop_depth, "False")

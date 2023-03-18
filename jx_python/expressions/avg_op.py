@@ -16,11 +16,14 @@ from jx_python.expressions._utils import multiop_to_python, with_var, PythonSour
 class AvgOp(AvgOp_):
     to_python = multiop_to_python
 
-    def to_python(self):
-        default = self.default.to_python()
+    def to_python(self, loop_depth):
+        default = self.default.to_python(loop_depth)
         return PythonScript(
             {},
+            loop_depth,
             with_var(
-                "x", self.terms.to_python(), f"sum(x)/count(x) if x else {default}"
+                "x",
+                self.terms.to_python(loop_depth),
+                f"sum(x)/count(x) if x else {default}",
             ),
         )

@@ -14,6 +14,6 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class LastOp(LastOp_):
-    def to_python(self):
-        term = self.term.to_python()
-        return PythonScript({}, "last(" + term + ")")
+    def to_python(self, loop_depth):
+        term = self.term.to_python(loop_depth)
+        return PythonScript({}, loop_depth, "last(" + term + ")")

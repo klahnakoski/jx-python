@@ -14,5 +14,7 @@ from jx_python.expressions._utils import with_var, PythonSource
 
 
 class ToBooleanOp(ToBooleanOp_):
-    def to_python(self):
-        return PythonScript({}, with_var("f", self.term.to_python(), "bool(f)"))
+    def to_python(self, loop_depth):
+        return PythonScript(
+            {}, loop_depth, with_var("f", self.term.to_python(loop_depth), "bool(f)")
+        )

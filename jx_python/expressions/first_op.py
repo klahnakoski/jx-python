@@ -14,6 +14,6 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class FirstOp(FirstOp_):
-    def to_python(self):
-        value = self.term.to_python()
-        return PythonScript({}, "enlist(" + value + ")[0]")
+    def to_python(self, loop_depth):
+        value = self.term.to_python(loop_depth)
+        return PythonScript({}, loop_depth, "enlist(" + value + ")[0]")

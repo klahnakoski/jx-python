@@ -20,33 +20,23 @@ from mo_json import array_of
 
 
 class SelectOp(SelectOp_):
-    def to_python(self):
-        frum = self.frum.partial_eval(Python).to_python()
+    def to_python(self, loop_depth):
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
+        loop_depth = frum.loop_depth + 1
         selects = tuple(
-            SelectOne(
-                t.name,
-                t
-                .value
-                .partial_eval(Python)
-                .map(dict(row="r", rows="rs", rownum="rn"))
-                .to_python(),
-            )
+            SelectOne(t.name, t.value.partial_eval(Python).to_python(loop_depth),)
             for t in self.terms
         )
 
         if len(selects) == 1 and selects[0].name == ".":
             # value selection
-            source = (
-                f"""delist([{selects[0].value.source} for rs in [enlist({frum.source})] for rn, r in enumerate(rs)])"""
-            )
+            source = f"""delist([{selects[0].value.source} for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})])"""
         else:
             # structure selection
             select_sources = ",".join(
                 quote(s.name) + ":" + s.value.source for s in selects
             )
-            source = (
-                f"""delist([leaves_to_data({{{select_sources}}}) for rs in [enlist({frum.source})] for rn, r in enumerate(rs)])"""
-            )
+            source = f"""delist([leaves_to_data({{{select_sources}}}) for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})])"""
 
         return PythonScript(
             merge_locals(
@@ -56,6 +46,7 @@ class SelectOp(SelectOp_):
                 enlist=enlist,
                 delist=delist,
             ),
+            loop_depth,
             array_of(self.type),
             source,
             self,

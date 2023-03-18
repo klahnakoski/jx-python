@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_logs import logger
 
 from jx_base.expressions import Variable as Variable_
 from jx_base.expressions.python_script import PythonScript
@@ -15,5 +15,7 @@ from mo_json import JX_ANY
 
 
 class Variable(Variable_):
-    def to_python(self):
-        return PythonScript({}, JX_ANY, self.var, self)
+    def to_python(self, loop_depth):
+        if self.var not in ["row", "rownum", "rows"]:
+            logger.error("not expected")
+        return PythonScript({}, loop_depth, JX_ANY, f"{self.var}{loop_depth}", self)

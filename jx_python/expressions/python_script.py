@@ -8,18 +8,8 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_imports import export
-from mo_logs import Log
 
-from jx_base.expressions import (
-    FALSE,
-    NULL,
-    ONE,
-    PythonScript as PythonScript_,
-    TRUE,
-    ZERO,
-    Expression,
-)
-from jx_base.utils import coalesce
+from jx_base.expressions import FALSE, TRUE, PythonScript as PythonScript_
 from jx_python.expressions import Python
 
 
@@ -27,11 +17,17 @@ class PythonScript(PythonScript_):
     def __str__(self):
         missing = self.miss.partial_eval(Python)
         if missing is FALSE:
-            return self.partial_eval(Python).to_python().source
+            return self.partial_eval(Python).to_python(loop_depth).source
         elif missing is TRUE:
             return "None"
 
-        return "None if (" + missing.to_python().source + ") else (" + self.source + ")"
+        return (
+            "None if ("
+            + missing.to_python(loop_depth).source
+            + ") else ("
+            + self.source
+            + ")"
+        )
 
     def __add__(self, other):
         return str(self) + str(other)
@@ -45,7 +41,7 @@ class PythonScript(PythonScript_):
             b = str(self)
             return ""
 
-    def to_python(self):
+    def to_python(self, loop_depth):
         return self
 
     def missing(self, lang):

@@ -15,5 +15,5 @@ from mo_json import JX_BOOLEAN
 
 
 class TrueOp(TrueOp_):
-    def to_python(self):
-        return PythonScript({}, JX_BOOLEAN, "True", self, FALSE)
+    def to_python(self, loop_depth):
+        return PythonScript({}, loop_depth, loop_depth, JX_BOOLEAN, "True", self, FALSE)

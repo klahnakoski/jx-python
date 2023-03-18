@@ -15,7 +15,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class FilterOp(FilterOp_):
-    def to_python(self):
+    def to_python(self, loop_depth):
         r = Variable("r")
         r.simplified = True
         rn = Variable("rn")
@@ -27,13 +27,18 @@ class FilterOp(FilterOp_):
             self
             .predicate
             .partial_eval(Python)
-            .map({"row": r, "rownum": rn, "rows": rs})
-            .to_python()
+            .map(dict(
+                row=f"row{loop_depth}",
+                rownum=f"rownum{loop_depth}",
+                rows=f"rows{loop_depth}",
+            ))
+            .to_python(loop_depth)
         )
-        frum = self.frum.partial_eval(Python).to_python()
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
             {"enlist": enlist, **frum.locals, **predicate.locals},
+            loop_depth,
             frum.type,
             f"[r for rs in [enlist({frum.source})] for rn, r in enumerate(rs) if"
             f" ({predicate.source})]",
