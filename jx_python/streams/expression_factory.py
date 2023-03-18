@@ -23,9 +23,9 @@ Any = Typer(python_type=JX_ANY)
 
 
 class ExpressionFactory:
-    def __init__(self, expr, domain):
+    def __init__(self, expr, codomain):
         self.expr: Expression = expr
-        self.codomain: Typer = domain or LazyTyper()
+        self.codomain: Typer = codomain or LazyTyper()
 
     def build(self):
         return compile_expression(self.expr.partial_eval(Python).to_python())
@@ -56,15 +56,15 @@ class ExpressionFactory:
         return ExpressionFactory(OrOp(self.expr, other.expr), Typer(python_type=bool))
 
 
-def factory(expr, typer=Any) -> ExpressionFactory:
+def factory(expr, codomain=Any) -> ExpressionFactory:
     """
     assemble the expression
     """
     if isinstance(expr, ExpressionFactory):
-        return ExpressionFactory(expr.expr, typer)
+        return ExpressionFactory(expr.expr, codomain)
 
     if is_function(expr):
-        return ExpressionFactory(PythonFunction(expr), typer)
+        return ExpressionFactory(PythonFunction(expr), codomain)
 
     if not isinstance(expr, Expression):
         expr = jx_expression(expr)
@@ -72,7 +72,7 @@ def factory(expr, typer=Any) -> ExpressionFactory:
     if expr.op == Literal.op:
         return ExpressionFactory(expr, Typer(example=expr.value))
 
-    return ExpressionFactory(expr, typer)
+    return ExpressionFactory(expr, codomain)
 
 
 class TopExpressionFactory(ExpressionFactory):

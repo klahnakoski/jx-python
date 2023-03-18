@@ -37,8 +37,7 @@ class SelectOp(SelectOp_):
         if len(selects) == 1 and selects[0].name == ".":
             # value selection
             source = (
-                f"[{selects[0].value.source} for rs in [enlist({frum.source})] for rn,"
-                " r in enumerate(rs)]"
+                f"""delist([{selects[0].value.source} for rs in [enlist({frum.source})] for rn, r in enumerate(rs)])"""
             )
         else:
             # structure selection
@@ -46,8 +45,7 @@ class SelectOp(SelectOp_):
                 quote(s.name) + ":" + s.value.source for s in selects
             )
             source = (
-                f"[leaves_to_data({{{select_sources}}}) for rs in"
-                f" [enlist({frum.source})] for rn, r in enumerate(rs)]"
+                f"""delist([leaves_to_data({{{select_sources}}}) for rs in [enlist({frum.source})] for rn, r in enumerate(rs)])"""
             )
 
         return PythonScript(

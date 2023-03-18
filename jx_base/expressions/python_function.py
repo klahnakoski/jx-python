@@ -17,4 +17,5 @@ class PythonFunction(Expression):
     REPRESENT A Python FUNCTION
     """
 
-    pass
+    def map(self, map_):
+        return self

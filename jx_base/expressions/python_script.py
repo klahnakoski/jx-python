@@ -36,3 +36,6 @@ class PythonScript(Expression):
         self.source = source
         self.many = many  # True if script returns multi-value
         self.frum = frum  # THE ORIGINAL EXPRESSION THAT MADE expr
+
+    def map(self, map_):
+        return self

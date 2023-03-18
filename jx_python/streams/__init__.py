@@ -14,7 +14,7 @@ from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
-from jx_python.streams.expression_factory import ExpressionFactory, factory
+from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct, group
 from mo_json import JxType, JX_IS_NULL, array_of, is_many
@@ -29,17 +29,16 @@ class Stream:
     A STREAM OF OBJECTS
     """
 
-    def __init__(self, values, factory, domain):
+    def __init__(self, values, factory):
         self.values = values
         self.factory = factory
-        self.domain: JxType = domain
 
     def __getattr__(self, item):
         accessor = ExpressionFactory(
             GetOp(self.factory.expr, Literal(item)), self.factory.codomain
         )
-        fact = factory(accessor, self.factory.codomain)
-        return Stream(self.values, fact, self.domain)
+        fact = factory(accessor, self.factory.codomain[item])
+        return Stream(self.values, fact)
 
     def __getitem__(self, item):
         if isinstance(item, str):
@@ -51,47 +50,49 @@ class Stream:
                 GetOp(self.factory.expr, item.expr), self.factory.codomain
             )
         fact = factory(accessor, self.factory.codomain)
-        return Stream(self.values, fact, self.domain)
+        return Stream(self.values, fact)
 
     def __iter__(self):
         func = self.factory.build()
         return iter(func(self.values))
 
     def map(self, accessor):
+
+        # Stream(v).filter()...
+        # Stream(v).map(it.filter())...
+        # it.filter()... .__call__(v)
+
+
         accessor = factory(accessor, self.factory.codomain)
         fact = ExpressionFactory(
             SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)),
             self.factory.codomain,
         )
-        return Stream(self.values, fact, self.domain)
+        return Stream(self.values, fact)
 
     def filter(self, expr):
         expr = factory(expr).expr
         return Stream(
             self.values,
             ExpressionFactory(FilterOp(self.factory.expr, expr), self.factory.codomain),
-            self.domain,
         )
 
     def distinct(self):
         return Stream(
             distinct(self),
             ExpressionFactory(Variable("."), self.factory.typer),
-            self.domain,
         )
 
     def reverse(self):
         return Stream(
             list(reversed(list(self))),
             ExpressionFactory(Variable("."), self.factory.typer),
-            self.domain,
         )
 
     def sort(self):
         return Stream(
             list(sort_using_cmp(self, value_compare)),
             ExpressionFactory(Variable("."), self.factory.typer),
-            self.domain,
         )
 
     def limit(self, num):
@@ -104,7 +105,6 @@ class Stream:
         return Stream(
             list(limit()),
             ExpressionFactory(Variable("."), self.factory.typer),
-            self.domain,
         )
 
     def group(self, expr):
@@ -133,7 +133,6 @@ class Stream:
             ExpressionFactory(
                 Variable(".", sup_codomain.python_type), Typer(array_of=sup_codomain)
             ),
-            Typer(array_of=sup_codomain),
         )
 
     ###########################################################################
@@ -142,8 +141,7 @@ class Stream:
 
     def to_list(self):
         func = self.factory.build()
-        rows = self.values
-        return [func(row, rownum, rows) for rownum, row in enumerate(rows)]
+        return func(self.values)
 
     def to_value(self):
         func = self.factory.build()
@@ -171,18 +169,17 @@ class Stream:
 def stream(values):
     if values == None:
         typer = Typer(python_type=JX_IS_NULL)
-        return Stream([], ExpressionFactory(Variable(".", JX_IS_NULL), typer), typer)
+        return Stream([], ExpressionFactory(Variable(".", JX_IS_NULL), typer))
 
     if is_many(values):
-        typer = Typer(python_type=JX_ANY)
+        typer = Typer(python_type=array_of(JX_ANY))
     else:
         typer = Typer(example=values)
         values = [values]
 
     return Stream(
         values,
-        ExpressionFactory(Variable(".", typer.python_type), typer),
-        Typer(array_of=typer),
+        it,
     )
 
 
