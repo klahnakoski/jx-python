@@ -86,9 +86,7 @@ class Domain(object):
                 return object.__new__(name_to_type[type])
             except Exception as e:
                 Log.error(
-                    'Problem with {"domain":{"type":{{type|quote}}}}',
-                    type=type,
-                    cause=e,
+                    'Problem with {"domain":{"type":{{type|quote}}}}', type=type, cause=e,
                 )
         else:
             return object.__new__(cls)
@@ -157,9 +155,7 @@ class Domain(object):
         for name in attribute_names:
             if getattr(self, name) == None:
                 Log.error(
-                    "{{type}} domain expects a {{name|quote}} parameter",
-                    type=self.type,
-                    name=name,
+                    "{{type}} domain expects a {{name|quote}} parameter", type=self.type, name=name,
                 )
 
 
@@ -318,9 +314,7 @@ class SimpleSetDomain(Domain):
         if isinstance(self.key, set):
             Log.error("problem")
 
-        if not key and (
-            len(partitions) == 0 or isinstance(partitions[0], (text, Number, tuple))
-        ):
+        if not key and (len(partitions) == 0 or isinstance(partitions[0], (text, Number, tuple))):
             # ASSUME PARTS ARE STRINGS, CONVERT TO REAL PART OBJECTS
             self.key = "value"
             self.map = {}
@@ -485,11 +479,7 @@ class SetDomain(Domain):
         self.type = "set"
         self.order = {}
         self.partitions = FlatList()
-        self.element_type = JxType(
-            name=JX_TEXT,
-            value=python_type_to_jx_type(partitions[0]),
-            dataIndex=JX_INTEGER,
-        )
+        self.element_type = JxType(name=JX_TEXT, value=python_type_to_jx_type(partitions[0]), dataIndex=JX_INTEGER,)
         if isinstance(self.key, set):
             Log.error("problem")
 
@@ -682,9 +672,7 @@ class DurationDomain(Domain):
         partitions=None,
         desc=None,
     ):
-        self.element_type = JxType(
-            min=JX_INTERVAL, max=JX_INTERVAL, dataIndex=JX_INTEGER
-        )
+        self.element_type = JxType(min=JX_INTERVAL, max=JX_INTERVAL, dataIndex=JX_INTEGER)
         if partitions:
             # IGNORE THE min, max, interval
             if not key:
@@ -858,9 +846,7 @@ class RangeDomain(Domain):
                 self.min = MIN([min, p.min])
                 self.max = MAX([max, p.max])
                 if p.dataIndex != None and p.dataIndex != i:
-                    Log.error(
-                        "Expecting `dataIndex` to agree with the order of the parts"
-                    )
+                    Log.error("Expecting `dataIndex` to agree with the order of the parts")
                 if p[key] == None:
                     Log.error(
                         "Expecting all parts to have {{key}} as a property", key=key,
@@ -879,8 +865,7 @@ class RangeDomain(Domain):
 
         self.key = "min"
         self.partitions = list_to_data([
-            {"min": v, "max": v + interval, "dataIndex": i}
-            for i, v in enumerate(frange(min, max, interval))
+            {"min": v, "max": v + interval, "dataIndex": i} for i, v in enumerate(frange(min, max, interval))
         ])
 
     def compare(self, a, b):

@@ -43,17 +43,10 @@ class OuterJoinOp(Expression):
             last = path
 
     def __data__(self):
-        return {"outerjoin": {
-            "from": self.frum.__data__(),
-            "nests": [n.__data__() for n in self.nests],
-        }}
+        return {"outerjoin": {"from": self.frum.__data__(), "nests": [n.__data__() for n in self.nests],}}
 
     def __eq__(self, other):
-        return (
-            is_op(other, OuterJoinOp)
-            and self.frum == other.frum
-            and self.nests == other.nests
-        )
+        return is_op(other, OuterJoinOp) and self.frum == other.frum and self.nests == other.nests
 
     def vars(self):
         return UNION(
@@ -71,9 +64,7 @@ class OuterJoinOp(Expression):
         if not self.nests:
             return TRUE
 
-        return OrOp(
-            [self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]
-        ).partial_eval(lang)
+        return OrOp([self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]).partial_eval(lang)
 
     def partial_eval(self, lang):
         nests = []

@@ -101,7 +101,5 @@ class SuffixOp(Expression):
         return CaseOp(
             WhenOp(self.expr.missing(lang), then=FALSE),
             WhenOp(self.suffix.missing(lang), then=TRUE),
-            RegExpOp(
-                self.expr, Literal(".*" + re.escape(coalesce(self.suffix.value, ""))),
-            ),
+            RegExpOp(self.expr, Literal(".*" + re.escape(coalesce(self.suffix.value, ""))),),
         ).partial_eval(lang)

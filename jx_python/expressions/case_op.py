@@ -17,13 +17,5 @@ class CaseOp(CaseOp_):
     def to_python(self, loop_depth=0):
         acc = (self.whens[-1]).to_python(loop_depth)
         for w in reversed(self.whens[0:-1]):
-            acc = (
-                "("
-                + w.then.to_python(loop_depth)
-                + ") if ("
-                + w.when.to_python(loop_depth)
-                + ") else ("
-                + acc
-                + ")"
-            )
+            acc = "(" + w.then.to_python(loop_depth) + ") if (" + w.when.to_python(loop_depth) + ") else (" + acc + ")"
         return PythonScript({}, loop_depth, acc)

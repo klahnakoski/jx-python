@@ -20,9 +20,7 @@ def parse(type_desc):
         # SOME TYPE ANNOTATIONS ARE ACTUAL TYPES, NOT STRINGS
         return CallableTyper(python_type=type_desc)
 
-    types = [
-        clean for t in type_desc.split("|") for clean in [t.strip()] if clean != "None"
-    ]
+    types = [clean for t in type_desc.split("|") for clean in [t.strip()] if clean != "None"]
 
     if len(types) == 1:
         if types[0] == "str":

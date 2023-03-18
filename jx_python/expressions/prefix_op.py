@@ -18,11 +18,5 @@ class PrefixOp(PrefixOp_):
         return PythonScript(
             {},
             loop_depth,
-            (
-                "("
-                + self.expr.to_python(loop_depth)
-                + ").startswith("
-                + (self.prefix).to_python(loop_depth)
-                + ")"
-            ),
+            ("(" + self.expr.to_python(loop_depth) + ").startswith(" + (self.prefix).to_python(loop_depth) + ")"),
         )

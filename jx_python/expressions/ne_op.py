@@ -21,7 +21,5 @@ class NeOp(NeOp_):
         return PythonScript(
             {**lhs.locals, **rhs.locals},
             loop_depth,
-            with_var(
-                "r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"
-            ),
+            with_var("r, l", "(" + lhs + "," + rhs + ")", "l!=None and r!=None and l!=r"),
         )

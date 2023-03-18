@@ -23,15 +23,7 @@ from mo_json import BOOLEAN, value2json, JX_IS_NULL, JxType
 from mo_logs import Log
 
 TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expect(
-    "TRUE",
-    "FALSE",
-    "Literal",
-    "is_literal",
-    "MissingOp",
-    "NotOp",
-    "NULL",
-    "Variable",
-    "AndOp",
+    "TRUE", "FALSE", "Literal", "is_literal", "MissingOp", "NotOp", "NULL", "Variable", "AndOp",
 )
 
 
@@ -72,9 +64,7 @@ class Expression(BaseExpression):
             else:
                 if not items:
                     return NULL
-                raise Log.error(
-                    "{{operator|quote}} is not a known operator", operator=expr
-                )
+                raise Log.error("{{operator|quote}} is not a known operator", operator=expr)
 
             if term == None:
                 return class_(**clauses)
@@ -97,12 +87,8 @@ class Expression(BaseExpression):
                 else:
                     return class_(_jx_expression(term, lang), **clauses)
         except Exception as cause:
-            Log.warning(
-                "programmer error expr = {{value|quote}}", value=expr, cause=cause
-            )
-            Log.error(
-                "programmer error expr = {{value|quote}}", value=expr, cause=cause
-            )
+            Log.warning("programmer error expr = {{value|quote}}", value=expr, cause=cause)
+            Log.error("programmer error expr = {{value|quote}}", value=expr, cause=cause)
 
     @property
     def name(self):
@@ -204,5 +190,5 @@ class Expression(BaseExpression):
         Log.error(
             """{{type}} object has no attribute {{item}}, did you .register_ops() for {{type}}?""",
             type=self.__class__.__name__,
-            item=item
+            item=item,
         )

@@ -35,9 +35,7 @@ from mo_future import (
 from mo_json.types import *
 
 FIND_LOOPS = False
-SNAP_TO_BASE_10 = (
-    False  # Identify floats near a round base10 value (has 000 or 999) and shorten
-)
+SNAP_TO_BASE_10 = False  # Identify floats near a round base10 value (has 000 or 999) and shorten
 CAN_NOT_DECODE_JSON = "Can not decode JSON"
 
 
@@ -85,30 +83,14 @@ def float2json(value):
         digits, more_digits = _snap_to_base_10(mantissa)
         int_exp = int(str_exp) + more_digits
         if int_exp > 15:
-            return (
-                sign
-                + digits[0]
-                + "."
-                + (digits[1:].rstrip("0") or "0")
-                + "e"
-                + text(int_exp)
-            )
+            return sign + digits[0] + "." + (digits[1:].rstrip("0") or "0") + "e" + text(int_exp)
         elif int_exp >= 0:
-            return sign + (
-                digits[: 1 + int_exp] + "." + digits[1 + int_exp :].rstrip("0")
-            ).rstrip(".")
+            return sign + (digits[: 1 + int_exp] + "." + digits[1 + int_exp :].rstrip("0")).rstrip(".")
         elif -4 < int_exp:
             digits = ("0" * (-int_exp)) + digits
             return sign + (digits[:1] + "." + digits[1:].rstrip("0")).rstrip(".")
         else:
-            return (
-                sign
-                + digits[0]
-                + "."
-                + (digits[1:].rstrip("0") or "0")
-                + "e"
-                + text(int_exp)
-            )
+            return sign + digits[0] + "." + (digits[1:].rstrip("0") or "0") + "e" + text(int_exp)
     except Exception as e:
         from mo_logs import Log
 
@@ -280,15 +262,12 @@ def value2json(obj, pretty=False, sort_keys=False, keep_whitespace=True):
     :return:
     """
     if FIND_LOOPS:
-        obj = scrub(
-            obj, scrub_text=_keep_whitespace if keep_whitespace else trim_whitespace
-        )
+        obj = scrub(obj, scrub_text=_keep_whitespace if keep_whitespace else trim_whitespace)
     try:
         json = json_encoder(obj, pretty=pretty)
         if json == None:
             Log.note(
-                str(type(obj)) + " is not valid{{type}}JSON",
-                type=" (pretty) " if pretty else " ",
+                str(type(obj)) + " is not valid{{type}}JSON", type=" (pretty) " if pretty else " ",
             )
             Log.error("Not valid JSON: " + str(obj) + " of type " + str(type(obj)))
         return json
@@ -420,31 +399,22 @@ def json2value(json_string, params=Null, flexible=False, leaves=False):
                 sample = sample[:43] + "..."
 
             Log.error(
-                CAN_NOT_DECODE_JSON + " at:\n\t{{sample}}\n\t{{pointer}}\n",
-                sample=sample,
-                pointer=pointer,
+                CAN_NOT_DECODE_JSON + " at:\n\t{{sample}}\n\t{{pointer}}\n", sample=sample, pointer=pointer,
             )
 
         base_str = strings.limit(json_string, 1000).encode("utf8")
         hexx_str = bytes2hex(base_str, " ")
         try:
-            char_str = " " + "  ".join(
-                (c.decode("latin1") if ord(c) >= 32 else ".") for c in base_str
-            )
+            char_str = " " + "  ".join((c.decode("latin1") if ord(c) >= 32 else ".") for c in base_str)
         except Exception:
             char_str = " "
         Log.error(
-            CAN_NOT_DECODE_JSON + ":\n{{char_str}}\n{{hexx_str}}\n",
-            char_str=char_str,
-            hexx_str=hexx_str,
-            cause=e,
+            CAN_NOT_DECODE_JSON + ":\n{{char_str}}\n{{hexx_str}}\n", char_str=char_str, hexx_str=hexx_str, cause=e,
         )
-
 
 
 def bytes2hex(value, separator=" "):
     return separator.join("{:02X}".format(x) for x in value)
-
 
 
 DATETIME_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -469,9 +439,7 @@ def datetime2unix(value):
             from mo_logs import Log
 
             Log.error(
-                "Can not convert {{value}} of type {{type}}",
-                value=value,
-                type=value.__class__,
+                "Can not convert {{value}} of type {{type}}", value=value, type=value.__class__,
             )
     except Exception as e:
         from mo_logs import Log

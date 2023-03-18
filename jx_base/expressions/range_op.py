@@ -29,10 +29,7 @@ class RangeOp(Expression):
         Expression.__new__(cls, *args)
         field, comparisons = term  # comparisons IS A Literal()
         return AndOp(
-            *(
-                getattr(cls.lang, operators[op])([field, Literal(value)])
-                for op, value in comparisons.value.items()
-            )
+            *(getattr(cls.lang, operators[op])([field, Literal(value)]) for op, value in comparisons.value.items())
         )
 
     def __init__(self, *term):

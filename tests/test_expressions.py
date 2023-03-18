@@ -15,7 +15,6 @@ from jx_python.expressions import Python
 
 
 class TestOther(FuzzyTestCase):
-
     @classmethod
     def tearDownClass(cls):
         stop_main_thread()

@@ -15,8 +15,4 @@ from jx_base.expressions.python_script import PythonScript
 
 class MinOp(MinOp_):
     def to_python(self, loop_depth=0):
-        return PythonScript(
-            {},
-            loop_depth,
-            "min([" + ",".join((t).to_python(loop_depth) for t in self.terms) + "])",
-        )
+        return PythonScript({}, loop_depth, "min([" + ",".join((t).to_python(loop_depth) for t in self.terms) + "])",)

@@ -31,9 +31,7 @@ TYPE_CHECK = True  # A LITTLE FASTER IF False
 ALLOW_SCRIPTING = False
 EMPTY_DICT = {}
 
-Literal, TRUE, FALSE, NULL, TupleOp, Variable = expect(
-    "Literal", "TRUE", "FALSE", "NULL", "TupleOp", "Variable"
-)
+Literal, TRUE, FALSE, NULL, TupleOp, Variable = expect("Literal", "TRUE", "FALSE", "NULL", "TupleOp", "Variable")
 
 
 def extend(cls):

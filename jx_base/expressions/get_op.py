@@ -18,6 +18,7 @@ class GetOp(Expression):
     """
     REPRESENT ATTRIBUTE ACCESS, FLATTENING THE RESULT
     """
+
     has_simple_form = True
 
     def __init__(self, var, *offsets):
@@ -48,8 +49,6 @@ class GetOp(Expression):
                 output = JX_ANY
         return output
 
-
-
     def vars(self):
         output = self.var.vars()
         for o in self.offsets:
@@ -60,5 +59,8 @@ class GetOp(Expression):
         return GetOp(self.var.map(map_), *(o.map(map_) for o in self.offsets))
 
     def __eq__(self, other):
-        return isinstance(other, GetOp) and other.var == self.var and all(
-            o == s for s, o in zip(self.offsets, other.offsets))
+        return (
+            isinstance(other, GetOp)
+            and other.var == self.var
+            and all(o == s for s, o in zip(self.offsets, other.offsets))
+        )

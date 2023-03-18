@@ -16,11 +16,5 @@ from jx_base.expressions.python_script import PythonScript
 class BasicEqOp(BasicEqOp_):
     def to_python(self, loop_depth=0):
         return PythonScript(
-            {},
-            loop_depth,
-            "("
-            + self.rhs.to_python(loop_depth)
-            + ") == ("
-            + self.lhs.to_python(loop_depth)
-            + ")",
+            {}, loop_depth, "(" + self.rhs.to_python(loop_depth) + ") == (" + self.lhs.to_python(loop_depth) + ")",
         )

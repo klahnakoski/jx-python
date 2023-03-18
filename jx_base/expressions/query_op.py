@@ -25,7 +25,8 @@ from jx_base.expressions.literal import ZERO
 from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import (
     SelectOp,
-    _normalize_selects, SelectOne,
+    _normalize_selects,
+    SelectOne,
 )
 from mo_imports import export
 from jx_base.expressions.variable import Variable
@@ -90,11 +91,7 @@ class QueryOp(Expression):
     ):
         Expression.__init__(self, None)
         self.frum = frum
-        self.select: SelectOp = (
-            select
-            if select is not None
-            else SelectOp(frum, DEFAULT_SELECT)
-        )
+        self.select: SelectOp = select if select is not None else SelectOp(frum, DEFAULT_SELECT)
         self.edges = edges
         self.groupby = groupby
         self.window = window
@@ -109,12 +106,7 @@ class QueryOp(Expression):
     def define(cls, expr):
         expr = to_data(expr)
         frum = expr["from"]
-        output = QueryOp(
-            frum=frum,
-            format=expr.format,
-            chunk_size=expr.chunk_size,
-            destination=expr.destination,
-        )
+        output = QueryOp(frum=frum, format=expr.format, chunk_size=expr.chunk_size, destination=expr.destination,)
 
         _import_temper_limit()
         limit = temper_limit(expr.limit, expr)
@@ -124,10 +116,7 @@ class QueryOp(Expression):
 
         select = from_data(expr).get("select")
         if expr.groupby and expr.edges:
-            raise Log.error(
-                "You can not use both the `groupby` and `edges` clauses in the same"
-                " query!"
-            )
+            raise Log.error("You can not use both the `groupby` and `edges` clauses in the same query!")
         elif expr.edges:
             if select is None:
                 select = [{"aggregate": "count"}]
@@ -186,12 +175,7 @@ class QueryOp(Expression):
         frum = snowflake.get_table(query_path)
         schema = frum.schema
 
-        output = QueryOp(
-            frum=frum,
-            format=query.format,
-            chunk_size=query.chunk_size,
-            destination=query.destination,
-        )
+        output = QueryOp(frum=frum, format=query.format, chunk_size=query.chunk_size, destination=query.destination,)
 
         _import_temper_limit()
         limit = temper_limit(query.limit, query)
@@ -201,10 +185,7 @@ class QueryOp(Expression):
 
         select = from_data(query).get("select")
         if query.groupby and query.edges:
-            raise Log.error(
-                "You can not use both the `groupby` and `edges` clauses in the same"
-                " query!"
-            )
+            raise Log.error("You can not use both the `groupby` and `edges` clauses in the same query!")
         elif query.edges:
             if select is None:
                 select = [{"aggregate": "count"}]
@@ -213,9 +194,7 @@ class QueryOp(Expression):
             else:
                 select = [query.select]
 
-            output.edges = _normalize_edges(
-                query.edges, limit=output.limit, schema=schema
-            )
+            output.edges = _normalize_edges(query.edges, limit=output.limit, schema=schema)
             output.groupby = Null
         elif query.groupby:
             if select is None:
@@ -226,9 +205,7 @@ class QueryOp(Expression):
                 select = [query.select]
 
             output.edges = Null
-            output.groupby = _normalize_groupby(
-                query.groupby, limit=output.limit, schema=schema
-            )
+            output.groupby = _normalize_groupby(query.groupby, limit=output.limit, schema=schema)
         else:
             output.edges = Null
             output.groupby = Null
@@ -326,10 +303,7 @@ class QueryOp(Expression):
             return set_default({"value": s.value.map(map_)}, s)
 
         def map_edge(e, map_):
-            partitions = delist([
-                set_default({"where": p.where.map(map_)}, p)
-                for p in e.domain.partitions
-            ])
+            partitions = delist([set_default({"where": p.where.map(map_)}, p) for p in e.domain.partitions])
 
             domain = copy(e.domain)
             domain.where = e.domain.where.map(map_)
@@ -405,9 +379,7 @@ def _import_temper_limit():
 
 def _normalize_edges(edges, limit, schema=None):
     return list_to_data([
-        n
-        for ie, e in enumerate(enlist(edges))
-        for n in _normalize_edge(e, ie, limit=limit, schema=schema)
+        n for ie, e in enumerate(enlist(edges)) for n in _normalize_edge(e, ie, limit=limit, schema=schema)
     ])
 
 
@@ -448,12 +420,7 @@ def _normalize_edge(edge, dim_index, limit, schema=None):
                     domain=leaves.getDomain(),
                 )]
             else:
-                return [Data(
-                    name=leaves.name,
-                    allowNulls=True,
-                    dim=dim_index,
-                    domain=leaves.getDomain(),
-                )]
+                return [Data(name=leaves.name, allowNulls=True, dim=dim_index, domain=leaves.getDomain(),)]
         else:
             return [Data(
                 name=edge,
@@ -495,11 +462,7 @@ def _normalize_edge(edge, dim_index, limit, schema=None):
 def _normalize_groupby(groupby, limit, schema=None):
     if groupby == None:
         return None
-    output = list_to_data([
-        n
-        for e in enlist(groupby)
-        for n in _normalize_group(e, None, limit, schema=schema)
-    ])
+    output = list_to_data([n for e in enlist(groupby) for n in _normalize_group(e, None, limit, schema=schema)])
     for i, o in enumerate(output):
         o.dim = i
     if any(o == None for o in output):
@@ -590,9 +553,7 @@ def _normalize_window(window, schema=None):
         name=coalesce(window.name, window.value),
         value=expr,
         edges=[
-            n
-            for i, e in enumerate(enlist(window.edges))
-            for n in _normalize_edge(e, i, limit=None, schema=schema)
+            n for i, e in enumerate(enlist(window.edges)) for n in _normalize_edge(e, i, limit=None, schema=schema)
         ],
         sort=_normalize_sort(window.sort),
         aggregate=window.aggregate,
@@ -643,9 +604,7 @@ def _map_term_using_schema(master, path, term, schema_edges):
                 if AND(is_variable_name(f) for f in dimension.fields):
                     # EXPECTING A TUPLE
                     if not isinstance(v, tuple):
-                        Log.error(
-                            "expecing {{name}}={{value}} to be a tuple", name=k, value=v
-                        )
+                        Log.error("expecing {{name}}={{value}} to be a tuple", name=k, value=v)
                     for i, f in enumerate(dimension.fields):
                         vv = v[i]
                         if vv == None:
@@ -717,25 +676,15 @@ def _where_terms(master, where, schema):
                                     and_agg.append({"term": {es_field: vvv}})
                             or_agg.append({"and": and_agg})
                         output.append({"or": or_agg})
-                    elif (
-                        is_list(fields)
-                        and len(fields) == 1
-                        and is_variable_name(fields[0])
-                    ):
+                    elif is_list(fields) and len(fields) == 1 and is_variable_name(fields[0]):
                         output.append({"terms": {fields[0]: v}})
                     elif domain.partitions:
-                        output.append({"or": [
-                            domain.getPartByKey(vv).esfilter for vv in v
-                        ]})
+                        output.append({"or": [domain.getPartByKey(vv).esfilter for vv in v]})
             return {"and": output}
         elif where["or"]:
-            return {"or": [
-                from_data(_where_terms(master, vv, schema)) for vv in where["or"]
-            ]}
+            return {"or": [from_data(_where_terms(master, vv, schema)) for vv in where["or"]]}
         elif where["and"]:
-            return {"and": [
-                from_data(_where_terms(master, vv, schema)) for vv in where["and"]
-            ]}
+            return {"and": [from_data(_where_terms(master, vv, schema)) for vv in where["and"]]}
         elif where["not"]:
             return {"not": from_data(_where_terms(master, where["not"], schema))}
     return where

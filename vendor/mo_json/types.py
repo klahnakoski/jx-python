@@ -49,9 +49,7 @@ class JxType(object):
             if sv is None:
                 if k in JX_NUMBER_TYPES.__dict__ and sd.get(_N):
                     continue
-                elif k is _N and any(
-                    sd.get(kk) for kk in JX_NUMBER_TYPES.__dict__.keys()
-                ):
+                elif k is _N and any(sd.get(kk) for kk in JX_NUMBER_TYPES.__dict__.keys()):
                     for kk in JX_NUMBER_TYPES.__dict__.keys():
                         try:
                             del sd[kk]
@@ -164,10 +162,7 @@ class JxType(object):
         return acc
 
     def __data__(self):
-        return {
-            k: v.__data__() if isinstance(v, JxType) else str(v)
-            for k, v in self.__dict__.items()
-        }
+        return {k: v.__data__() if isinstance(v, JxType) else str(v) for k, v in self.__dict__.items()}
 
     def __str__(self):
         return str(self.__data__())
@@ -296,12 +291,7 @@ JX_NUMBER_TYPES = _new(JxType)
 JX_NUMBER_TYPES.__dict__ = [
     (x, x.update(d))[0]
     for x in [{}]
-    for d in [
-        JX_INTEGER.__dict__,
-        JX_NUMBER.__dict__,
-        JX_TIME.__dict__,
-        JX_INTERVAL.__dict__,
-    ]
+    for d in [JX_INTEGER.__dict__, JX_NUMBER.__dict__, JX_TIME.__dict__, JX_INTERVAL.__dict__,]
 ][0]
 
 _json_type_to_jx_type = {

@@ -48,9 +48,7 @@ class BaseBinaryOp(Expression):
         return self.lhs.vars() | self.rhs.vars() | self.default.vars()
 
     def map(self, map_):
-        return self.__class__(
-            [self.lhs.map(map_), self.rhs.map(map_)], default=self.default.map(map_)
-        )
+        return self.__class__([self.lhs.map(map_), self.rhs.map(map_)], default=self.default.map(map_))
 
     def missing(self, lang):
         if self.default.exists():

@@ -15,6 +15,4 @@ from jx_base.expressions.python_script import PythonScript
 
 class ExistsOp(ExistsOp_):
     def to_python(self, loop_depth=0):
-        return PythonScript(
-            {}, loop_depth, self.expr.to_python(loop_depth) + " != None"
-        )
+        return PythonScript({}, loop_depth, self.expr.to_python(loop_depth) + " != None")

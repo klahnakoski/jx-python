@@ -132,9 +132,7 @@ def get_dispatcher_for(name):
     return dispatcher
 
 
-BaseExpression = LanguageElement(
-    str("BaseExpression"), (object,), {"partial_eval": partial_eval}
-)
+BaseExpression = LanguageElement(str("BaseExpression"), (object,), {"partial_eval": partial_eval})
 
 
 class Language(object):
@@ -156,9 +154,7 @@ class Language(object):
             double_dispatch_methods = tuple(sorted(set(self.ops[1].lookups.keys())))
         else:
             num_ops = 1 + max(
-                obj.get_id()
-                for obj in module_vars.values()
-                if isinstance(obj, type) and hasattr(obj, ID)
+                obj.get_id() for obj in module_vars.values() if isinstance(obj, type) and hasattr(obj, ID)
             )
             self.ops = [None] * num_ops
 
@@ -194,8 +190,7 @@ class Language(object):
                         args = get_function_arguments(member)
                         if args[:2] != ("self", "lang"):
                             Log.error(
-                                "{{module}}.{{clazz}}.{{name}} is expecting (self,"
-                                " lang) parameters, minimum",
+                                "{{module}}.{{clazz}}.{{name}} is expecting (self, lang) parameters, minimum",
                                 module=new_op.__module__,
                                 clazz=new_op.__name__,
                                 name=dd_method,
@@ -354,10 +349,7 @@ def value_compare(left, right, ordering=1):
             return 0
     except Exception as e:
         Log.error(
-            "Can not compare values {{left}} to {{right}}",
-            left=left,
-            right=right,
-            cause=e,
+            "Can not compare values {{left}} to {{right}}", left=left, right=right, cause=e,
         )
 
 

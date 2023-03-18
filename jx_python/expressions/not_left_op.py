@@ -20,15 +20,5 @@ class NotLeftOp(NotLeftOp_):
         return PythonScript(
             {**v.locals, **l.locals},
             loop_depth,
-            (
-                "None if "
-                + v
-                + " == None or "
-                + l.source
-                + " == None else "
-                + v.source
-                + "[max(0, "
-                + l.source
-                + "):]"
-            ),
+            ("None if " + v + " == None or " + l.source + " == None else " + v.source + "[max(0, " + l.source + "):]"),
         )

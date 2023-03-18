@@ -47,14 +47,10 @@ class FloorOp(Expression):
         return self.lhs.vars() | self.rhs.vars() | self.default.vars()
 
     def map(self, map_):
-        return FloorOp(
-            [self.lhs.map(map_), self.rhs.map(map_)], default=self.default.map(map_)
-        )
+        return FloorOp([self.lhs.map(map_), self.rhs.map(map_)], default=self.default.map(map_))
 
     def missing(self, lang):
         if self.default.exists():
             return FALSE
         else:
-            return OrOp(
-                self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),
-            )
+            return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),)

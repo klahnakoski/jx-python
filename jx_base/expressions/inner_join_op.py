@@ -44,17 +44,10 @@ class InnerJoinOp(Expression):
             last = path
 
     def __data__(self):
-        return {"innerjoin": {
-            "from": self.frum.__data__(),
-            "nests": [n.__data__() for n in self.nests],
-        }}
+        return {"innerjoin": {"from": self.frum.__data__(), "nests": [n.__data__() for n in self.nests],}}
 
     def __eq__(self, other):
-        return (
-            is_op(other, InnerJoinOp)
-            and self.frum == other.frum
-            and self.nests == other.nests
-        )
+        return is_op(other, InnerJoinOp) and self.frum == other.frum and self.nests == other.nests
 
     def vars(self):
         return UNION(
@@ -72,9 +65,7 @@ class InnerJoinOp(Expression):
         if not self.nests:
             return TRUE
 
-        return OrOp(
-            [self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]
-        ).partial_eval(lang)
+        return OrOp([self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]).partial_eval(lang)
 
     def partial_eval(self, lang):
         nests = []
@@ -84,6 +75,4 @@ class InnerJoinOp(Expression):
                 return NULL  # IF ANY ARE MISSING, THEN self IS MISSING
             nests.append(n)
 
-        return InnerJoinOp(
-            frum=self.frum, nests=[n.partial_eval(lang) for n in self.nests],
-        )
+        return InnerJoinOp(frum=self.frum, nests=[n.partial_eval(lang) for n in self.nests],)

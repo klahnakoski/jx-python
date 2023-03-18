@@ -81,13 +81,9 @@ def failure(row, rownum, rows, constraint):
 
     try:
         if not expr(row, rownum, row):
-            raise Log.error(
-                "{{row}} fails to pass {{req}}", row=row, req=expr.__data__()
-            )
+            raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
     except Exception as cause:
-        raise Log.error(
-            "{{row}} fails to pass {{req}}", row=row, req=expr.__data__(), cause=cause
-        )
+        raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__(), cause=cause)
 
 
 def DataClass(name, columns, constraint=None):
@@ -114,17 +110,9 @@ def DataClass(name, columns, constraint=None):
     """
 
     columns = to_data([
-        {"name": c, "required": True, "nulls": False, "type": object}
-        if is_text(c)
-        else c
-        for c in columns
+        {"name": c, "required": True, "nulls": False, "type": object} if is_text(c) else c for c in columns
     ])
-    constraint = {
-        "and": [
-            {"exists": c.name} for c in columns if not c.nulls and c.default == None
-        ]
-        + [constraint]
-    }
+    constraint = {"and": [{"exists": c.name} for c in columns if not c.nulls and c.default == None] + [constraint]}
     slots = columns.name
     required = to_data(filter(lambda c: c.required and c.default == None, columns)).name
     # nulls = to_data(filter(lambda c: c.nulls, columns)).name
@@ -236,12 +224,8 @@ class {{class_name}}(Mapping):
             "defaults": _to_python(defaults),
             "len_slots": len(slots),
             "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
-            "assign": "; ".join(
-                "_set(output, " + quote(s) + ", self." + s + ")" for s in slots
-            ),
-            "types": "{"
-            + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items())
-            + "}",
+            "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
+            "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
             "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
             .partial_eval(Python)
             .to_python(loop_depth),

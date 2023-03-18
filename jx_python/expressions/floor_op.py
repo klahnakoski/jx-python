@@ -18,11 +18,5 @@ class FloorOp(FloorOp_):
         return PythonScript(
             {},
             loop_depth,
-            (
-                "mo_math.floor("
-                + (self.lhs).to_python(loop_depth)
-                + ", "
-                + (self.rhs).to_python(loop_depth)
-                + ")"
-            ),
+            ("mo_math.floor(" + (self.lhs).to_python(loop_depth) + ", " + (self.rhs).to_python(loop_depth) + ")"),
         )

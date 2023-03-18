@@ -24,10 +24,7 @@ class SelectOp(SelectOp_):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         frum_source = f"enlist({frum.source})"
         loop_depth = frum.loop_depth + 1
-        selects = tuple(
-            SelectOne(t.name, t.value.partial_eval(Python).to_python(loop_depth), )
-            for t in self.terms
-        )
+        selects = tuple(SelectOne(t.name, t.value.partial_eval(Python).to_python(loop_depth),) for t in self.terms)
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
@@ -40,9 +37,7 @@ class SelectOp(SelectOp_):
                 source = f"""[{selects[0].value.source} for rows{loop_depth} in [{frum_source}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]"""
         else:
             # structure selection
-            select_sources = ",".join(
-                quote(s.name) + ":" + s.value.source for s in selects
-            )
+            select_sources = ",".join(quote(s.name) + ":" + s.value.source for s in selects)
             source = f"""[leaves_to_data({{{select_sources}}}) for rows{loop_depth} in [{frum_source}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]"""
 
         return PythonScript(

@@ -18,7 +18,5 @@ class CoalesceOp(CoalesceOp_):
         return PythonScript(
             {"coalesce": coalesce},
             loop_depth,
-            "coalesce("
-            + ", ".join((t).to_python(loop_depth) for t in self.terms)
-            + ")",
+            "coalesce(" + ", ".join((t).to_python(loop_depth) for t in self.terms) + ")",
         )

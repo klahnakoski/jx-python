@@ -19,9 +19,7 @@ from mo_dots import is_many
 from mo_json.types import JX_BOOLEAN
 from mo_logs import Log
 
-EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect(
-    "EqOp", "MissingOp", "NestedOp", "NotOp", "NULL", "Variable"
-)
+EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect("EqOp", "MissingOp", "NestedOp", "NotOp", "NULL", "Variable")
 
 
 class BasicInOp(Expression):
@@ -69,11 +67,7 @@ class BasicInOp(Expression):
             return Literal(value() in superset())
         elif is_op(value, NestedOp):
             return (
-                NestedOp(
-                    value.nested_path,
-                    None,
-                    AndOp(BasicInOp(value.select, superset), value.where),
-                )
+                NestedOp(value.nested_path, None, AndOp(BasicInOp(value.select, superset), value.where),)
                 .exists()
                 .partial_eval(lang)
             )

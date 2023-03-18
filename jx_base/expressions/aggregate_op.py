@@ -29,10 +29,7 @@ class AggregateOp(Expression):
         return source.query(self.op)
 
     def __data__(self):
-        return {"aggregate": [
-            self.frum.__data__(),
-            first(self.op(NULL).__data__().keys()),
-        ]}
+        return {"aggregate": [self.frum.__data__(), first(self.op(NULL).__data__().keys()),]}
 
     def vars(self):
         return self.frum.vars() | self.op.vars()

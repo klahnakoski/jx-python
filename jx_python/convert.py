@@ -29,10 +29,7 @@ def list2cube(rows, column_names=None):
     data = {k: [] for k in keys}
     output = dict_to_data({
         "meta": {"format": "cube"},
-        "edges": [{
-            "name": "rownum",
-            "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},
-        }],
+        "edges": [{"name": "rownum", "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},}],
         "data": data,
     })
 
@@ -62,14 +59,9 @@ def table2csv(table_data):
     :param table_data: expecting a list of tuples
     :return: text in nice formatted csv
     """
-    text_data = [
-        tuple(value2json(vals, pretty=True) for vals in rows) for rows in table_data
-    ]
+    text_data = [tuple(value2json(vals, pretty=True) for vals in rows) for rows in table_data]
 
     col_widths = [max(len(t) for t in cols) for cols in zip(*text_data)]
-    template = ", ".join(
-        "{{" + text(i) + "|left_align(" + text(w) + ")}}"
-        for i, w in enumerate(col_widths)
-    )
+    template = ", ".join("{{" + text(i) + "|left_align(" + text(w) + ")}}" for i, w in enumerate(col_widths))
     output = "\n".join(expand_template(template, d) for d in text_data)
     return output

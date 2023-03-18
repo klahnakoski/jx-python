@@ -18,17 +18,5 @@ class ConcatOp(ConcatOp_):
         v = (self.value).to_python(loop_depth)
         l = (self.length).to_python(loop_depth)
         return PythonScript(
-            {},
-            loop_depth,
-            (
-                "None if "
-                + v
-                + " == None or "
-                + l
-                + " == None else "
-                + v
-                + "[0:max(0, "
-                + l
-                + ")]"
-            ),
+            {}, loop_depth, ("None if " + v + " == None or " + l + " == None else " + v + "[0:max(0, " + l + ")]"),
         )

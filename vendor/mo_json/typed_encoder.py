@@ -74,14 +74,10 @@ def untype_path(encoded):
         remainder = encoded.lstrip(".")
         back = len(encoded) - len(remainder) - 1
         return ("." * back) + join_field(
-            decode_property(c)
-            for c in split_field(remainder)
-            if not IS_TYPE_KEY.match(c)
+            decode_property(c) for c in split_field(remainder) if not IS_TYPE_KEY.match(c)
         )
     else:
-        return join_field(
-            decode_property(c) for c in split_field(encoded) if not IS_TYPE_KEY.match(c)
-        )
+        return join_field(decode_property(c) for c in split_field(encoded) if not IS_TYPE_KEY.match(c))
 
 
 def unnest_path(encoded):
@@ -99,8 +95,7 @@ def unnest_path(encoded):
             return "."
 
     return join_field(
-        [decode_property(c) for c in path[:-1] if not IS_TYPE_KEY.match(c)]
-        + [decode_property(path[-1])]
+        [decode_property(c) for c in path[:-1] if not IS_TYPE_KEY.match(c)] + [decode_property(path[-1])]
     )
 
 
@@ -198,18 +193,14 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
             if value_json_type == column_json_type:
                 pass  # ok
             elif value_json_type == ARRAY and all(
-                python_type_to_jx_type[v.__class__] == column_json_type
-                for v in value
-                if v != None
+                python_type_to_jx_type[v.__class__] == column_json_type for v in value if v != None
             ):
                 pass  # empty arrays can be anything
             else:
                 from mo_logs import Log
 
                 Log.error(
-                    "Can not store {{value}} in {{column|quote}}",
-                    value=value,
-                    column=sub_schema.name,
+                    "Can not store {{value}} in {{column|quote}}", value=value, column=sub_schema.name,
                 )
 
             sub_schema = {json_type_to_inserter_type[value_json_type]: sub_schema}
@@ -249,11 +240,7 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
                     append(buffer, QUOTED_ARRAY_KEY)
                     append(buffer, "[")
                     _dict2json(
-                        value,
-                        sub_schema[ARRAY_KEY],
-                        path + [ARRAY_KEY],
-                        net_new_properties,
-                        buffer,
+                        value, sub_schema[ARRAY_KEY], path + [ARRAY_KEY], net_new_properties, buffer,
                     )
                     append(buffer, "]" + COMMA)
                     append(buffer, QUOTED_EXISTS_KEY)
@@ -327,26 +314,18 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
                 append(buffer, "{")
                 append(buffer, QUOTED_EXISTS_KEY)
                 append(buffer, "0}")
-            elif any(
-                v.__class__ in (Data, dict, set, list, tuple, FlatList) for v in value
-            ):
+            elif any(v.__class__ in (Data, dict, set, list, tuple, FlatList) for v in value):
                 if len(value) == 1:
                     if ARRAY_KEY in sub_schema:
                         append(buffer, "{")
                         append(buffer, QUOTED_ARRAY_KEY)
                         _list2json(
-                            value,
-                            sub_schema[ARRAY_KEY],
-                            path + [ARRAY_KEY],
-                            net_new_properties,
-                            buffer,
+                            value, sub_schema[ARRAY_KEY], path + [ARRAY_KEY], net_new_properties, buffer,
                         )
                         append(buffer, "}")
                     else:
                         # NO NEED TO NEST, SO DO NOT DO IT
-                        typed_encode(
-                            value[0], sub_schema, path, net_new_properties, buffer
-                        )
+                        typed_encode(value[0], sub_schema, path, net_new_properties, buffer)
                 else:
                     if ARRAY_KEY not in sub_schema:
                         sub_schema[ARRAY_KEY] = {}
@@ -354,30 +333,20 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
                     append(buffer, "{")
                     append(buffer, QUOTED_ARRAY_KEY)
                     _list2json(
-                        value,
-                        sub_schema[ARRAY_KEY],
-                        path + [ARRAY_KEY],
-                        net_new_properties,
-                        buffer,
+                        value, sub_schema[ARRAY_KEY], path + [ARRAY_KEY], net_new_properties, buffer,
                     )
                     append(buffer, "}")
             else:
                 # ALLOW PRIMITIVE MULTIVALUES
                 value = [v for v in value if v != None]
-                types = list(set(
-                    python_type_to_jx_type_key[v.__class__] for v in value
-                ))
+                types = list(set(python_type_to_jx_type_key[v.__class__] for v in value))
                 if len(types) == 0:  # HANDLE LISTS WITH Nones IN THEM
                     append(buffer, "{")
                     append(buffer, QUOTED_ARRAY_KEY)
                     append(buffer, "[]}")
                 elif len(types) > 1:
                     _list2json(
-                        value,
-                        sub_schema,
-                        path + [ARRAY_KEY],
-                        net_new_properties,
-                        buffer,
+                        value, sub_schema, path + [ARRAY_KEY], net_new_properties, buffer,
                     )
                 else:
                     element_type = types[0]
@@ -388,11 +357,7 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
                     append(buffer, quote(element_type))
                     append(buffer, COLON)
                     _multivalue2json(
-                        value,
-                        sub_schema[element_type],
-                        path + [element_type],
-                        net_new_properties,
-                        buffer,
+                        value, sub_schema[element_type], path + [element_type], net_new_properties, buffer,
                     )
                     append(buffer, "}")
         elif _type is date:
@@ -447,11 +412,7 @@ def typed_encode(value, sub_schema, path, net_new_properties, buffer):
             append(buffer, "{")
             append(buffer, QUOTED_ARRAY_KEY)
             _iter2json(
-                value,
-                sub_schema[ARRAY_KEY],
-                path + [ARRAY_KEY],
-                net_new_properties,
-                buffer,
+                value, sub_schema[ARRAY_KEY], path + [ARRAY_KEY], net_new_properties, buffer,
             )
             append(buffer, "}")
         else:

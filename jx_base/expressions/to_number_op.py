@@ -69,19 +69,14 @@ class ToNumberOp(Expression):
             return term
         elif is_op(term, CaseOp):  # REWRITING
             return CaseOp(
-                [WhenOp(t.when, then=ToNumberOp(t.then)) for t in term.whens[:-1]]
-                + [ToNumberOp(term.whens[-1])]
+                [WhenOp(t.when, then=ToNumberOp(t.then)) for t in term.whens[:-1]] + [ToNumberOp(term.whens[-1])]
             ).partial_eval(lang)
         elif is_op(term, WhenOp):  # REWRITING
-            return WhenOp(
-                term.when, then=ToNumberOp(term.then), **{"else": ToNumberOp(term.els_)}
-            ).partial_eval(lang)
+            return WhenOp(term.when, then=ToNumberOp(term.then), **{"else": ToNumberOp(term.els_)}).partial_eval(lang)
         elif is_op(term, CoalesceOp):
             return CoalesceOp(*(ToNumberOp(t) for t in term.terms))
         elif is_op(term, SelectOp):
-            return CoalesceOp([
-                ToNumberOp(s["value"]).partial_eval(lang) for s in term.terms
-            ])
+            return CoalesceOp([ToNumberOp(s["value"]).partial_eval(lang) for s in term.terms])
         return ToNumberOp(term)
 
 

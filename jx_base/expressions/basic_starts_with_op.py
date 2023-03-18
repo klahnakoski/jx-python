@@ -44,7 +44,4 @@ class BasicStartsWithOp(Expression):
         return FALSE
 
     def partial_eval(self, lang):
-        return BasicStartsWithOp(
-            ToTextOp(self.value).partial_eval(lang),
-            ToTextOp(self.prefix).partial_eval(lang),
-        )
+        return BasicStartsWithOp(ToTextOp(self.value).partial_eval(lang), ToTextOp(self.prefix).partial_eval(lang),)

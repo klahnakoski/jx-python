@@ -48,9 +48,7 @@ class ConcatOp(Expression):
         return ConcatOp(
             terms,
             **{
-                k: Literal(v)
-                if is_text(v) and not is_variable_name(v)
-                else jx_expression(v)
+                k: Literal(v) if is_text(v) and not is_variable_name(v) else jx_expression(v)
                 for k, v in expr.items()
                 if k in ["default", "separator"]
             }
@@ -91,13 +89,7 @@ class ConcatOp(Expression):
         return set.union(*(t.vars() for t in self.terms))
 
     def map(self, map_):
-        return ConcatOp(
-            [t.map(map_) for t in self.terms],
-            self.separator.map(map_),
-            self.default.map(map_),
-        )
+        return ConcatOp([t.map(map_) for t in self.terms], self.separator.map(map_), self.default.map(map_),)
 
     def missing(self, lang):
-        return AndOp(
-            [t.missing(lang) for t in self.terms] + [self.default.missing(lang)]
-        ).partial_eval(lang)
+        return AndOp([t.missing(lang) for t in self.terms] + [self.default.missing(lang)]).partial_eval(lang)

@@ -20,11 +20,5 @@ class RegExpOp(RegExpOp_):
         return PythonScript(
             {"re": re},
             loop_depth,
-            (
-                "re.match("
-                + quote(self.pattern.value + "$")
-                + ", "
-                + self.expr.to_python(loop_depth)
-                + ")"
-            ),
+            ("re.match(" + quote(self.pattern.value + "$") + ", " + self.expr.to_python(loop_depth) + ")"),
         )

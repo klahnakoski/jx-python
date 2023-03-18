@@ -21,15 +21,7 @@ class WhenOp(WhenOp_):
         return PythonScript(
             {**when.locals, **then.locals, **els_.locals},
             loop_depth,
-            (
-                "("
-                + then.source
-                + ") if ("
-                + when.source
-                + ") else ("
-                + els_.source
-                + ")"
-            ),
+            ("(" + then.source + ") if (" + when.source + ") else (" + els_.source + ")"),
         )
 
 

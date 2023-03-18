@@ -10,7 +10,9 @@ from jx_base.expressions import (
     AndOp,
     OrOp,
     NeOp,
-    CallOp, LastOp, FirstOp,
+    CallOp,
+    LastOp,
+    FirstOp,
 )
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
@@ -25,6 +27,7 @@ class ExpressionFactory:
     """
     USE PYTHON MAGIC METHODS TO BUILD EXPRESSIONS
     """
+
     def __init__(self, expr):
         self.expr: Expression = expr
 

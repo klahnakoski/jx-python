@@ -26,17 +26,9 @@ class GroupOp(GroupOp_):
             self
             .select
             .partial_eval(Python)
-            .map(dict(
-                row=f"row{loop_depth}",
-                rownum=f"rownum{loop_depth}",
-                rows=f"rows{loop_depth}",
-            ))
+            .map(dict(row=f"row{loop_depth}", rownum=f"rownum{loop_depth}", rows=f"rows{loop_depth}",))
             .to_python(loop_depth)
         )
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
 
-        return PythonScript(
-            {},
-            loop_depth,
-            f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]",
-        )
+        return PythonScript({}, loop_depth, f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]",)

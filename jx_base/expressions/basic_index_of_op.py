@@ -33,11 +33,7 @@ class BasicIndexOfOp(Expression):
         self.start = start
 
     def __data__(self):
-        return {"basic.indexOf": [
-            self.value.__data__(),
-            self.find.__data__(),
-            self.start.__data__(),
-        ]}
+        return {"basic.indexOf": [self.value.__data__(), self.find.__data__(), self.start.__data__(),]}
 
     def vars(self):
         return self.value.vars() | self.find.vars() | self.start.vars()
@@ -51,16 +47,10 @@ class BasicIndexOfOp(Expression):
     def partial_eval(self, lang):
         start = ToIntegerOp(MaxOp(ZERO, self.start)).partial_eval(lang)
         return self.lang.BasicIndexOfOp(
-            ToTextOp(self.value).partial_eval(lang),
-            ToTextOp(self.find).partial_eval(lang),
-            start,
+            ToTextOp(self.value).partial_eval(lang), ToTextOp(self.find).partial_eval(lang), start,
         )
 
     def __eq__(self, other):
         if not is_op(other, BasicIndexOfOp):
             return False
-        return (
-            self.value == self.value
-            and self.find == other.find
-            and self.start == other.start
-        )
+        return self.value == self.value and self.find == other.find and self.start == other.start

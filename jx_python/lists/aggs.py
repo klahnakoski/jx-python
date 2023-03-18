@@ -25,11 +25,7 @@ _ = Date
 
 
 def is_aggs(query):
-    if (
-        query.edges
-        or query.groupby
-        or any(a != None and a != "none" for a in enlist(query.select).aggregate)
-    ):
+    if query.edges or query.groupby or any(a != None and a != "none" for a in enlist(query.select).aggregate):
         return True
     return False
 
@@ -53,10 +49,7 @@ def list_aggs(frum, query):
 
     result = {
         s.name: Matrix(
-            dims=[
-                len(e.domain.partitions) + (1 if e.allowNulls else 0)
-                for e in query.edges
-            ],
+            dims=[len(e.domain.partitions) + (1 if e.allowNulls else 0) for e in query.edges],
             zeros=lambda: windows.name_to_aggregate.get(s.aggregate)(**s),
         )
         for s in select
@@ -65,9 +58,7 @@ def list_aggs(frum, query):
     coord = [None] * len(query.edges)
     edge_accessor = [(i, make_accessor(e)) for i, e in enumerate(query.edges)]
 
-    net_new_edge_names = set(to_data(query.edges).name) - UNION(
-        e.value.vars() for e in query.edges
-    )
+    net_new_edge_names = set(to_data(query.edges).name) - UNION(e.value.vars() for e in query.edges)
     if net_new_edge_names & UNION(ss.value.vars() for ss in select):
         # s_accessor NEEDS THESE EDGES, SO WE PASS THEM ANYWAY
         for d in filter(where, frum):
@@ -134,9 +125,7 @@ def make_accessor(e):
     elif e.range:
         for p in d.partitions:
             if p["max"] == None or p["min"] == None:
-                Log.error(
-                    "Inclusive expects domain parts to have `min` and `max` properties"
-                )
+                Log.error("Inclusive expects domain parts to have `min` and `max` properties")
 
         mi_accessor = jx_expression_to_function(e.range.min)
         ma_accessor = jx_expression_to_function(e.range.max)
@@ -145,11 +134,7 @@ def make_accessor(e):
 
             def output3(row):
                 mi, ma = mi_accessor(row), ma_accessor(row)
-                output = [
-                    p.dataIndex
-                    for p in d.partitions
-                    if mi <= p["max"] and p["min"] < ma
-                ]
+                output = [p.dataIndex for p in d.partitions if mi <= p["max"] and p["min"] < ma]
                 if e.allowNulls and not output:
                     return [len(d.partitions)]  # ENSURE THIS IS NULL
                 return output

@@ -21,13 +21,7 @@ class PythonScript(PythonScript_):
         elif missing is TRUE:
             return "None"
 
-        return (
-            "None if ("
-            + missing.to_python(loop_depth).source
-            + ") else ("
-            + self.source
-            + ")"
-        )
+        return "None if (" + missing.to_python(loop_depth).source + ") else (" + self.source + ")"
 
     def __add__(self, other):
         return str(self) + str(other)

@@ -19,11 +19,7 @@ class LastOp(LastOp_):
     def to_python(self, loop_depth=0):
         term = self.term.to_python(loop_depth)
         return PythonScript(
-            merge_locals(term.locals, last=last),
-            loop_depth,
-            member_type(term.type),
-            f"last({term.source})",
-            self
+            merge_locals(term.locals, last=last), loop_depth, member_type(term.type), f"last({term.source})", self,
         )
 
 

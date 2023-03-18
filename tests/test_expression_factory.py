@@ -96,19 +96,14 @@ class TestExpressionFactory(TestCase):
         result = stream(range(10)).limit(10).to_list()
         self.assertEqual(result, list(range(10)))
 
-    @skip('not supported yet')
+    @skip("not supported yet")
     def test_group1(self):
         result = (
-            stream([1, 2, 3])
-            .group(lambda v: v % 2)
-            .map(lambda v: {"group": v.group, "value": v.to_list()})
-            .to_list()
+            stream([1, 2, 3]).group(lambda v: v % 2).map(lambda v: {"group": v.group, "value": v.to_list()}).to_list()
         )
-        self.assertEqual(
-            result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}]
-        )
+        self.assertEqual(result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}])
 
-    @skip('not supported yet')
+    @skip("not supported yet")
     def test_group2(self):
         result = (
             stream([1, 2, 3])
@@ -136,9 +131,5 @@ class TestExpressionFactory(TestCase):
                 SomeClass.num += 1
 
         ANNOTATIONS[(SomeClass, "value")] = Typer(python_type=int)
-        result = (
-            stream([SomeClass(), SomeClass(), SomeClass()])
-            .map(it.value)
-            .last()
-        )
+        result = stream([SomeClass(), SomeClass(), SomeClass()]).map(it.value).last()
         self.assertEqual(result, 2)

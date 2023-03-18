@@ -17,6 +17,4 @@ class ToTextOp(ToTextOp_):
     def to_python(self, loop_depth=0):
         missing = self.term.missing(Python)
         value = self.term.to_python(loop_depth)
-        return PythonScript(
-            value.locals, loop_depth, value.type, value.source, self, missing
-        )
+        return PythonScript(value.locals, loop_depth, value.type, value.source, self, missing)

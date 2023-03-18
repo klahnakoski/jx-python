@@ -74,11 +74,7 @@ class InOp(Expression):
                 return EqOp(value, superset)
         elif is_op(value, NestedOp):
             return (
-                NestedOp(
-                    value.nested_path,
-                    None,
-                    AndOp(InOp(value.select, superset), value.where),
-                )
+                NestedOp(value.nested_path, None, AndOp(InOp(value.select, superset), value.where),)
                 .exists()
                 .partial_eval(lang)
             )

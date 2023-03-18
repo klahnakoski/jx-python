@@ -84,9 +84,7 @@ class One(AggregationFunction):
             return
         if value != self.value:
             Log.error(
-                "Expecting value to match: {{expecting}}, {{instead}}",
-                expecting=self.value,
-                instead=value,
+                "Expecting value to match: {{expecting}}, {{instead}}", expecting=self.value, instead=value,
             )
 
     def merge(self, agg):
@@ -95,9 +93,7 @@ class One(AggregationFunction):
         elif self.value is not None:
             if self.value != agg.value:
                 Log.error(
-                    "Expecting value to match: {{expecting}}, {{instead}}",
-                    expecting=self.value,
-                    instead=agg.value,
+                    "Expecting value to match: {{expecting}}, {{instead}}", expecting=self.value, instead=agg.value,
                 )
 
     def end(self):
@@ -152,9 +148,7 @@ class _Stats(WindowFunction):
         ignore = mo_math.ceiling(len(self.samples) * (1 - self.middle) / 2)
         if ignore * 2 >= len(self.samples):
             return stats.Stats()
-        output = stats.Stats(samples=sorted(self.samples)[
-            ignore : len(self.samples) - ignore :
-        ])
+        output = stats.Stats(samples=sorted(self.samples)[ignore : len(self.samples) - ignore :])
         output.samples = list(self.samples)
         return output
 

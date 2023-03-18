@@ -31,9 +31,7 @@ class NestedOp(Expression):
 
     __slots__ = ["nested_path", "select", "where", "sort", "limit"]
 
-    def __init__(
-        self, *frum, nested_path, select=None, where=TRUE, sort=Null, limit=NULL
-    ):
+    def __init__(self, *frum, nested_path, select=None, where=TRUE, sort=Null, limit=NULL):
         select = select or SelectOp(frum, {"name": ".", "value": IDENTITY})
         Expression.__init__(self, [select, where])
         self.nested_path = nested_path
@@ -101,13 +99,7 @@ class NestedOp(Expression):
         )
 
     def vars(self):
-        return (
-            self.nested_path.vars()
-            | self.select.vars()
-            | self.where.vars()
-            | self.sort.vars()
-            | self.limit.vars()
-        )
+        return self.nested_path.vars() | self.select.vars() | self.where.vars() | self.sort.vars() | self.limit.vars()
 
     def map(self, mapping):
         return NestedOp(

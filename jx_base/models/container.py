@@ -57,8 +57,7 @@ class Container(object):
                 )
 
             settings = set_default(
-                {"index": join_field(split_field(frum)[:1:]), "name": frum,},
-                config.default.settings,
+                {"index": join_field(split_field(frum)[:1:]), "name": frum,}, config.default.settings,
             )
             settings.type = None  # WE DO NOT WANT TO INFLUENCE THE TYPE BECAUSE NONE IS IN THE frum STRING ANYWAY
             return type2container["elasticsearch"](settings)
@@ -73,9 +72,7 @@ class Container(object):
             else:
                 Log.error("Do not know how to handle {{frum|json}}", frum=frum)
         else:
-            Log.error(
-                "Do not know how to handle {{type}}", type=frum.__class__.__name__
-            )
+            Log.error("Do not know how to handle {{type}}", type=frum.__class__.__name__)
 
     @property
     def language(self):

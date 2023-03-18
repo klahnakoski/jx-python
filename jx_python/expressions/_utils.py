@@ -88,9 +88,7 @@ def _inequality_to_python(self, loop_depth=0):
             OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
-                "else": PythonScript(
-                    {**lhs.locals, **rhs.locals}, loop_depth, script, type=JX_BOOLEAN
-                ),
+                "else": PythonScript({**lhs.locals, **rhs.locals}, loop_depth, script, type=JX_BOOLEAN),
             },
         )
         .partial_eval(Python)
@@ -105,9 +103,7 @@ def _binaryop_to_python(self, not_null=False, boolean=False):
     lhs = ToNumberOp(self.lhs).partial_eval(Python).to_python(loop_depth)
     rhs = ToNumberOp(self.rhs).partial_eval(Python).to_python(loop_depth)
     script = "(" + lhs + ") " + op + " (" + rhs + ")"
-    missing = OrOp(
-        self.lhs.missing(Python), self.rhs.missing(Python),
-    ).partial_eval(Python)
+    missing = OrOp(self.lhs.missing(Python), self.rhs.missing(Python),).partial_eval(Python)
     if missing is FALSE:
         return script
     else:
@@ -119,10 +115,7 @@ def multiop_to_python(self):
     if len(self.terms) == 0:
         return (self.default).to_python(loop_depth)
     elif self.default is NULL:
-        return sign.join(
-            "coalesce(" + t.to_python(loop_depth) + ", " + zero + ")"
-            for t in self.terms
-        )
+        return sign.join("coalesce(" + t.to_python(loop_depth) + ", " + zero + ")" for t in self.terms)
     else:
         return (
             "coalesce("

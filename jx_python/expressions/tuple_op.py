@@ -18,12 +18,6 @@ class TupleOp(TupleOp_):
         if len(self.terms) == 0:
             return PythonScript({}, loop_depth, "tuple()")
         elif len(self.terms) == 1:
-            return PythonScript(
-                {}, loop_depth, "(" + (self.terms[0]).to_python(loop_depth) + ",)"
-            )
+            return PythonScript({}, loop_depth, "(" + (self.terms[0]).to_python(loop_depth) + ",)")
         else:
-            return PythonScript(
-                {},
-                loop_depth,
-                "(" + ",".join((t).to_python(loop_depth) for t in self.terms) + ")",
-            )
+            return PythonScript({}, loop_depth, "(" + ",".join((t).to_python(loop_depth) for t in self.terms) + ")",)

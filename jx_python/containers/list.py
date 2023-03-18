@@ -117,12 +117,7 @@ class ListContainer(Container, Namespace, Table):
                     meta={"format": "cube"},
                     edges=[{
                         "name": "rownum",
-                        "domain": {
-                            "type": "rownum",
-                            "min": 0,
-                            "max": len(rows),
-                            "interval": 1,
-                        },
+                        "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1,},
                     }],
                 )
             else:
@@ -162,11 +157,7 @@ class ListContainer(Container, Namespace, Table):
         return ListContainer("from " + self.name, filter(temp, self.data), self.schema)
 
     def sort(self, sort):
-        return ListContainer(
-            "sorted " + self.name,
-            jx.sort(self.data, sort, already_normalized=True),
-            self.schema,
-        )
+        return ListContainer("sorted " + self.name, jx.sort(self.data, sort, already_normalized=True), self.schema,)
 
     def get(self, select):
         """
@@ -181,11 +172,7 @@ class ListContainer(Container, Namespace, Table):
     def select(self, select):
         selects = enlist(select)
 
-        if (
-            len(selects) == 1
-            and is_op(selects[0].value, Variable)
-            and selects[0].value.var == "."
-        ):
+        if len(selects) == 1 and is_op(selects[0].value, Variable) and selects[0].value.var == ".":
             new_schema = self.schema
             if selects[0].name == ".":
                 return self
@@ -195,13 +182,9 @@ class ListContainer(Container, Namespace, Table):
         if is_list(select):
             if all(is_op(s.value, Variable) and s.name == s.value.var for s in select):
                 names = set(s.value.var for s in select)
-                new_schema = Schema(
-                    ".", [c for c in self.schema.columns if c.name in names]
-                )
+                new_schema = Schema(".", [c for c in self.schema.columns if c.name in names])
 
-            push_and_pull = [
-                (s.name, jx_expression_to_function(s.value)) for s in selects
-            ]
+            push_and_pull = [(s.name, jx_expression_to_function(s.value)) for s in selects]
 
             def selector(d):
                 output = Data()
@@ -214,11 +197,7 @@ class ListContainer(Container, Namespace, Table):
             select_value = jx_expression_to_function(select.value)
             new_data = list(map(select_value, self.data))
             if is_op(select.value, Variable):
-                column = dict(
-                    **first(
-                        c for c in self.schema.columns if c.name == select.value.var
-                    )
-                )
+                column = dict(**first(c for c in self.schema.columns if c.name == select.value.var))
                 column.update({
                     "name": ".",
                     "json_type": ARRAY,
@@ -320,11 +299,7 @@ def _exec(code):
         Log.error("Could not execute {{code|quote}}", code=code, cause=e)
 
 
-DUAL = ListContainer(
-    name="dual",
-    data=[{}],
-    schema=Schema(table_name="dual", columns=UniqueIndex(keys=("name",))),
-)
+DUAL = ListContainer(name="dual", data=[{}], schema=Schema(table_name="dual", columns=UniqueIndex(keys=("name",))),)
 
 
 export("jx_base.models.container", ListContainer)

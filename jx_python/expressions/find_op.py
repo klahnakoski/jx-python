@@ -25,11 +25,7 @@ class FindOp(FindOp_):
         index = BasicIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
 
         output = WhenOp(
-            OrOp(
-                self.value.missing(Python),
-                self.find.missing(Python),
-                BasicEqOp(index, Literal(-1)),
-            ),
+            OrOp(self.value.missing(Python), self.find.missing(Python), BasicEqOp(index, Literal(-1)),),
             then=self.default,
             **{"else": index}
         ).partial_eval(lang)
@@ -52,12 +48,7 @@ class FindOp(FindOp_):
             loop_depth,
             with_var(
                 "f",
-                "("
-                + (self.value).to_python(loop_depth)
-                + ").find"
-                + "("
-                + (self.find).to_python(loop_depth)
-                + ")",
+                "(" + (self.value).to_python(loop_depth) + ").find" + "(" + (self.find).to_python(loop_depth) + ")",
                 "None if f==-1 else f",
             ),
         )

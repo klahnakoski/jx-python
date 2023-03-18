@@ -28,8 +28,4 @@ class RowsOp(RowsOp_):
 
         for p in path[:-1]:
             agg = agg + ".get(" + strings.quote(p) + ", EMPTY_DICT)"
-        return PythonScript(
-            {"EMPTY_DICT": {}},
-            loop_depth,
-            agg + ".get(" + strings.quote(path[-1]) + ")",
-        )
+        return PythonScript({"EMPTY_DICT": {}}, loop_depth, agg + ".get(" + strings.quote(path[-1]) + ")",)

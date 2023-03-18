@@ -57,9 +57,7 @@ class FormatOp(Expression):
         if self.format == "container":
             output = QueryTable(new_table, container=container)
         elif self.format == "cube" or (not self.format and normalized_query.edges):
-            column_names = [None] * (
-                max(c.push_column_index for c in index_to_columns.values()) + 1
-            )
+            column_names = [None] * (max(c.push_column_index for c in index_to_columns.values()) + 1)
             for c in index_to_columns.values():
                 column_names[c.push_column_index] = c.push_column_name
 
@@ -72,16 +70,12 @@ class FormatOp(Expression):
                 else:
                     select = {"name": normalized_query.select.name}
 
-                return Data(
-                    data=from_data(data), select=select, meta={"format": "cube"}
-                )
+                return Data(data=from_data(data), select=select, meta={"format": "cube"})
 
             if not result.data:
                 edges = []
                 dims = []
-                for i, e in enumerate(
-                    normalized_query.edges + normalized_query.groupby
-                ):
+                for i, e in enumerate(normalized_query.edges + normalized_query.groupby):
                     allowNulls = coalesce(e.allowNulls, True)
 
                     if e.domain.type == "set" and e.domain.partitions:
@@ -92,11 +86,7 @@ class FormatOp(Expression):
                         pulls = (
                             jx
                             .sort(
-                                [
-                                    c
-                                    for c in index_to_columns.values()
-                                    if c.push_list_name == e.name
-                                ],
+                                [c for c in index_to_columns.values() if c.push_list_name == e.name],
                                 "push_column_child",
                             )
                             .pull
@@ -107,9 +97,7 @@ class FormatOp(Expression):
                         domain = SimpleSetDomain(partitions=[])
 
                     dims.append(1 if allowNulls else 0)
-                    edges.append(Data(
-                        name=e.name, allowNulls=allowNulls, domain=domain
-                    ))
+                    edges.append(Data(name=e.name, allowNulls=allowNulls, domain=domain))
 
                 data = {}
                 for si, s in enumerate(enlist(normalized_query.select)):
@@ -124,10 +112,7 @@ class FormatOp(Expression):
                     select = {"name": normalized_query.select.name}
 
                 return Data(
-                    meta={"format": "cube"},
-                    edges=edges,
-                    select=select,
-                    data={k: v.cube for k, v in data.items()},
+                    meta={"format": "cube"}, edges=edges, select=select, data={k: v.cube for k, v in data.items()},
                 )
 
             columns = None
@@ -152,12 +137,7 @@ class FormatOp(Expression):
                     pulls = (
                         jx
                         .sort(
-                            [
-                                c
-                                for c in index_to_columns.values()
-                                if c.push_list_name == e.name
-                            ],
-                            "push_column_child",
+                            [c for c in index_to_columns.values() if c.push_list_name == e.name], "push_column_child",
                         )
                         .pull
                     )
@@ -172,18 +152,14 @@ class FormatOp(Expression):
                     parts -= {None}
 
                     if normalized_query.sort[i].sort == -1:
-                        domain = SimpleSetDomain(partitions=wrap(sorted(
-                            parts, reverse=True
-                        )))
+                        domain = SimpleSetDomain(partitions=wrap(sorted(parts, reverse=True)))
                     else:
                         domain = SimpleSetDomain(partitions=jx.sort(parts))
 
                 dims.append(len(domain.partitions) + (1 if allowNulls else 0))
                 edges.append(Data(name=e.name, allowNulls=allowNulls, domain=domain))
 
-            data_cubes = {
-                s["name"]: Matrix(dims=dims) for s in normalized_query.select.terms
-            }
+            data_cubes = {s["name"]: Matrix(dims=dims) for s in normalized_query.select.terms}
 
             r2c = index_to_coordinate(dims)  # WORKS BECAUSE THE DATABASE SORTED THE EDGES TO CONFORM
             for record, row in enumerate(result.data):
@@ -200,15 +176,10 @@ class FormatOp(Expression):
             select = normalized_query.select.__data__()["select"]
 
             return Data(
-                meta={"format": "cube"},
-                edges=edges,
-                select=select,
-                data={k: v.cube for k, v in data_cubes.items()},
+                meta={"format": "cube"}, edges=edges, select=select, data={k: v.cube for k, v in data_cubes.items()},
             )
         elif self.format == "table" or (not self.format and normalized_query.groupby):
-            column_names = [None] * (
-                max(c.push_column_index for c in index_to_columns.values()) + 1
-            )
+            column_names = [None] * (max(c.push_column_index for c in index_to_columns.values()) + 1)
             for c in index_to_columns.values():
                 column_names[c.push_column_index] = c.push_column_name
             data = []
@@ -220,9 +191,7 @@ class FormatOp(Expression):
                     elif s.num_push_columns:
                         tuple_value = row[s.push_column_index]
                         if tuple_value == None:
-                            tuple_value = row[s.push_column_index] = (
-                                [None] * s.num_push_columns
-                            )
+                            tuple_value = row[s.push_column_index] = [None] * s.num_push_columns
                         tuple_value[s.push_column_child] = s.pull(d)
                     elif row[s.push_column_index] == None:
                         row[s.push_column_index] = Data()
@@ -232,15 +201,11 @@ class FormatOp(Expression):
                 data.append(tuple(from_data(r) for r in row))
 
             output = Data(meta={"format": "table"}, header=column_names, data=data)
-        elif self.format == "list" or (
-            not normalized_query.edges and not normalized_query.groupby
-        ):
+        elif self.format == "list" or (not normalized_query.edges and not normalized_query.groupby):
             if (
                 not normalized_query.edges
                 and not normalized_query.groupby
-                and any(
-                    s["aggregate"] is not NULL for s in normalized_query.select.terms
-                )
+                and any(s["aggregate"] is not NULL for s in normalized_query.select.terms)
             ):
                 data = Data()
                 for s in index_to_columns.values():
@@ -248,9 +213,7 @@ class FormatOp(Expression):
                         data[s.push_column_name][s.push_column_child] = s.pull(result.data[0])
                     else:
                         data[s.push_column_name][s.push_column_child] += [s.pull(result.data[0])]
-                output = Data(
-                    meta={"format": "value"}, data=delist(from_data(data))
-                )
+                output = Data(meta={"format": "value"}, data=delist(from_data(data)))
             else:
                 data = []
                 for record in result.data:
@@ -261,9 +224,7 @@ class FormatOp(Expression):
                         elif c.num_push_columns:
                             tuple_value = row[c.push_list_name]
                             if not tuple_value:
-                                tuple_value = row[c.push_list_name] = (
-                                    [None] * c.num_push_columns
-                                )
+                                tuple_value = row[c.push_list_name] = [None] * c.num_push_columns
                             tuple_value[c.push_column_child] = c.pull(record)
                         else:
                             row[c.push_list_name][c.push_column_child] = c.pull(record)

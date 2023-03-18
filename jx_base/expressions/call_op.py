@@ -21,7 +21,7 @@ class CallOp(Expression):
     def __init__(self, func, *args, **kwargs):
         Expression.__init__(self, *[func, *args, *(v for v in kwargs.values())])
         self.func = func
-        self.args=args
+        self.args = args
         self.kwargs = kwargs
 
     def vars(self):
@@ -36,7 +36,7 @@ class CallOp(Expression):
         return CallOp(
             self.func.map(map_),
             tuple(v.map(map_) for v in self.args),
-            {k: v.map(map_) for k, v in self.kwargs.items()}
+            {k: v.map(map_) for k, v in self.kwargs.items()},
         )
 
     def partial_eval(self, lang):
@@ -49,5 +49,5 @@ class CallOp(Expression):
         return to_data({
             "call": self.func.__data__(),
             "args": [a.__data__() for a in self.args],
-            "kwargs": {k: v.__data__() for k, v in self.kwargs}
+            "kwargs": {k: v.__data__() for k, v in self.kwargs},
         })

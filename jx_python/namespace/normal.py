@@ -71,10 +71,7 @@ class Normal(Namespace):
                 output.select = {"name": "__all__", "value": "*", "aggregate": "none"}
 
         if query.groupby and query.edges:
-            Log.error(
-                "You can not use both the `groupby` and `edges` clauses in the same"
-                " query!"
-            )
+            Log.error("You can not use both the `groupby` and `edges` clauses in the same query!")
         elif query.edges:
             output.edges = convert_list(self._convert_edge, query.edges)
             output.groupby = None
@@ -95,14 +92,11 @@ class Normal(Namespace):
 
         # DEPTH ANALYSIS - LOOK FOR COLUMN REFERENCES THAT MAY BE DEEPER THAN
         # THE from SOURCE IS.
-        vars = get_all_vars(
-            output, exclude_where=True
-        )  # WE WILL EXCLUDE where VARIABLES
+        vars = get_all_vars(output, exclude_where=True)  # WE WILL EXCLUDE where VARIABLES
         for c in query.columns:
             if c.name in vars and len(c.nested_path) != 1:
                 Log.error(
-                    "This query, with variable {{var_name}} is too deep",
-                    var_name=c.name,
+                    "This query, with variable {{var_name}} is too deep", var_name=c.name,
                 )
 
         return output
@@ -136,9 +130,7 @@ class Normal(Namespace):
             if not output.name:
                 Log.error("expecting select to have a name: {{select}}", select=select)
 
-            output.aggregate = coalesce(
-                canonical_aggregates.get(select.aggregate), select.aggregate, "none"
-            )
+            output.aggregate = coalesce(canonical_aggregates.get(select.aggregate), select.aggregate, "none")
             return output
 
     def _convert_edge(self, edge):
@@ -154,11 +146,7 @@ class Normal(Namespace):
                 domain = self._convert_domain()
                 domain.dimension = Data(fields=edge.value)
 
-                return Data(
-                    name=edge.name,
-                    allowNulls=False if edge.allowNulls is False else True,
-                    domain=domain,
-                )
+                return Data(name=edge.name, allowNulls=False if edge.allowNulls is False else True, domain=domain,)
 
             domain = self._convert_domain(edge.domain)
             return Data(
@@ -171,16 +159,10 @@ class Normal(Namespace):
 
     def _convert_group(self, column):
         if is_text(column):
-            return dict_to_data({
-                "name": column,
-                "value": column,
-                "domain": {"type": "default"},
-            })
+            return dict_to_data({"name": column, "value": column, "domain": {"type": "default"},})
         else:
             column = to_data(column)
-            if (
-                column.domain and column.domain.type != "default"
-            ) or column.allowNulls != None:
+            if (column.domain and column.domain.type != "default") or column.allowNulls != None:
                 Log.error("groupby does not accept complicated domains")
 
             if not column.name and not is_text(column.value):

@@ -49,32 +49,22 @@ class WhenOp(Expression):
     def __eq__(self, other):
         if not isinstance(other, WhenOp):
             return False
-        return (
-            self.when == other.when
-            and self.then == other.then
-            and self.els_ == other.els_
-        )
+        return self.when == other.when and self.then == other.then and self.els_ == other.els_
 
     def vars(self):
         return self.when.vars() | self.then.vars() | self.els_.vars()
 
     def map(self, map_):
-        return WhenOp(
-            self.when.map(map_),
-            then=self.then.map(map_),
-            **{"else": self.els_.map(map_)}
-        )
+        return WhenOp(self.when.map(map_), then=self.then.map(map_), **{"else": self.els_.map(map_)})
 
     def missing(self, lang):
         return OrOp(
-            AndOp(self.when, self.then.missing(lang)),
-            AndOp(NotOp(self.when), self.els_.missing(lang)),
+            AndOp(self.when, self.then.missing(lang)), AndOp(NotOp(self.when), self.els_.missing(lang)),
         ).partial_eval(lang)
 
     def invert(self, lang):
         return OrOp(
-            AndOp(self.when, self.then.invert(lang)),
-            AndOp(NotOp(self.when), self.els_.invert(lang)),
+            AndOp(self.when, self.then.invert(lang)), AndOp(NotOp(self.when), self.els_.invert(lang)),
         ).partial_eval(lang)
 
     def partial_eval(self, lang):

@@ -106,9 +106,7 @@ class Variable(Expression):
 
         selects = []
         for path, leaves in paths.items():
-            if startswith_field(
-                path, schema.nested_path[0]
-            ) and len(path) > len(schema.nested_path[0]):
+            if startswith_field(path, schema.nested_path[0]) and len(path) > len(schema.nested_path[0]):
                 selects.append({
                     "name": self.var,
                     "value": QueryOp(

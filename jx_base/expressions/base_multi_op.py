@@ -28,7 +28,7 @@ class BaseMultiOp(Expression):
 
     def __init__(self, *terms, nulls=False, **clauses):
         Expression.__init__(self, *terms)
-        self.terms : Tuple[Expression] = terms
+        self.terms: Tuple[Expression] = terms
         # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
         self.decisive = nulls in (True, TRUE)
 
@@ -45,9 +45,7 @@ class BaseMultiOp(Expression):
         return output
 
     def map(self, map_):
-        return self.__class__(
-            [t.map(map_) for t in self.terms], **{"decisive": self.decisive}
-        )
+        return self.__class__([t.map(map_) for t in self.terms], **{"decisive": self.decisive})
 
     def missing(self, lang):
         if self.decisive:

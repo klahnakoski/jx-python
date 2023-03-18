@@ -18,13 +18,5 @@ from jx_base.expressions.python_script import PythonScript
 class OffsetOp(OffsetOp_):
     def to_python(self, loop_depth=0):
         return PythonScript(
-            {},
-            loop_depth,
-            (
-                "row["
-                + text(self.var)
-                + "] if 0<="
-                + text(self.var)
-                + "<len(row) else None"
-            ),
+            {}, loop_depth, ("row[" + text(self.var) + "] if 0<=" + text(self.var) + "<len(row) else None"),
         )

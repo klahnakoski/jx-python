@@ -25,9 +25,7 @@ class ToNumberOp(NumberOp_):
         if exists is TRUE:
             if term.type in JX_NUMBER_TYPES:
                 return value
-            return PythonScript(
-                {**value.locals}, loop_depth, JX_NUMBER, "float(" + value.source + ")"
-            )
+            return PythonScript({**value.locals}, loop_depth, JX_NUMBER, "float(" + value.source + ")")
         else:
             return PythonScript(
                 {**value.locals},

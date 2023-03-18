@@ -19,11 +19,5 @@ class AvgOp(AvgOp_):
     def to_python(self, loop_depth=0):
         default = self.default.to_python(loop_depth)
         return PythonScript(
-            {},
-            loop_depth,
-            with_var(
-                "x",
-                self.terms.to_python(loop_depth),
-                f"sum(x)/count(x) if x else {default}",
-            ),
+            {}, loop_depth, with_var("x", self.terms.to_python(loop_depth), f"sum(x)/count(x) if x else {default}",),
         )

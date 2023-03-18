@@ -18,11 +18,5 @@ class SplitOp(SplitOp_):
         return PythonScript(
             {},
             loop_depth,
-            (
-                "("
-                + (self.value).to_python(loop_depth)
-                + ").split("
-                + (self.find).to_python(loop_depth)
-                + ")"
-            ),
+            ("(" + (self.value).to_python(loop_depth) + ").split(" + (self.find).to_python(loop_depth) + ")"),
         )

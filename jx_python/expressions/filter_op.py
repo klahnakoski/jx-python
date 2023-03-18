@@ -18,12 +18,7 @@ class FilterOp(FilterOp_):
     def to_python(self, loop_depth=0):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
-        predicate = (
-            self
-            .predicate
-            .partial_eval(Python)
-            .to_python(loop_depth)
-        )
+        predicate = self.predicate.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
             {"enlist": enlist, **frum.locals, **predicate.locals},

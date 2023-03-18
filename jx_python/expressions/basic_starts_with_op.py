@@ -9,16 +9,12 @@
 #
 
 
-from jx_base.expressions.basic_starts_with_op import (
-    BasicStartsWithOp as _BasicStartsWithOp,
-)
+from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp as _BasicStartsWithOp
 from jx_base.expressions.python_script import PythonScript
 
 
 class BasicStartsWithOp(_BasicStartsWithOp):
     def to_python(self, loop_depth=0):
         return PythonScript(
-            {},
-            loop_depth,
-            f"({self.value.to_python(loop_depth)}).startswith({self.prefix.to_python(loop_depth)})",
+            {}, loop_depth, f"({self.value.to_python(loop_depth)}).startswith({self.prefix.to_python(loop_depth)})",
         )

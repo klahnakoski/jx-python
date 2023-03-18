@@ -15,8 +15,4 @@ from jx_base.expressions.python_script import PythonScript
 
 class MaxOp(MaxOp_):
     def to_python(self, loop_depth=0):
-        return PythonScript(
-            {},
-            loop_depth,
-            "max([" + ",".join((t).to_python(loop_depth) for t in self.terms) + "])",
-        )
+        return PythonScript({}, loop_depth, "max([" + ",".join((t).to_python(loop_depth) for t in self.terms) + "])",)

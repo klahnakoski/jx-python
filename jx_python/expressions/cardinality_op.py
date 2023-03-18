@@ -18,6 +18,4 @@ class CardinalityOp(CardinalityOp_):
         if not self.terms:
             return PythonScript({}, loop_depth, "0")
         else:
-            return PythonScript(
-                {}, loop_depth, "len(set(" + self.terms.to_python(loop_depth) + "))"
-            )
+            return PythonScript({}, loop_depth, "len(set(" + self.terms.to_python(loop_depth) + "))")

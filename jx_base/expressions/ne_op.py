@@ -53,11 +53,7 @@ class NeOp(Expression):
         return FALSE  # USING THE decisive EQUALITY https://github.com/mozilla/jx-sqlite/blob/master/docs/Logical%20Equality.md#definitions
 
     def invert(self, lang):
-        return OrOp(
-            self.lhs.missing(lang),
-            self.rhs.missing(lang),
-            BasicEqOp(self.lhs, self.rhs),
-        ).partial_eval(lang)
+        return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), BasicEqOp(self.lhs, self.rhs),).partial_eval(lang)
 
     def partial_eval(self, lang):
         lhs = self.lhs.partial_eval(lang)
@@ -72,7 +68,5 @@ class NeOp(Expression):
                 limit=lhs.limit.partial_eval(lang),
             ).partial_eval(lang)
 
-        output = AndOp(
-            lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)),
-        ).partial_eval(lang)
+        output = AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)),).partial_eval(lang)
         return output

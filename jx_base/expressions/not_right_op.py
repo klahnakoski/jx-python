@@ -59,7 +59,5 @@ class NotRightOp(Expression):
             return value
 
         max_length = LengthOp(value)
-        part = BasicSubstringOp(
-            value, ZERO, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),
-        )
+        part = BasicSubstringOp(value, ZERO, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),)
         return (WhenOp(self.missing(lang), **{"else": part})).partial_eval(lang)

@@ -42,11 +42,7 @@ def cube_aggs(frum, query):
 
     result = {
         s.name: Matrix(
-            dims=[
-                len(e.domain.partitions) + (1 if e.allowNulls else 0)
-                for e in query.edges
-            ],
-            zeros=s.default,
+            dims=[len(e.domain.partitions) + (1 if e.allowNulls else 0) for e in query.edges], zeros=s.default,
         )
         for s in select
     }
@@ -80,9 +76,7 @@ def cube_aggs(frum, query):
                     if acc == None:
                         acc = windows.name_to_aggregate.get(agg)
                         if acc == None:
-                            Log.error(
-                                "select aggregate {{agg}} is not recognized", agg=agg
-                            )
+                            Log.error("select aggregate {{agg}} is not recognized", agg=agg)
                         acc = acc(**s)
                         mat[c] = acc
                     acc.add(val)

@@ -21,16 +21,8 @@ class AndOp(AndOp_):
             return PythonScript({}, loop_depth, JX_BOOLEAN, "True", self, FALSE)
         else:
             sources, locals = zip(
-                *(
-                    (c.source, c.locals)
-                    for t in self.terms
-                    for c in [ToBooleanOp(t).to_python(loop_depth)]
-                )
+                *((c.source, c.locals) for t in self.terms for c in [ToBooleanOp(t).to_python(loop_depth)])
             )
             return PythonScript(
-                {k: v for l in locals for k, v in l.items()},
-                JX_BOOLEAN,
-                " and ".join(sources),
-                self,
-                FALSE,
+                {k: v for l in locals for k, v in l.items()}, JX_BOOLEAN, " and ".join(sources), self, FALSE,
             )

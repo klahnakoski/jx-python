@@ -53,8 +53,7 @@ def compile_expression(code: PythonScript, function_name="output"):
                 + code.source
                 + "\n"
                 + "    except Exception as e:\n"
-                + "        Log.error('Problem with dynamic function {{func|quote}}', "
-                " func=_source, cause=e)\n"
+                + "        Log.error('Problem with dynamic function {{func|quote}}',  func=_source, cause=e)\n"
             ),
             fake_globals,
             fake_locals,

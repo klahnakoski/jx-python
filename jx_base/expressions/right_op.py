@@ -54,9 +54,5 @@ class RightOp(Expression):
 
         return WhenOp(
             self.missing(lang),
-            **{"else": BasicSubstringOp(
-                value,
-                MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),
-                max_length,
-            )}
+            **{"else": BasicSubstringOp(value, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))), max_length,)}
         ).partial_eval(lang)

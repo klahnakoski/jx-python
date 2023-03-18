@@ -26,11 +26,7 @@ class Source:
     def copy_and_replace(self, old_origin: "Source", new_origin: "Source"):
         if self is old_origin:
             return new_origin
-        return Source(
-            self.alias,
-            self.frum,
-            [j.copy_and_replace(self, old_origin, new_origin) for j in self.joins],
-        )
+        return Source(self.alias, self.frum, [j.copy_and_replace(self, old_origin, new_origin) for j in self.joins],)
 
     def __str__(self):
         return self._start_str(None)
@@ -101,9 +97,7 @@ class SqlLeftJoinsOp(Expression):
         self.selects = selects  # REQUIRED FOR type
 
     def copy_and_replace(self, old_origin, new_origin):
-        return SqlLeftJoinsOp(
-            self.frum.copy_and_replace(old_origin, new_origin), self.selects
-        )
+        return SqlLeftJoinsOp(self.frum.copy_and_replace(old_origin, new_origin), self.selects)
 
     @property
     def type(self):

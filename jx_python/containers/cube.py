@@ -69,10 +69,7 @@ class Cube(Container):
                 # EXPECTING NO MORE THAN ONE rownum EDGE IN THE DATA
                 length = MAX([len(v) for v in data.values()])
                 if length >= 1:
-                    self.edges = list_to_data([{
-                        "name": "rownum",
-                        "domain": {"type": "rownum"},
-                    }])
+                    self.edges = list_to_data([{"name": "rownum", "domain": {"type": "rownum"},}])
                 else:
                     self.edges = Null
             elif is_list(data):
@@ -82,12 +79,7 @@ class Cube(Container):
                 data = {select.name: Matrix.wrap(data)}
                 self.edges = list_to_data([{
                     "name": "rownum",
-                    "domain": {
-                        "type": "rownum",
-                        "min": 0,
-                        "max": len(data),
-                        "interval": 1,
-                    },
+                    "domain": {"type": "rownum", "min": 0, "max": len(data), "interval": 1,},
                 }])
             elif isinstance(data, Matrix):
                 if is_list(select):
@@ -152,10 +144,7 @@ class Cube(Container):
             return
         e_names = self.edges.name
         s_names = self.select.name
-        parts = [
-            e.domain.partitions.value if e.domain.primitive else e.domain.partitions
-            for e in self.edges
-        ]
+        parts = [e.domain.partitions.value if e.domain.primitive else e.domain.partitions for e in self.edges]
         for c in matrix._all_combos():
             try:
                 output = {n: parts[i][c[i]] for i, n in enumerate(e_names)}
@@ -233,11 +222,7 @@ class Cube(Container):
 
             # MAP DICT TO NUMERIC INDICES
             for name, v in item.items():
-                ei, parts = first(
-                    (i, e.domain.partitions)
-                    for i, e in enumerate(self.edges)
-                    if e.name == name
-                )
+                ei, parts = first((i, e.domain.partitions) for i, e in enumerate(self.edges) if e.name == name)
                 if not parts:
                     Log.error(
                         "Can not find {{name}}=={{value|quote}} in list of edges, maybe"
@@ -254,19 +239,12 @@ class Cube(Container):
             edges = [e for e, v in zip(self.edges, coordinates) if v is None]
             if not edges:
                 # ZERO DIMENSIONAL VALUE
-                return dict_to_data({
-                    k: v.__getitem__(coordinates) for k, v in self.data.items()
-                })
+                return dict_to_data({k: v.__getitem__(coordinates) for k, v in self.data.items()})
             else:
                 output = Cube(
                     select=self.select,
-                    edges=list_to_data([
-                        e for e, v in zip(self.edges, coordinates) if v is None
-                    ]),
-                    data={
-                        k: Matrix(values=c.__getitem__(coordinates))
-                        for k, c in self.data.items()
-                    },
+                    edges=list_to_data([e for e, v in zip(self.edges, coordinates) if v is None]),
+                    data={k: Matrix(values=c.__getitem__(coordinates)) for k, c in self.data.items()},
                 )
                 return output
         elif is_text(item):
@@ -280,9 +258,7 @@ class Cube(Container):
                 Log.error("{{name}} not found in cube", name=item)
 
             output = Cube(
-                select=first(s for s in self.select if s.name == item),
-                edges=self.edges,
-                data={item: self.data[item]},
+                select=first(s for s in self.select if s.name == item), edges=self.edges, data={item: self.data[item]},
             )
             return output
         else:
@@ -323,14 +299,9 @@ class Cube(Container):
 
     def _select(self, select):
         selects = enlist(select)
-        is_aggregate = OR(
-            s.aggregate != None and s.aggregate != "none" for s in selects
-        )
+        is_aggregate = OR(s.aggregate != None and s.aggregate != "none" for s in selects)
         if is_aggregate:
-            values = {
-                s.name: Matrix(value=self.data[s.value].aggregate(s.aggregate))
-                for s in selects
-            }
+            values = {s.name: Matrix(value=self.data[s.value].aggregate(s.aggregate)) for s in selects}
             return Cube(select, [], values)
         else:
             values = {s.name: self.data[s.value] for s in selects}
@@ -365,17 +336,12 @@ class Cube(Container):
         keys = edges.name
         getKey = [e.domain.getKey for e in self.edges]
         lookup = [
-            [
-                getKey[i](p)
-                for p in e.domain.partitions + ([None] if e.allowNulls else [])
-            ]
+            [getKey[i](p) for p in e.domain.partitions + ([None] if e.allowNulls else [])]
             for i, e in enumerate(self.edges)
         ]
 
         def coord2term(coord):
-            output = leaves_to_data({
-                keys[i]: lookup[i][c] for i, c in enumerate(coord)
-            })
+            output = leaves_to_data({keys[i]: lookup[i][c] for i, c in enumerate(coord)})
             return output
 
         if is_list(self.select):
@@ -391,21 +357,11 @@ class Cube(Container):
 
             output = transpose(
                 coord,
-                [
-                    Cube(
-                        self.select,
-                        remainder,
-                        {s.name: v[i] for i, s in enumerate(selects)},
-                    )
-                    for v in zip(*values)
-                ],
+                [Cube(self.select, remainder, {s.name: v[i] for i, s in enumerate(selects)},) for v in zip(*values)],
             )
         elif not remainder:
             # v IS A VALUE, NO NEED TO WRAP IT IN A Cube
-            output = (
-                (coord2term(coord), v)
-                for coord, v in self.data[self.select.name].groupby(selector)
-            )
+            output = ((coord2term(coord), v) for coord, v in self.data[self.select.name].groupby(selector))
         else:
             output = (
                 (coord2term(coord), Cube(self.select, remainder, v))
@@ -431,17 +387,12 @@ class Cube(Container):
         keys = edges.name
         getKey = [e.domain.getKey for e in self.edges]
         lookup = [
-            [
-                getKey[i](p)
-                for p in e.domain.partitions + ([None] if e.allowNulls else [])
-            ]
+            [getKey[i](p) for p in e.domain.partitions + ([None] if e.allowNulls else [])]
             for i, e in enumerate(self.edges)
         ]
 
         def coord2term(coord):
-            output = leaves_to_data({
-                keys[i]: lookup[i][c] for i, c in enumerate(coord)
-            })
+            output = leaves_to_data({keys[i]: lookup[i][c] for i, c in enumerate(coord)})
             return output
 
         if is_list(self.select):
@@ -457,21 +408,11 @@ class Cube(Container):
 
             output = transpose(
                 coord,
-                [
-                    Cube(
-                        self.select,
-                        remainder,
-                        {s.name: v[i] for i, s in enumerate(selects)},
-                    )
-                    for v in zip(*values)
-                ],
+                [Cube(self.select, remainder, {s.name: v[i] for i, s in enumerate(selects)},) for v in zip(*values)],
             )
         elif not remainder:
             # v IS A VALUE, NO NEED TO WRAP IT IN A Cube
-            output = (
-                (coord2term(coord), v)
-                for coord, v in self.data[self.select.name].groupby(selector)
-            )
+            output = ((coord2term(coord), v) for coord, v in self.data[self.select.name].groupby(selector))
         else:
             output = (
                 (coord2term(coord), Cube(self.select, remainder, v))
@@ -499,9 +440,7 @@ class Cube(Container):
                 row[k] = self.data[k][coord]
             for c, e in zip(coord, self.edges):
                 row[e.name] = e.domain.partitions[c]
-            m[coord] = accessor(
-                row, Null, Null
-            )  # DUMMY Null VALUES BECAUSE I DO NOT KNOW WHAT TO DO
+            m[coord] = accessor(row, Null, Null)  # DUMMY Null VALUES BECAUSE I DO NOT KNOW WHAT TO DO
 
         self.select.append(window)
         return self
@@ -536,10 +475,7 @@ class Cube(Container):
 
     def __data__(self):
         return Data(
-            select=self.select,
-            edges=self.edges,
-            data={k: v.cube for k, v in self.data.items()},
-            meta=self.meta,
+            select=self.select, edges=self.edges, data={k: v.cube for k, v in self.data.items()}, meta=self.meta,
         )
 
 

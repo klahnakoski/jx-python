@@ -75,9 +75,7 @@ def run(query, container=Null):
         container = to_data(query)["from"]
         query_op = QueryOp.wrap(query, container=container, namespace=container.schema)
     else:
-        query_op = QueryOp.wrap(
-            query, container=container, namespace=container.namespace
-        )
+        query_op = QueryOp.wrap(query, container=container, namespace=container.namespace)
 
     if container == None:
         from jx_python.containers.list import DUAL
@@ -97,9 +95,7 @@ def run(query, container=Null):
         container = query["from"]
         container = run(QueryOp.wrap(query, container, container.namespace), container)
     else:
-        Log.error(
-            "Do not know how to handle {{type}}", type=container.__class__.__name__
-        )
+        Log.error("Do not know how to handle {{type}}", type=container.__class__.__name__)
 
     if is_aggs(query_op):
         container = list_aggs(container, query_op)
@@ -146,9 +142,7 @@ def index(data, keys=None):
             names = list(data.data.keys())
             for d in (
                 set_default(mo_dots.zip(names, r), {keys[0]: p})
-                for r, p in zip(
-                    zip(*data.data.values()), data.edges[0].domain.partitions.value
-                )
+                for r, p in zip(zip(*data.data.values()), data.edges[0].domain.partitions.value)
             ):
                 o.add(d)
             return o
@@ -173,8 +167,7 @@ def unique_index(data, keys=None, fail_on_dup=True):
         except Exception as e:
             o.add(d)
             Log.error(
-                "index {{index}} is not unique {{key}} maps to both {{value1}} and"
-                " {{value2}}",
+                "index {{index}} is not unique {{key}} maps to both {{value1}} and {{value2}}",
                 index=keys,
                 key=select([d], keys)[0],
                 value1=o[d],
@@ -402,9 +395,7 @@ def _select_deep(v, field, depth, record):
         else:
             record[field.name] = v.get(f)
     except Exception as e:
-        Log.error(
-            "{{value}} does not have {{field}} property", value=v, field=f, cause=e
-        )
+        Log.error("{{value}} does not have {{field}} property", value=v, field=f, cause=e)
     return 0, None
 
 
@@ -450,10 +441,7 @@ def _select_deep_meta(field, depth):
                     destination[name] = source.get(f)
             except Exception as e:
                 Log.error(
-                    "{{value}} does not have {{field}} property",
-                    value=source,
-                    field=f,
-                    cause=e,
+                    "{{value}} does not have {{field}} property", value=source, field=f, cause=e,
                 )
             return 0, None
 
@@ -474,10 +462,7 @@ def _select_deep_meta(field, depth):
                     destination[name] = source.get(f)
                 except Exception as e:
                     Log.error(
-                        "{{value}} does not have {{field}} property",
-                        value=source,
-                        field=f,
-                        cause=e,
+                        "{{value}} does not have {{field}} property", value=source, field=f, cause=e,
                     )
                 return 0, None
 
@@ -489,10 +474,7 @@ def get_columns(data, leaves=False):
     if not leaves:
         return list_to_data([{"name": n} for n in UNION(set(d.keys()) for d in data)])
     else:
-        return to_data([
-            {"name": leaf}
-            for leaf in set(leaf for row in data for leaf, _ in row.leaves())
-        ])
+        return to_data([{"name": leaf} for leaf in set(leaf for row in data for leaf, _ in row.leaves())])
 
 
 _ = """
@@ -593,9 +575,7 @@ def sort(data, fieldnames=None, already_normalized=False):
         if is_text(data):
             raise Log.error("Do not know how to handle")
         elif is_many(data):
-            output = list_to_data([
-                d for d in sort_using_cmp((from_data(d) for d in data), cmp=comparer)
-            ])
+            output = list_to_data([d for d in sort_using_cmp((from_data(d) for d in data), cmp=comparer)])
         else:
             raise Log.error("Do not know how to handle")
 
@@ -669,21 +649,15 @@ def filter(data, where):
     if is_container(data):
         temp = get(where)
         dd = to_data(data)
-        return list_to_data([
-            from_data(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)
-        ])
+        return list_to_data([from_data(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)])
     else:
-        Log.error(
-            "Do not know how to handle type {{type}}", type=data.__class__.__name__
-        )
+        Log.error("Do not know how to handle type {{type}}", type=data.__class__.__name__)
 
     try:
         return drill_filter(where, data)
     except Exception as _:
         # WOW!  THIS IS INEFFICIENT!
-        return to_data([
-            from_data(d) for d in drill_filter(where, [DataObject(d) for d in data])
-        ])
+        return to_data([from_data(d) for d in drill_filter(where, [DataObject(d) for d in data])])
 
 
 def drill(data, path):

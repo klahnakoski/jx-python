@@ -38,9 +38,7 @@ class AndOp(Expression):
 
     def __eq__(self, other):
         if is_op(other, AndOp):
-            return all(o in self.terms for o in other.terms) and all(
-                s in other.terms for s in self.terms
-            )
+            return all(o in self.terms for o in other.terms) and all(s in other.terms for s in self.terms)
         return False
 
     def __rcontains__(self, superset):
@@ -107,10 +105,7 @@ class AndOp(Expression):
                 return AndOp(*and_terms)
 
         return OrOp(
-            *(
-                AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0]
-                for and_terms in or_terms
-            )
+            *(AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0] for and_terms in or_terms)
         ).partial_eval(lang)
 
 

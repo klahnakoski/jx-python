@@ -61,33 +61,21 @@ class Stream:
 
     def map(self, accessor):
         accessor = factory(accessor)
-        fact = ExpressionFactory(SelectOp(
-            self.factory.expr, (SelectOne(".", accessor.expr),)
-        ))
+        fact = ExpressionFactory(SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)))
         return Stream(self.values, fact)
 
     def filter(self, expr):
         expr = factory(expr).expr
-        return Stream(
-            self.values, ExpressionFactory(FilterOp(self.factory.expr, expr)),
-        )
+        return Stream(self.values, ExpressionFactory(FilterOp(self.factory.expr, expr)),)
 
     def distinct(self):
-        return Stream(
-            distinct(self), ExpressionFactory(Variable(".")),
-        )
+        return Stream(distinct(self), ExpressionFactory(Variable(".")),)
 
     def reverse(self):
-        return Stream(
-            list(reversed(list(self))),
-            ExpressionFactory(Variable(".")),
-        )
+        return Stream(list(reversed(list(self))), ExpressionFactory(Variable(".")),)
 
     def sort(self):
-        return Stream(
-            list(sort_using_cmp(self, value_compare)),
-            ExpressionFactory(Variable(".")),
-        )
+        return Stream(list(sort_using_cmp(self, value_compare)), ExpressionFactory(Variable(".")),)
 
     def limit(self, num):
         def limit():
@@ -120,8 +108,8 @@ class Stream:
     def to_list(self):
         row0 = self.values
         result = [
-            get_attr(row1, 'props', 'a')
-            for rows1 in [get_attr(enlist(row0), 'value')]
+            get_attr(row1, "props", "a")
+            for rows1 in [get_attr(enlist(row0), "value")]
             for rownum1, row1 in enumerate(rows1)
         ]
 
@@ -145,9 +133,7 @@ class Stream:
 
 
 def stream(values):
-    return Stream(
-        values, ExpressionFactory(SelectOp(it.expr, (SelectOne(".", Variable(".")),)))
-    )
+    return Stream(values, ExpressionFactory(SelectOp(it.expr, (SelectOne(".", Variable(".")),))))
 
 
 ANNOTATIONS = {

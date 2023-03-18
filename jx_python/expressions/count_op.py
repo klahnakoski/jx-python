@@ -16,9 +16,5 @@ from jx_base.expressions.python_script import PythonScript
 class CountOp(CountOp_):
     def to_python(self, loop_depth=0):
         return PythonScript(
-            {},
-            loop_depth,
-            "sum(((0 if v==None else 1) for v in "
-            + self.terms.to_python(loop_depth)
-            + "), 0)",
+            {}, loop_depth, "sum(((0 if v==None else 1) for v in " + self.terms.to_python(loop_depth) + "), 0)",
         )

@@ -18,7 +18,8 @@ from mo_dots import (
     join_field,
     literal_field,
     is_missing,
-    is_many, concat_field,
+    is_many,
+    concat_field,
 )
 from mo_future import is_text, text
 from mo_imports import export
@@ -54,8 +55,7 @@ class SelectOp(Expression):
         :param terms: list OF SelectOne DESCRIPTORS
         """
         if TYPE_CHECK and (
-            not all(isinstance(term, SelectOne) for term in terms)
-            or any(term.name is None for term in terms)
+            not all(isinstance(term, SelectOne) for term in terms) or any(term.name is None for term in terms)
         ):
             Log.error("expecting list of SelectOne")
         Expression.__init__(self, frum, *[t.value for t in terms], *kwargs.values())
@@ -74,50 +74,37 @@ class SelectOp(Expression):
                 terms.extend(t.terms)
             elif is_text(t):
                 if not is_variable_name(t):
-                    Log.error(
-                        "expecting {{value}} a simple dot-delimited path name", value=t
-                    )
+                    Log.error("expecting {{value}} a simple dot-delimited path name", value=t)
                 terms.append({"name": t, "value": _jx_expression(t, cls.lang)})
             elif t.aggregate:
                 # AGGREGATES ARE INSERTED INTO THE CALL CHAIN
                 if t.value == None:
-                    Log.error(
-                        "expecting select parameters to have name and value properties"
-                    )
+                    Log.error("expecting select parameters to have name and value properties")
                 elif t.name == None:
                     if is_text(t.value):
                         if not is_variable_name(t.value):
                             Log.error(
-                                "expecting {{value}} a simple dot-delimited path name",
-                                value=t.value,
+                                "expecting {{value}} a simple dot-delimited path name", value=t.value,
                             )
                         else:
                             terms.append({
                                 "name": t.value,
-                                "value": AggregateOp(
-                                    FromOp(_jx_expression(t.value, cls.lang)),
-                                    t.aggregate,
-                                ),
+                                "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate,),
                             })
                     else:
                         Log.error("expecting a name property")
                 else:
                     terms.append({
                         "name": t.name,
-                        "value": AggregateOp(
-                            FromOp(_jx_expression(t.value, cls.lang)), t.aggregate
-                        ),
+                        "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate),
                     })
             elif t.name == None:
                 if t.value == None:
-                    Log.error(
-                        "expecting select parameters to have name and value properties"
-                    )
+                    Log.error("expecting select parameters to have name and value properties")
                 elif is_text(t.value):
                     if not is_variable_name(t.value):
                         Log.error(
-                            "expecting {{value}} a simple dot-delimited path name",
-                            value=t.value,
+                            "expecting {{value}} a simple dot-delimited path name", value=t.value,
                         )
                     else:
                         terms.append({
@@ -145,10 +132,7 @@ class SelectOp(Expression):
                 continue
             elif is_op(expr, SelectOp):
                 for child_name, child_value in expr.terms:
-                    new_terms.append(SelectOne(
-                        concat_field(name, child_name),
-                        child_value,
-                    ))
+                    new_terms.append(SelectOne(concat_field(name, child_name), child_value,))
             else:
                 new_terms.append(SelectOne(name, new_expr))
 
@@ -175,31 +159,19 @@ class SelectOp(Expression):
             yield term.name, term.value
 
     def __data__(self):
-        return {
-            "select": [self.frum.__data__()]
-            + [{"name": name, "value": value.__data__()} for name, value in self]
-        }
+        return {"select": [self.frum.__data__()] + [{"name": name, "value": value.__data__()} for name, value in self]}
 
     def vars(self):
         return set(v for term in self.terms for v in term.value.vars())
 
     def map(self, map_):
-        return SelectOp(
-            self.frum,
-            *(
-                SelectOne(name, value.map(map_))
-                for name, value in self
-            )
-        )
+        return SelectOp(self.frum, *(SelectOne(name, value.map(map_)) for name, value in self))
 
 
 def normalize_one(frum, select):
     if is_text(select):
         if select == "*":
-            return SelectOp(
-                self.frum,
-                *({"name": ".", "value": LeavesOp(Variable(".")), "aggregate": NULL,})
-            )
+            return SelectOp(self.frum, *({"name": ".", "value": LeavesOp(Variable(".")), "aggregate": NULL,}))
         select = Data(value=select)
     else:
         select = to_data(select)
@@ -212,8 +184,7 @@ def normalize_one(frum, select):
         }
         if unexpected:
             Log.error(
-                "Expecting a select clause with `value` property.  Unexpected"
-                " property: {{unexpected}}",
+                "Expecting a select clause with `value` property.  Unexpected property: {{unexpected}}",
                 unexpected=unexpected,
             )
         if is_missing(select.value) and is_missing(select.aggregate):
@@ -252,9 +223,7 @@ def normalize_one(frum, select):
             expr = jx_expression(root_name, schema=schema)
             if not is_op(expr, Variable):
                 Log.error("do not know what to do")
-            canonical["value"] = LeavesOp(
-                expr, prefix=Literal((select.prefix or "") + path[-1] + ".")
-            )
+            canonical["value"] = LeavesOp(expr, prefix=Literal((select.prefix or "") + path[-1] + "."))
         else:
             canonical["name"] = coalesce(name, value.lstrip("."), aggregate)
             canonical["value"] = jx_expression(value, schema=schema)
@@ -293,18 +262,12 @@ def _normalize_selects(frum, selects) -> SelectOp:
             if len(selects) == 0:
                 return select_nothing
             else:
-                terms = [
-                    t for s in selects for t in SelectOp.normalize_one(frum, s).terms
-                ]
+                terms = [t for s in selects for t in SelectOp.normalize_one(frum, s).terms]
         else:
             return SelectOp(frum, normalize_one(frum, select))
     elif is_many(selects):
         terms = [
-            ss
-            for s in selects
-            for ss in SelectOp
-            .normalize_one(s, frum=frum, format=format, schema=schema)
-            .terms
+            ss for s in selects for ss in SelectOp.normalize_one(s, frum=frum, format=format, schema=schema).terms
         ]
     else:
         Log.error("should not happen")

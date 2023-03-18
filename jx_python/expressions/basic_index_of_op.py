@@ -20,12 +20,7 @@ class BasicIndexOfOp(BasicIndexOfOp_):
             loop_depth,
             with_var(
                 "f",
-                "("
-                + (self.value).to_python(loop_depth)
-                + ").find"
-                + "("
-                + (self.find).to_python(loop_depth)
-                + ")",
+                "(" + (self.value).to_python(loop_depth) + ").find" + "(" + (self.find).to_python(loop_depth) + ")",
                 "None if f==-1 else f",
             ),
         )

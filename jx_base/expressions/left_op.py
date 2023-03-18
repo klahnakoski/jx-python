@@ -48,9 +48,7 @@ class LeftOp(Expression):
         return LeftOp(self.value.map(map_), self.length.map(map_))
 
     def missing(self, lang):
-        return OrOp(
-            self.value.missing(lang), self.length.missing(lang),
-        ).partial_eval(lang)
+        return OrOp(self.value.missing(lang), self.length.missing(lang),).partial_eval(lang)
 
     def partial_eval(self, lang):
         value = (self.value).partial_eval(lang)
@@ -58,8 +56,5 @@ class LeftOp(Expression):
         max_length = LengthOp(value)
 
         return WhenOp(
-            self.missing(lang),
-            **{"else": BasicSubstringOp(
-                value, ZERO, MaxOp(ZERO, MinOp(length, max_length)),
-            )}
+            self.missing(lang), **{"else": BasicSubstringOp(value, ZERO, MaxOp(ZERO, MinOp(length, max_length)),)}
         ).partial_eval(lang)

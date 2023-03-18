@@ -36,9 +36,7 @@ class CaseOp(Expression):
 
         for w in terms[:-1]:
             if not is_op(w, WhenOp) or w.els_ is not NULL:
-                Log.error(
-                    "case expression does not allow `else` clause in `when` sub-clause"
-                )
+                Log.error("case expression does not allow `else` clause in `when` sub-clause")
 
         els_ = terms[-1]
         if is_op(els_, WhenOp):
@@ -63,16 +61,13 @@ class CaseOp(Expression):
         return CaseOp(*(w.map(map_) for w in self.whens))
 
     def missing(self, lang):
-        whens = [
-            WhenOp(w.when, then=w.then.missing(lang)) for w in self.whens[:-1]
-        ] + [self.whens[-1].missing(lang)]
+        whens = [WhenOp(w.when, then=w.then.missing(lang)) for w in self.whens[:-1]] + [self.whens[-1].missing(lang)]
 
         return CaseOp(whens).partial_eval(lang)
 
     def invert(self, lang):
         return CaseOp(
-            [WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens[:-1]]
-            + [self.whens[-1]]
+            [WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens[:-1]] + [self.whens[-1]]
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
@@ -107,6 +102,4 @@ class CaseOp(Expression):
 
     @property
     def type(self):
-        return union_type(
-            *(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens)
-        )
+        return union_type(*(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens))

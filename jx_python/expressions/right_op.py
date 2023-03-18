@@ -19,9 +19,5 @@ class RightOp(RightOp_):
         l = (self.length).to_python(loop_depth)
 
         return PythonScript(
-            {},
-            loop_depth,
-            with_var(
-                "v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]"
-            ),
+            {}, loop_depth, with_var("v", v, "None if v == None else v[max(0, len(v)-int(" + l + ")):]"),
         )

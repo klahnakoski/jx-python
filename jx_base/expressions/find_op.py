@@ -65,18 +65,11 @@ class FindOp(Expression):
         return i
 
     def vars(self):
-        return (
-            self.value.vars()
-            | self.find.vars()
-            | self.default.vars()
-            | self.start.vars()
-        )
+        return self.value.vars() | self.find.vars() | self.default.vars() | self.start.vars()
 
     def map(self, map_):
         return FindOp(
-            [self.value.map(map_), self.find.map(map_)],
-            start=self.start.map(map_),
-            default=self.default.map(map_),
+            [self.value.map(map_), self.find.map(map_)], start=self.start.map(map_), default=self.default.map(map_),
         )
 
     def invert(self, lang):

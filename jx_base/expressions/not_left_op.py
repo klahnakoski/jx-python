@@ -60,8 +60,6 @@ class NotLeftOp(Expression):
         max_length = LengthOp(value)
         output = WhenOp(
             self.missing(lang),
-            **{"else": BasicSubstringOp(
-                value, MaxOp(ZERO, MinOp(length, max_length)), max_length,
-            )}
+            **{"else": BasicSubstringOp(value, MaxOp(ZERO, MinOp(length, max_length)), max_length,)}
         ).partial_eval(lang)
         return output

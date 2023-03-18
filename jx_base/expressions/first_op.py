@@ -56,13 +56,10 @@ class FirstOp(Expression):
             return term
         elif is_op(term, CaseOp):  # REWRITING
             return CaseOp(
-                [WhenOp(t.when, then=FirstOp(t.then)) for t in term.whens[:-1]]
-                + [FirstOp(term.whens[-1])]
+                [WhenOp(t.when, then=FirstOp(t.then)) for t in term.whens[:-1]] + [FirstOp(term.whens[-1])]
             ).partial_eval(lang)
         elif is_op(term, WhenOp):
-            return WhenOp(
-                term.when, then=FirstOp(term.then), **{"else": FirstOp(term.els_)}
-            ).partial_eval(lang)
+            return WhenOp(term.when, then=FirstOp(term.then), **{"else": FirstOp(term.els_)}).partial_eval(lang)
         elif base_type(term.type) == ARRAY:
             return term
         elif is_literal(term):

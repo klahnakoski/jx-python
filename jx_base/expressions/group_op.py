@@ -17,6 +17,7 @@ class GroupOp(Expression):
     """
     return a series of {"group": group, "part": list_of_rows_for_group}
     """
+
     def __init__(self, frum, select):
         Expression.__init__(self, frum, select)
         self.frum, self.select = frum, select
