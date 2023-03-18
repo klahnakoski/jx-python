@@ -15,7 +15,7 @@ from jx_python.expressions.to_boolean_op import ToBooleanOp
 
 
 class OrOp(OrOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {},
             loop_depth,

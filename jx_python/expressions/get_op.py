@@ -17,7 +17,7 @@ from mo_json import JX_ANY
 
 
 class GetOp(GetOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         offsets, locals = zip(
             *(
                 (c.source, c.locals)

@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class SuffixOp(SuffixOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {},
             loop_depth,

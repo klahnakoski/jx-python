@@ -20,7 +20,7 @@ from mo_json import array_of
 
 
 class SelectOp(SelectOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
         selects = tuple(

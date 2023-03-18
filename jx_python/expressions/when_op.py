@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class WhenOp(WhenOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         when = self.when.to_python(loop_depth)
         then = self.then.to_python(loop_depth)
         els_ = self.els_.to_python(loop_depth)

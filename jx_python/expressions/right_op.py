@@ -14,7 +14,7 @@ from jx_python.expressions._utils import with_var, PythonScript
 
 
 class RightOp(RightOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         v = (self.value).to_python(loop_depth)
         l = (self.length).to_python(loop_depth)
 

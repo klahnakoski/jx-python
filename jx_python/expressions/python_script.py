@@ -41,7 +41,7 @@ class PythonScript(PythonScript_):
             b = str(self)
             return ""
 
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return self
 
     def missing(self, lang):

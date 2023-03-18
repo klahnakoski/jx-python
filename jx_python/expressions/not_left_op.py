@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class NotLeftOp(NotLeftOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         v = self.value.to_python(loop_depth)
         l = self.length.to_python(loop_depth)
         return PythonScript(

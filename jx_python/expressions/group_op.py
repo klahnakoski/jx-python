@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class GroupOp(GroupOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         r = Variable("r")
         r.simplified = True
         rn = Variable("rn")

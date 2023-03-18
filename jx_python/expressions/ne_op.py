@@ -14,7 +14,7 @@ from jx_python.expressions._utils import with_var, PythonSource
 
 
 class NeOp(NeOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         lhs = self.lhs.to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)
 

@@ -15,7 +15,7 @@ from mo_json import JX_INTEGER
 
 
 class ToIntegerOp(IntegerOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {},
             loop_depth,

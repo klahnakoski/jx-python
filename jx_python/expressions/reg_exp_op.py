@@ -16,7 +16,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class RegExpOp(RegExpOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {"re": re},
             loop_depth,

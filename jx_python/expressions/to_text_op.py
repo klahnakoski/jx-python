@@ -14,7 +14,7 @@ from jx_python.expressions._utils import Python
 
 
 class ToTextOp(ToTextOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         missing = self.term.missing(Python)
         value = self.term.to_python(loop_depth)
         return PythonScript(

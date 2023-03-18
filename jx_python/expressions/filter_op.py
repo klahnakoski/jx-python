@@ -8,39 +8,27 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import FilterOp as FilterOp_, Variable
+from jx_base.expressions import FilterOp as FilterOp_
+from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_base.expressions.python_script import PythonScript
 
 
 class FilterOp(FilterOp_):
-    def to_python(self, loop_depth):
-        r = Variable("r")
-        r.simplified = True
-        rn = Variable("rn")
-        rn.simplified = True
-        rs = Variable("rs")
-        rs.simplified = True
-
+    def to_python(self, loop_depth=0):
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
+        loop_depth = frum.loop_depth + 1
         predicate = (
             self
             .predicate
             .partial_eval(Python)
-            .map(dict(
-                row=f"row{loop_depth}",
-                rownum=f"rownum{loop_depth}",
-                rows=f"rows{loop_depth}",
-            ))
             .to_python(loop_depth)
         )
-        frum = self.frum.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
             {"enlist": enlist, **frum.locals, **predicate.locals},
             loop_depth,
             frum.type,
-            f"[r for rs in [enlist({frum.source})] for rn, r in enumerate(rs) if"
-            f" ({predicate.source})]",
+            f"""[row{loop_depth} for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth}) if ({predicate.source})]""",
             self,
         )

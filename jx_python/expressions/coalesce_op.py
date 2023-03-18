@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class CoalesceOp(CoalesceOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {"coalesce": coalesce},
             loop_depth,

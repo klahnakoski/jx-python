@@ -14,7 +14,7 @@ from jx_python.expressions._utils import with_var, PythonScript
 
 
 class BasicIndexOfOp(BasicIndexOfOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {},
             loop_depth,

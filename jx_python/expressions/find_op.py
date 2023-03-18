@@ -46,7 +46,7 @@ class FindOp(FindOp_):
         ).partial_eval(lang)
         return output
 
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {},
             loop_depth,

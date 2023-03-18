@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class BasicSubstringOp(_BasicSubstringOp):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         value = self.value.to_python(loop_depth)
         return PythonScript(
             {},

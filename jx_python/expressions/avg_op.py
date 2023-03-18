@@ -16,7 +16,7 @@ from jx_python.expressions._utils import multiop_to_python, with_var, PythonSour
 class AvgOp(AvgOp_):
     to_python = multiop_to_python
 
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         default = self.default.to_python(loop_depth)
         return PythonScript(
             {},

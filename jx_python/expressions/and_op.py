@@ -16,7 +16,7 @@ from mo_json import JX_BOOLEAN
 
 
 class AndOp(AndOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         if not self.terms:
             return PythonScript({}, loop_depth, JX_BOOLEAN, "True", self, FALSE)
         else:

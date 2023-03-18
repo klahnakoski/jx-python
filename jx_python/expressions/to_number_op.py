@@ -17,7 +17,7 @@ from jx_base.expressions.true_op import TRUE
 
 
 class ToNumberOp(NumberOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         term = self.term
         exists = self.term.exists()
         value = self.term.to_python(loop_depth)

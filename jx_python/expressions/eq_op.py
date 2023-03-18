@@ -17,7 +17,7 @@ from mo_json import JX_BOOLEAN
 
 
 class EqOp(EqOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         lhs = self.lhs.to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)
         return PythonScript(

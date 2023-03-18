@@ -14,7 +14,7 @@ from jx_base.expressions.python_script import PythonScript
 
 
 class CaseOp(CaseOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         acc = (self.whens[-1]).to_python(loop_depth)
         for w in reversed(self.whens[0:-1]):
             acc = (

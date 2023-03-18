@@ -14,7 +14,7 @@ from mo_json import JX_ANY
 
 
 class CallOp(CallOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         func = self.func.to_python(loop_depth)
         if self.args:
             arg_source, arg_locals = zip(

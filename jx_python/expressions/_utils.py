@@ -73,11 +73,11 @@ class JXExpression(object):
 
 
 @extend(NullOp)
-def to_python(self, loop_depth):
+def to_python(self, loop_depth=0):
     return PythonScript({}, loop_depth, JX_IS_NULL, "None", NullOp, TrueOp)
 
 
-def _inequality_to_python(self, loop_depth):
+def _inequality_to_python(self, loop_depth=0):
     op, identity = _python_operators[self.op]
     lhs = ToNumberOp(self.lhs).partial_eval(Python).to_python(loop_depth)
     rhs = ToNumberOp(self.rhs).partial_eval(Python).to_python(loop_depth)

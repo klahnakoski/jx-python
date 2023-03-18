@@ -15,7 +15,7 @@ from mo_json import JX_ANY
 
 
 class Variable(Variable_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         if self.var not in ["row", "rownum", "rows"]:
             logger.error("not expected")
         return PythonScript({}, loop_depth, JX_ANY, f"{self.var}{loop_depth}", self)

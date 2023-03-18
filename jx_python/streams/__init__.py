@@ -73,19 +73,19 @@ class Stream:
 
     def distinct(self):
         return Stream(
-            distinct(self), ExpressionFactory(Variable("."), self.factory.typer),
+            distinct(self), ExpressionFactory(Variable(".")),
         )
 
     def reverse(self):
         return Stream(
             list(reversed(list(self))),
-            ExpressionFactory(Variable("."), self.factory.typer),
+            ExpressionFactory(Variable(".")),
         )
 
     def sort(self):
         return Stream(
             list(sort_using_cmp(self, value_compare)),
-            ExpressionFactory(Variable("."), self.factory.typer),
+            ExpressionFactory(Variable(".")),
         )
 
     def limit(self, num):

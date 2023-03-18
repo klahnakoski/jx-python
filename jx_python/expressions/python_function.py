@@ -27,7 +27,7 @@ class PythonFunction(PythonFunction_):
         self._data_type = type
         self._name = f"boxed_function{randoms.string(8)}"
 
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         return PythonScript(
             {self._name: self.func},
             loop_depth,

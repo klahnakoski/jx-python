@@ -20,7 +20,7 @@ from jx_python.expressions.to_integer_op import ToIntegerOp
 
 
 class RowsOp(RowsOp_):
-    def to_python(self, loop_depth):
+    def to_python(self, loop_depth=0):
         agg = "rows[rownum+" + (ToIntegerOp(self.offset)).to_python(loop_depth) + "]"
         path = split_field(json2value(self.var.json))
         if not path:
