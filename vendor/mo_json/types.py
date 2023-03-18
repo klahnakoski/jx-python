@@ -12,10 +12,9 @@ from decimal import Decimal
 from math import isnan
 
 from mo_dots import split_field, NullType, is_many, is_data, concat_field, is_sequence
+from mo_future import text, none_type, items, first, POS_INF
 from mo_logs import Log
 from mo_times import Date
-
-from mo_future import text, none_type, items, first, POS_INF
 
 
 def to_jx_type(value):
@@ -112,12 +111,18 @@ class JxType(object):
                 return False
         return True
 
+    def __ne__(self, other):
+        if self is JX_ANY and other is ARRAY:
+            return False
+        return not self == other
+
     def __eq__(self, other):
+        if other is ARRAY and hasattr(self, _A):
+            # SHALLOW CHECK IF THIS IS AN ARRAY
+            return True
+
         if not isinstance(other, JxType):
             return False
-
-        if self is JX_ARRAY and hasattr(other, _A) or other is JX_ARRAY and hasattr(self, _A):
-            return True
 
         if self is JX_INTEGER or self is JX_NUMBER:
             if other is JX_INTEGER or other is JX_NUMBER:
@@ -173,6 +178,16 @@ class JxType(object):
 
 def array_of(type_):
     return JxType(**{_A: type_})
+
+
+def member_type(type_):
+    """
+    RETURN THE MEMBER TYPE, IF AN ARRAY
+    """
+    if type_ == ARRAY:
+        return getattr(type_, _A)
+    else:
+        return type_
 
 
 def base_type(type_):

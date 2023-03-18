@@ -11,11 +11,12 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.null_op import NULL
+from mo_json import ARRAY
 
 
 class ToArrayOp(Expression):
     def __init__(self, *term):
-        Expression.__init__(self, [term])
+        Expression.__init__(self, *term)
         self.term = term
 
     def __data__(self):
@@ -33,6 +34,6 @@ class ToArrayOp(Expression):
     def partial_eval(self, lang):
         if self.term.missing():
             return NULL
-        if self.term.type == JX_ARRAY:
+        if self.term.type == ARRAY:
             return self.term.partial_eval(lang)
         return ToArrayOp(self.term.partial_eval(lang))

@@ -10,7 +10,7 @@ from jx_base.expressions import (
     AndOp,
     OrOp,
     NeOp,
-    CallOp,
+    CallOp, LastOp, FirstOp,
 )
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
@@ -30,6 +30,12 @@ class ExpressionFactory:
 
     def build(self):
         return compile_expression(self.expr.partial_eval(Python).to_python(0))
+
+    def first(self):
+        return ExpressionFactory(FirstOp(self.expr))
+
+    def last(self):
+        return ExpressionFactory(LastOp(self.expr))
 
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))

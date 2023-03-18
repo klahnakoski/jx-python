@@ -13,7 +13,7 @@ from jx_base.expressions import GetOp as GetOp_
 from jx_base.utils import enlist, delist
 from jx_base.expressions.python_script import PythonScript
 from jx_python.utils import merge_locals
-from mo_json import JX_ANY
+from mo_json import JX_ANY, ARRAY, array_of, is_many
 
 
 class GetOp(GetOp_):
@@ -27,30 +27,44 @@ class GetOp(GetOp_):
         )
         offsets = ", ".join(offsets)
         var = self.var.to_python(loop_depth)
+        if var.type == ARRAY:
+            var_type = array_of(JX_ANY)
+        else:
+            var_type = JX_ANY
+
         return PythonScript(
             merge_locals(locals, var.locals, get_attr=get_attr),
             loop_depth,
-            JX_ANY,
+            var_type,
             f"get_attr({var.source}, {offsets})",
             self,
         )
 
 
+def unit(x):
+    return x
+
+
 def get_attr(value, *items):
+    undo = delist
+    if is_many(value):
+        undo = unit
+
     values = enlist(value)
     for item in items:
         result = []
         for v in values:
             try:
-                result.extend(enlist(getattr(v, item)))
-                continue
+                child = getattr(v, item)
             except:
-                pass
+                try:
+                    child = v[item]
+                except:
+                    continue
 
-            try:
-                result.extend(enlist(v[item]))
-            except:
-                pass
+            result.extend(enlist(child))
 
         values = result
-    return delist(values)
+    return undo(values)
+
+

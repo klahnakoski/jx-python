@@ -7,13 +7,21 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_future import first
 
 from jx_base.expressions import FirstOp as FirstOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_python.utils import merge_locals
+from mo_json import member_type
 
 
 class FirstOp(FirstOp_):
     def to_python(self, loop_depth=0):
         value = self.term.to_python(loop_depth)
-        return PythonScript({}, loop_depth, "enlist(" + value + ")[0]")
+        return PythonScript(
+            merge_locals(value.locals, first=first),
+            loop_depth,
+            member_type(value.type),
+            f"first({value.source})",
+            self,
+        )

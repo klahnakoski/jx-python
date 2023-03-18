@@ -15,6 +15,7 @@ from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist, enlist
+from jx_python.expressions.get_op import get_attr
 from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct, group
@@ -117,6 +118,13 @@ class Stream:
     ###########################################################################
 
     def to_list(self):
+        row0 = self.values
+        result = [
+            get_attr(row1, 'props', 'a')
+            for rows1 in [get_attr(enlist(row0), 'value')]
+            for rownum1, row1 in enumerate(rows1)
+        ]
+
         func = self.factory.build()
         return func(self.values)
 
@@ -128,19 +136,12 @@ class Stream:
         return sum(v for v in self if exists(v))
 
     def first(self):
-        func = self.factory.build()
-        for v in self.values:
-            return func(v, 0, self.values)
-        return None
+        func = self.factory.first().build()
+        return func(self.values)
 
     def last(self):
-        func = self.factory.build()
-        values = (
-            self.values if isinstance(self.values, (tuple, list)) else list(self.values)
-        )
-        if self.values:
-            return func(values[-1], len(values) - 1, values)
-        return None
+        func = self.factory.last().build()
+        return func(self.values)
 
 
 def stream(values):

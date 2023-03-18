@@ -15,6 +15,9 @@ from mo_json import JX_ANY
 
 
 class GetOp(Expression):
+    """
+    REPRESENT ATTRIBUTE ACCESS, FLATTENING THE RESULT
+    """
     has_simple_form = True
 
     def __init__(self, var, *offsets):

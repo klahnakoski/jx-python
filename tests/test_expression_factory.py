@@ -35,6 +35,16 @@ class TestExpressionFactory(TestCase):
         value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
         # attribute access will flatten
         result = stream(value).value.props.map(it.a).to_list()
+        self.assertEqual(result, [1, 2, 3])
+
+    def test_deep_iteration3(self):
+        class Something:
+            def __init__(self, value):
+                self.value = value
+
+        value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        # attribute access will flatten
+        result = stream(value).value.map(it.props.a).to_list()
         self.assertEqual(result, [[1, 2, 3]])
 
     def test_iterator(self):
@@ -112,6 +122,10 @@ class TestExpressionFactory(TestCase):
     def test_first(self):
         result = stream([1, 2, 3]).first()
         self.assertEqual(result, 1)
+
+    def test_last(self):
+        result = stream([1, 2, 3]).last()
+        self.assertEqual(result, 3)
 
     def test_map_it(self):
         class SomeClass:
