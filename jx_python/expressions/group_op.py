@@ -7,28 +7,37 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+import itertools
 
-from jx_base.expressions import GroupOp as GroupOp_, Variable
-from jx_python.expressions import Python
+from jx_base.expressions import GroupOp as GroupOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_base.utils import enlist
+from jx_python import stream
+from jx_python.expressions import Python
+from jx_python.utils import merge_locals
+from mo_json.types import _A, JxType, array_of
 
 
 class GroupOp(GroupOp_):
     def to_python(self, loop_depth=0):
-        r = Variable("r")
-        r.simplified = True
-        rn = Variable("rn")
-        rn.simplified = True
-        rs = Variable("rs")
-        rs.simplified = True
-
-        func = (
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
+        loop_depth = frum.loop_depth
+        group = (
             self
-            .select
+            .group
             .partial_eval(Python)
-            .map(dict(row=f"row{loop_depth}", rownum=f"rownum{loop_depth}", rows=f"rows{loop_depth}",))
             .to_python(loop_depth)
         )
-        frum = self.frum.partial_eval(Python).to_python(loop_depth)
 
-        return PythonScript({}, loop_depth, f"[r for rs in [enlist({frum})] for rn, r in enumerate(rs) if ({func})]",)
+        return PythonScript(
+            merge_locals(frum.locals, group.locals, stream=stream, enlist=enlist),
+            loop_depth,
+            array_of(frum.type) | JxType(group=group.type),
+            f"""[{group.source} for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]""",
+            self
+        )
+
+
+def group(values, func):
+    for g, rows in itertools.groupby(sorted(values, key=func), func):
+        yield {_A: stream(rows), "group": g}

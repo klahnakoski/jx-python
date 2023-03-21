@@ -12,14 +12,7 @@
 from copy import copy
 
 import mo_math
-from jx_base.models.dimensions import Dimension
-from jx_base.domains import Domain, DefaultDomain
-from jx_base.expressions import QueryOp, get_all_vars
-from jx_base.expressions import Variable
-from jx_base.language import is_op
-from jx_python.containers import Container
-from jx_python.expressions import TRUE
-from jx_python.namespace import Namespace, convert_list
+from jx_base.namespace import Namespace
 from mo_dots import (
     Data,
     FlatList,
@@ -27,12 +20,19 @@ from mo_dots import (
     coalesce,
     is_data,
     is_list,
-    listwrap,
     to_data,
     dict_to_data,
 )
 from mo_future import is_text
 from mo_logs import Log
+
+from jx_base.domains import Domain, DefaultDomain
+from jx_base.expressions import QueryOp, TRUE
+from jx_base.expressions import Variable
+from jx_base.language import is_op
+from jx_base.models.dimensions import Dimension
+from jx_base.models.namespace import convert_list
+from jx_base.utils import enlist
 
 DEFAULT_LIMIT = 10
 
@@ -159,7 +159,7 @@ class Normal(Namespace):
 
     def _convert_group(self, column):
         if is_text(column):
-            return dict_to_data({"name": column, "value": column, "domain": {"type": "default"},})
+            return dict_to_data({"name": column, "value": column, "domain": {"type": "default"}})
         else:
             column = to_data(column)
             if (column.domain and column.domain.type != "default") or column.allowNulls != None:

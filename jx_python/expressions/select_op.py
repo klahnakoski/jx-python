@@ -16,7 +16,7 @@ from jx_base.expressions.select_op import SelectOne
 from jx_base.utils import enlist, delist
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_json import array_of, ARRAY
+from mo_json import array_of
 
 
 class SelectOp(SelectOp_):

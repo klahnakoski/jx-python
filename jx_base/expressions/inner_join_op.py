@@ -9,16 +9,17 @@
 #
 
 
+from mo_dots import startswith_field
+from mo_logs import Log
+from mo_math import UNION
+
 from jx_base.expressions._utils import TRUE
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
 from jx_base.language import is_op
-from mo_dots import startswith_field
 from mo_json.types import JX_BOOLEAN
-from mo_logs import Log
-from mo_math import UNION
 
 
 class InnerJoinOp(Expression):
@@ -44,7 +45,7 @@ class InnerJoinOp(Expression):
             last = path
 
     def __data__(self):
-        return {"innerjoin": {"from": self.frum.__data__(), "nests": [n.__data__() for n in self.nests],}}
+        return {"innerjoin": {"from": self.frum.__data__(), "nests": [n.__data__() for n in self.nests]}}
 
     def __eq__(self, other):
         return is_op(other, InnerJoinOp) and self.frum == other.frum and self.nests == other.nests

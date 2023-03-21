@@ -57,7 +57,7 @@ class Container(object):
                 )
 
             settings = set_default(
-                {"index": join_field(split_field(frum)[:1:]), "name": frum,}, config.default.settings,
+                {"index": join_field(split_field(frum)[:1:]), "name": frum}, config.default.settings,
             )
             settings.type = None  # WE DO NOT WANT TO INFLUENCE THE TYPE BECAUSE NONE IS IN THE frum STRING ANYWAY
             return type2container["elasticsearch"](settings)

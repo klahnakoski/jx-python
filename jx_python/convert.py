@@ -9,12 +9,12 @@
 #
 
 
-from mo_dots import unwraplist, dict_to_data
+from mo_dots import dict_to_data
 from mo_future import text
+from mo_logs.strings import expand_template
 
 from jx_base.utils import delist
 from mo_json import value2json
-from mo_logs.strings import expand_template
 
 
 def list2cube(rows, column_names=None):
@@ -29,7 +29,7 @@ def list2cube(rows, column_names=None):
     data = {k: [] for k in keys}
     output = dict_to_data({
         "meta": {"format": "cube"},
-        "edges": [{"name": "rownum", "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},}],
+        "edges": [{"name": "rownum", "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1}}],
         "data": data,
     })
 

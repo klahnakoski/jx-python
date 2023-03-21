@@ -7,9 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
-from mo_dots import listwrap
+from jx_base.utils import enlist
 
 
 class Record(object):

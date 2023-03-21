@@ -10,10 +10,6 @@
 
 
 import mo_dots as dot
-from jx_base.models.container import Container
-from jx_base.expressions.query_op import _normalize_edge
-from jx_python.cubes.aggs import cube_aggs
-from jx_python.lists.aggs import is_aggs
 from mo_collections.matrix import Matrix
 from mo_dots import (
     Data,
@@ -21,7 +17,6 @@ from mo_dots import (
     Null,
     is_data,
     is_list,
-    listwrap,
     leaves_to_data,
     to_data,
     list_to_data,
@@ -31,6 +26,12 @@ from mo_future import is_text, transpose, first
 from mo_imports import export
 from mo_logs import Log
 from mo_math import MAX, OR
+
+from jx_base.expressions.query_op import _normalize_edge
+from jx_base.models.container import Container
+from jx_base.utils import enlist
+from jx_python.cubes.aggs import cube_aggs
+from jx_python.lists.aggs import is_aggs
 
 
 class Cube(Container):
@@ -69,7 +70,7 @@ class Cube(Container):
                 # EXPECTING NO MORE THAN ONE rownum EDGE IN THE DATA
                 length = MAX([len(v) for v in data.values()])
                 if length >= 1:
-                    self.edges = list_to_data([{"name": "rownum", "domain": {"type": "rownum"},}])
+                    self.edges = list_to_data([{"name": "rownum", "domain": {"type": "rownum"}}])
                 else:
                     self.edges = Null
             elif is_list(data):
@@ -79,7 +80,7 @@ class Cube(Container):
                 data = {select.name: Matrix.wrap(data)}
                 self.edges = list_to_data([{
                     "name": "rownum",
-                    "domain": {"type": "rownum", "min": 0, "max": len(data), "interval": 1,},
+                    "domain": {"type": "rownum", "min": 0, "max": len(data), "interval": 1},
                 }])
             elif isinstance(data, Matrix):
                 if is_list(select):

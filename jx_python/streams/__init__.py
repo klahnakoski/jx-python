@@ -14,8 +14,7 @@ from mo_imports import export
 from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
-from jx_base.utils import delist, enlist
-from jx_python.expressions.get_op import get_attr
+from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct, group
@@ -41,8 +40,6 @@ class Stream:
     def __getattr__(self, item):
         if item in Stream.__slots__:
             return None
-
-        print(item)
         accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
         fact = factory(accessor)
         return Stream(self.values, fact)
@@ -87,32 +84,21 @@ class Stream:
         return Stream(list(limit()), ExpressionFactory(Variable(".")),)
 
     def group(self, expr):
-        fact = factory(expr)
-        func = fact.build()
-        sub_factory = ExpressionFactory(Variable("."))
-        this = self
+        func = factory(expr).build()
 
-        def nested():
+        def nested(this):
             for g, rows in group(this, func):
                 yield {
-                    _A: Stream(list(rows), sub_factory),
+                    _A: stream(rows),
                     "group": g,
                 }
 
-        return Stream(list(nested()), ExpressionFactory(Variable(".")))
+        return stream(nested(self))
 
     ###########################################################################
     # TERMINATORS
     ###########################################################################
-
     def to_list(self):
-        row0 = self.values
-        result = [
-            get_attr(row1, "props", "a")
-            for rows1 in [get_attr(enlist(row0), "value")]
-            for rownum1, row1 in enumerate(rows1)
-        ]
-
         func = self.factory.build()
         return func(self.values)
 

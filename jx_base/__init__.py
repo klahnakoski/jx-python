@@ -38,18 +38,6 @@ ENABLE_CONSTRAINTS = True
 
 
 def generateGuid():
-    """
-    Gets a random GUID.
-    Note: python's UUID generation library is used here.
-    Basically UUID is the same as GUID when represented as a string.
-    :Returns:
-        str, the generated random GUID.
-
-    a=GenerateGuid()
-    import uuid
-    print(a)
-    print(uuid.UUID(a).hex)
-    """
     return text(uuid4())
 
 
@@ -228,7 +216,7 @@ class {{class_name}}(Mapping):
             "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
             "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
             .partial_eval(Python)
-            .to_python(loop_depth),
+            .to_python(),
             "constraint": value2json(constraint),
         },
     )

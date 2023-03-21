@@ -18,24 +18,24 @@ class GroupOp(Expression):
     return a series of {"group": group, "part": list_of_rows_for_group}
     """
 
-    def __init__(self, frum, select):
-        Expression.__init__(self, frum, select)
-        self.frum, self.select = frum, select
+    def __init__(self, frum, group):
+        Expression.__init__(self, frum, group)
+        self.frum, self.select = frum, group
         if self.frum.type != JX_ARRAY:
             Log.error("expecting an array")
 
     def __data__(self):
-        return {"group": [self.frum.__data(), self.select.__data__()]}
+        return {"group": [self.frum.__data(), self.group.__data__()]}
 
     def vars(self):
-        return self.frum.vars() | self.select.vars()
+        return self.frum.vars() | self.group.vars()
 
     def map(self, map_):
-        return GroupOp(self.frum.map(map_), self.select.map(map_))
+        return GroupOp(self.frum.map(map_), self.group.map(map_))
 
     @property
     def type(self):
-        return array_of(self.frum.type) | JxType(group=self.select.type)
+        return array_of(self.frum.type) | JxType(group=self.group.type)
 
     def missing(self, lang):
         return MissingOp(self)

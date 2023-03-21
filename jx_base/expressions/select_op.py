@@ -171,7 +171,7 @@ class SelectOp(Expression):
 def normalize_one(frum, select):
     if is_text(select):
         if select == "*":
-            return SelectOp(self.frum, *({"name": ".", "value": LeavesOp(Variable(".")), "aggregate": NULL,}))
+            return SelectOp(self.frum, *({"name": ".", "value": LeavesOp(Variable(".")), "aggregate": NULL}))
         select = Data(value=select)
     else:
         select = to_data(select)
