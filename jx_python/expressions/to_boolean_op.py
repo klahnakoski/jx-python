@@ -9,10 +9,12 @@
 #
 
 
-from jx_base.expressions import ToBooleanOp as ToBooleanOp_
-from jx_python.expressions._utils import with_var, PythonScript
+from jx_base.expressions import ToBooleanOp as ToBooleanOp_, FALSE, PythonScript
+from jx_python.expressions._utils import with_var
+from mo_json import JX_BOOLEAN
 
 
 class ToBooleanOp(ToBooleanOp_):
     def to_python(self, loop_depth=0):
-        return PythonScript({}, loop_depth, with_var("f", self.term.to_python(loop_depth), "bool(f)"), self)
+        term =self.term.to_python(loop_depth)
+        return PythonScript(term.locals, loop_depth, JX_BOOLEAN, with_var("f", term.source, "bool(f)"), self, FALSE)

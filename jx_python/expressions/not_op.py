@@ -9,12 +9,11 @@
 #
 
 
-from jx_base.expressions import NotOp as NotOp_
-from jx_base.expressions.python_script import PythonScript
-from jx_python.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions import NotOp as NotOp_, PythonScript, ToBooleanOp, FALSE
+from mo_json import JX_BOOLEAN
 
 
 class NotOp(NotOp_):
     def to_python(self, loop_depth=0):
         term = ToBooleanOp(self.term).to_python(loop_depth)
-        return PythonScript(term.locals, loop_depth, "not (" + term.source + ")")
+        return PythonScript(term.locals, loop_depth, JX_BOOLEAN, "not (" + term.source + ")", FALSE)

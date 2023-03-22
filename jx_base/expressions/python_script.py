@@ -40,3 +40,6 @@ class PythonScript(Expression):
 
     def map(self, map_):
         return self
+
+    def __str__(self):
+        return self.source

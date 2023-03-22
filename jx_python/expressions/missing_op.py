@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import MissingOp as MissingOp_
-from jx_base.expressions.python_script import PythonScript
+from jx_base.expressions import MissingOp as MissingOp_, PythonScript, FALSE
+from mo_json import JX_BOOLEAN
 
 
 class MissingOp(MissingOp_):
     def to_python(self, loop_depth=0):
         expr = self.expr.to_python(loop_depth)
-        return PythonScript(expr.locals, loop_depth, expr.source + " == None")
+        return PythonScript(expr.locals, loop_depth, JX_BOOLEAN, expr.source + " == None", self, FALSE)

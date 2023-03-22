@@ -11,6 +11,7 @@ from mo_imports import export
 
 from jx_base.expressions import WhenOp as WhenOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_python.utils import merge_locals
 
 
 class WhenOp(WhenOp_):
@@ -19,9 +20,11 @@ class WhenOp(WhenOp_):
         then = self.then.to_python(loop_depth)
         els_ = self.els_.to_python(loop_depth)
         return PythonScript(
-            {**when.locals, **then.locals, **els_.locals},
+            merge_locals(when.locals, then.locals, els_.locals),
             loop_depth,
-            ("(" + then.source + ") if (" + when.source + ") else (" + els_.source + ")"),
+            then.type| els_.type,
+            f"({then.source}) if ({when.source}) else ({els_.source})",
+            self
         )
 
 

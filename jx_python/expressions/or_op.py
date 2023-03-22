@@ -9,15 +9,17 @@
 #
 from mo_imports import export
 
-from jx_base.expressions import OrOp as OrOp_
-from jx_base.expressions.python_script import PythonScript
-from jx_python.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions import OrOp as OrOp_, FALSE, PythonScript, ToBooleanOp
+from jx_python.utils import merge_locals
+from mo_json import JX_BOOLEAN
 
 
 class OrOp(OrOp_):
     def to_python(self, loop_depth=0):
+        locals, sources = zip(*((p.locals, p.source) for t in self.terms for p in [ToBooleanOp(t).to_python(loop_depth)]))
         return PythonScript(
-            {}, loop_depth, " or ".join("(" + ToBooleanOp(t).to_python(loop_depth) + ")" for t in self.terms),
+            merge_locals(*locals), loop_depth, JX_BOOLEAN, " or ".join(f"({source})" for source in sources), self,
+            FALSE,
         )
 
 

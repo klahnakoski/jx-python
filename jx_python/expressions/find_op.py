@@ -18,6 +18,7 @@ from jx_python.expressions.eq_op import EqOp
 from jx_python.expressions.literal import Literal
 from jx_python.expressions.or_op import OrOp
 from jx_python.expressions.when_op import WhenOp
+from mo_json import JX_INTEGER
 
 
 class FindOp(FindOp_):
@@ -43,12 +44,16 @@ class FindOp(FindOp_):
         return output
 
     def to_python(self, loop_depth=0):
+        value = self.value.to_python(loop_depth)
+        find = self.find.to_python(loop_depth)
         return PythonScript(
             {},
             loop_depth,
+            JX_INTEGER,
             with_var(
                 "f",
-                "(" + (self.value).to_python(loop_depth) + ").find" + "(" + (self.find).to_python(loop_depth) + ")",
+                f"({value.source}).find{find})",
                 "None if f==-1 else f",
             ),
+            self,
         )

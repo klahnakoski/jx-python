@@ -216,7 +216,8 @@ class {{class_name}}(Mapping):
             "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
             "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
             .partial_eval(Python)
-            .to_python(),
+            .to_python()
+            .source,
             "constraint": value2json(constraint),
         },
     )
