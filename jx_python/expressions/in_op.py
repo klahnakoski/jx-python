@@ -20,5 +20,9 @@ class InOp(InOp_):
         value = self.value.to_python(loop_depth)
         superset = self.superset.to_python(loop_depth)
         return PythonScript(
-            merge_locals(value.locals, superset.locals), loop_depth, JX_BOOLEAN, f"{value.source} in {superset.source}", self
+            merge_locals(value.locals, superset.locals),
+            loop_depth,
+            JX_BOOLEAN,
+            f"{value.source} in {superset.source}",
+            self,
         )

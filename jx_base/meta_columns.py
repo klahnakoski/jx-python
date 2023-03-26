@@ -54,7 +54,7 @@ strings
 
 TableDesc = DataClass(
     "Table",
-    ["name", {"name": "url", "nulls": true}, "query_path", {"name": "last_updated", "nulls": False}, "columns",],
+    ["name", {"name": "url", "nulls": true}, "query_path", {"name": "last_updated", "nulls": False}, "columns"],
     constraint={"and": [{"ne": [{"last": "query_path"}, {"literal": "."}]}]},
 )
 
@@ -91,18 +91,18 @@ Column = DataClass(
         {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
         {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
         {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
-        {"ne": [{"last": "nested_path"}, {"literal": "."},]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
+        {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
         {
             "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
             "then": {"or": [
-                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": "nested"}}, {"eq": {"es_type": "nested"}},]},
-                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": "object"}}, {"eq": {"es_type": "object"}},]},
+                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": "nested"}}, {"eq": {"es_type": "nested"}}]},
+                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": "object"}}, {"eq": {"es_type": "object"}}]},
             ]},
             "else": True,
         },
         {
             "when": {"gte": [{"count": "nested_path"}, 2]},
-            "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."},]},  # SECOND-LAST ELEMENT
+            "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
             "else": True,
         },
     ]},
@@ -231,7 +231,7 @@ try:
                     nested_path=ROOT_PATH,
                     multi=1,
                 )
-                for c in ["name", "es_type", "json_type", "es_column", "es_index", "partitions",]
+                for c in ["name", "es_type", "json_type", "es_column", "es_index", "partitions"]
             ]
             + [
                 Column(

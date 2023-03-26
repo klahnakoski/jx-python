@@ -11,23 +11,24 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 from mo_dots import is_data, is_list, Null
-from mo_future import is_text
+from mo_future import is_text, extend
 from mo_imports import expect
 from mo_logs import strings
 
-from mo_json.types import JX_BOOLEAN, JX_IS_NULL
+from jx_python.utils import merge_locals
+from mo_json.types import JX_BOOLEAN, JX_IS_NULL, JX_NUMBER
 
 from jx_base.expressions import (
     FALSE,
     NULL,
     NullOp,
-    extend,
     jx_expression,
+    PythonScript, TRUE
 )
 from jx_base.language import Language, is_expression, is_op
 
-ToNumberOp, OrOp, PythonScript, ScriptOp, WhenOp, compile_expression = expect(
-    "ToNumberOp", "OrOp", "PythonScript", "ScriptOp", "WhenOp", "compile_expression"
+ToNumberOp, OrOp, ScriptOp, WhenOp, compile_expression = expect(
+    "ToNumberOp", "OrOp", "ScriptOp", "WhenOp", "compile_expression"
 )
 
 
@@ -43,14 +44,14 @@ def jx_expression_to_function(expr):
         if is_op(expr, ScriptOp) and not is_text(expr.script):
             return expr.script
         else:
-            func = compile_expression(expr.to_python(loop_depth))
+            func = compile_expression(expr.to_python())
             return JXExpression(func, expr.__data__())
     if not is_data(expr) and not is_list(expr) and hasattr(expr, "__call__"):
         # THIS APPEARS TO BE A FUNCTION ALREADY
         return expr
 
     expr = jx_expression(expr)
-    func = compile_expression((expr).to_python(loop_depth))
+    func = compile_expression((expr).to_python())
     return JXExpression(func, expr)
 
 
@@ -74,7 +75,7 @@ class JXExpression(object):
 
 @extend(NullOp)
 def to_python(self, loop_depth=0):
-    return PythonScript({}, loop_depth, JX_IS_NULL, "None", NullOp, TrueOp)
+    return PythonScript({}, loop_depth, JX_IS_NULL, "None", NullOp, TRUE)
 
 
 def _inequality_to_python(self, loop_depth=0):
@@ -88,29 +89,25 @@ def _inequality_to_python(self, loop_depth=0):
             OrOp(self.lhs.missing(Python), self.rhs.missing(Python)),
             **{
                 "then": FALSE,
-                "else": PythonScript({**lhs.locals, **rhs.locals}, loop_depth, script, type=JX_BOOLEAN),
+                "else": PythonScript({**lhs.locals, **rhs.locals}, loop_depth, JX_BOOLEAN, script, self),
             },
         )
         .partial_eval(Python)
         .to_python(loop_depth)
-        .source
     )
 
 
-def _binaryop_to_python(self, not_null=False, boolean=False):
+def _binaryop_to_python(self, loop_depth, not_null=False, boolean=False):
     op, identity = _python_operators[self.op]
 
     lhs = ToNumberOp(self.lhs).partial_eval(Python).to_python(loop_depth)
     rhs = ToNumberOp(self.rhs).partial_eval(Python).to_python(loop_depth)
-    script = "(" + lhs + ") " + op + " (" + rhs + ")"
-    missing = OrOp(self.lhs.missing(Python), self.rhs.missing(Python),).partial_eval(Python)
-    if missing is FALSE:
-        return script
-    else:
-        return "(None) if (" + missing.to_python(loop_depth) + ") else (" + script + ")"
+    script = f"({lhs.source}){op}({rhs.source})"
+    missing = OrOp(lhs.missing(Python), rhs.missing(Python)).partial_eval(Python)
+    return PythonScript(merge_locals(lhs.locals, rhs.locals), loop_depth, JX_NUMBER, script, self, missing)
 
 
-def multiop_to_python(self):
+def multiop_to_python(self, loop_depth):
     sign, zero = _python_operators[self.op]
     if len(self.terms) == 0:
         return (self.default).to_python(loop_depth)

@@ -41,12 +41,12 @@ def generateGuid():
     return text(uuid4())
 
 
-def _exec(code, name):
+def _exec(code, name, defines={}):
     try:
+        locals = {}
         globs = globals()
-        fake_locals = {}
-        exec(code, globs, fake_locals)
-        temp = fake_locals[name]
+        exec(code, {**defines, **globs}, locals)
+        temp = locals[name]
         return temp
     except Exception as cause:
         Log.error("Can not make class\n{{code}}", code=code, cause=cause)
@@ -106,7 +106,7 @@ def DataClass(name, columns, constraint=None):
     # nulls = to_data(filter(lambda c: c.nulls, columns)).name
     defaults = {c.name: coalesce(c.default, None) for c in columns}
     types = {c.name: coalesce(c.type, object) for c in columns}
-
+    constraint_expr = jx_expression(not ENABLE_CONSTRAINTS or constraint).partial_eval(Python).to_python()
     code = expand_template(
         """
 import re
@@ -122,12 +122,12 @@ class {{class_name}}(Mapping):
     __slots__ = {{slots}}
 
 
-    def _constraint(row, rownum, rows):
+    def _constraint(row0, rownum0, rows0):
         code = {{constraint_expr|quote}}
         import re
         if {{constraint_expr}}:
             return
-        failure(row, rownum, rows, {{constraint}})
+        failure(row0, rownum0, rows0, {{constraint}})
         Log.error(
             "constraint\\n{" + "{code}}\\nnot satisfied {" + "{expect}}\\n{" + "{value|indent}}",
             code={{constraint_expr|quote}},
@@ -214,14 +214,12 @@ class {{class_name}}(Mapping):
             "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
             "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
             "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
-            "constraint_expr": jx_expression(not ENABLE_CONSTRAINTS or constraint)
-            .partial_eval(Python)
-            .to_python()
-            .source,
+            "constraint_expr": constraint_expr.source,
             "constraint": value2json(constraint),
         },
     )
 
-    output = _exec(code, name)
+    output = _exec(code, name, constraint_expr.locals)
     register_data(output)
     return output
+

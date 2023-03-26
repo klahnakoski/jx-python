@@ -21,7 +21,7 @@ NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 class AndOp(Expression):
     _data_type = JX_BOOLEAN
-    default = TRUE  # ADD THIS TO terms FOR NO EEFECT
+    default = TRUE  # ADD THIS TO terms FOR NO EFFECT
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

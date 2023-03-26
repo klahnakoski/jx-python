@@ -1,5 +1,4 @@
 from jx_base.expressions._utils import (
-    extend,
     jx_expression,
     merge_types,
     operators,

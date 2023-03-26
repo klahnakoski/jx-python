@@ -10,29 +10,23 @@
 from mo_imports import export
 
 from jx_base.expressions.python_script import PythonScript
-from mo_json.types import JX_NUMBER_TYPES, JX_NUMBER
-
 from jx_base.expressions.to_number_op import ToNumberOp as NumberOp_
-from jx_base.expressions.true_op import TRUE
+from mo_json.types import JX_NUMBER
 
 
 class ToNumberOp(NumberOp_):
     def to_python(self, loop_depth=0):
-        term = self.term
         exists = self.term.exists()
         value = self.term.to_python(loop_depth)
 
-        if exists is TRUE:
-            if term.type in JX_NUMBER_TYPES:
-                return value
-            return PythonScript({**value.locals}, loop_depth, JX_NUMBER, "float(" + value.source + ")")
-        else:
-            return PythonScript(
-                {**value.locals},
-                loop_depth,
-                JX_NUMBER,
-                "float(" + value + ") if (" + exists.to_python(loop_depth).source + ")",
-            )
+        return PythonScript(
+            value.locals,
+            loop_depth,
+            JX_NUMBER,
+            f"float({value.source})",
+            self,
+            exists
+        )
 
 
 export("jx_python.expressions._utils", ToNumberOp)

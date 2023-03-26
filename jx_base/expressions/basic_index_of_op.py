@@ -33,7 +33,7 @@ class BasicIndexOfOp(Expression):
         self.start = start
 
     def __data__(self):
-        return {"basic.indexOf": [self.value.__data__(), self.find.__data__(), self.start.__data__(),]}
+        return {"basic.indexOf": [self.value.__data__(), self.find.__data__(), self.start.__data__()]}
 
     def vars(self):
         return self.value.vars() | self.find.vars() | self.start.vars()

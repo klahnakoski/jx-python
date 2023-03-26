@@ -16,9 +16,15 @@ from mo_json import JX_BOOLEAN
 
 class OrOp(OrOp_):
     def to_python(self, loop_depth=0):
-        locals, sources = zip(*((p.locals, p.source) for t in self.terms for p in [ToBooleanOp(t).to_python(loop_depth)]))
+        locals, sources = zip(
+            *((p.locals, p.source) for t in self.terms for p in [ToBooleanOp(t).to_python(loop_depth)])
+        )
         return PythonScript(
-            merge_locals(*locals), loop_depth, JX_BOOLEAN, " or ".join(f"({source})" for source in sources), self,
+            merge_locals(*locals),
+            loop_depth,
+            JX_BOOLEAN,
+            " or ".join(f"({source})" for source in sources),
+            self,
             FALSE,
         )
 

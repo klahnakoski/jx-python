@@ -22,19 +22,14 @@ class GroupOp(GroupOp_):
     def to_python(self, loop_depth=0):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth
-        group = (
-            self
-            .group
-            .partial_eval(Python)
-            .to_python(loop_depth)
-        )
+        group = self.group.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
             merge_locals(frum.locals, group.locals, stream=stream, enlist=enlist),
             loop_depth,
             array_of(frum.type) | JxType(group=group.type),
             f"""[{group.source} for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]""",
-            self
+            self,
         )
 
 

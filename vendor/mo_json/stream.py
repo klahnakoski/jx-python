@@ -251,7 +251,7 @@ class Parser(object):
             while True:
                 c = self.json[index]
                 index += 1
-                if c in b",]}":
+                if c in b"]}":
                     break
             return index - 1
 
@@ -308,7 +308,7 @@ class Parser(object):
             self.json.mark(index - 1)
             while True:
                 c = self.json[index]
-                if c in b",]}":
+                if c in b"]}":
                     break
                 index += 1
             text = self.json.release(index)

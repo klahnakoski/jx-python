@@ -26,7 +26,7 @@ class BasicSubstringOp(Expression):
         self.value, self.start, self.end = terms
 
     def __data__(self):
-        return {"basic.substring": [self.value.__data__(), self.start.__data__(), self.end.__data__(),]}
+        return {"basic.substring": [self.value.__data__(), self.start.__data__(), self.end.__data__()]}
 
     def map(self, map_):
         return BasicSubstringOp(self.value.map(map_), self.start.map(map_), self.end.map(map_),)

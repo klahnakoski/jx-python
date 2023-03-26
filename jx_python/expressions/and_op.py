@@ -22,6 +22,4 @@ class AndOp(AndOp_):
         sources, locals = zip(
             *((c.source, c.locals) for t in self.terms for c in [ToBooleanOp(t).to_python(loop_depth)])
         )
-        return PythonScript(
-            merge_locals(*locals), loop_depth, JX_BOOLEAN, " and ".join(sources), self, FALSE,
-        )
+        return PythonScript(merge_locals(*locals), loop_depth, JX_BOOLEAN, " and ".join(sources), self, FALSE,)

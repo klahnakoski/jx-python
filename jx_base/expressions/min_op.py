@@ -60,7 +60,7 @@ class MinOp(Expression):
             if is_op(simple, NullOp):
                 pass
             elif is_literal(simple):
-                minimum = MIN([minimum, simple.value])
+                minimum = MIN(minimum, simple.value)
             else:
                 terms.append(simple)
         if len(terms) == 0:
@@ -70,8 +70,8 @@ class MinOp(Expression):
                 return Literal(minimum)
         else:
             if minimum == None:
-                output = MinOp(terms)
+                output = MinOp(*terms)
             else:
-                output = MinOp([Literal(minimum)] + terms)
+                output = MinOp(Literal(minimum), *terms)
 
         return output

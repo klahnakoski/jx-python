@@ -18,6 +18,7 @@ from jx_python.expressions.eq_op import EqOp
 from jx_python.expressions.literal import Literal
 from jx_python.expressions.or_op import OrOp
 from jx_python.expressions.when_op import WhenOp
+from jx_python.utils import merge_locals
 from mo_json import JX_INTEGER
 
 
@@ -28,7 +29,7 @@ class FindOp(FindOp_):
         output = WhenOp(
             OrOp(self.value.missing(Python), self.find.missing(Python), BasicEqOp(index, Literal(-1)),),
             then=self.default,
-            **{"else": index}
+            **{"else": index},
         ).partial_eval(lang)
         return output
 
@@ -47,13 +48,9 @@ class FindOp(FindOp_):
         value = self.value.to_python(loop_depth)
         find = self.find.to_python(loop_depth)
         return PythonScript(
-            {},
+            merge_locals(value.locals, find.locals),
             loop_depth,
             JX_INTEGER,
-            with_var(
-                "f",
-                f"({value.source}).find{find})",
-                "None if f==-1 else f",
-            ),
+            with_var("f", f"({value.source}).find({find.source})", "None if f==-1 else f",),
             self,
         )

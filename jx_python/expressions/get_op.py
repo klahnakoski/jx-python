@@ -20,6 +20,8 @@ class GetOp(GetOp_):
     def to_python(self, loop_depth=0):
         offsets, locals = zip(*((c.source, c.locals) for o in self.offsets for c in [o.to_python(loop_depth)]))
         offsets = ", ".join(offsets)
+        if not offsets.startswith('\''):
+            print("error")
         var = self.var.to_python(loop_depth)
         if var.type == ARRAY:
             var_type = array_of(JX_ANY)

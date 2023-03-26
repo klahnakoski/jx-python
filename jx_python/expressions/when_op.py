@@ -22,7 +22,7 @@ class WhenOp(WhenOp_):
         return PythonScript(
             merge_locals(when.locals, then.locals, els_.locals),
             loop_depth,
-            then.type| els_.type,
+            then.type | els_.type,
             f"({then.source}) if ({when.source}) else ({els_.source})",
             self
         )

@@ -16,5 +16,7 @@ from mo_json import JX_BOOLEAN
 
 class ToBooleanOp(ToBooleanOp_):
     def to_python(self, loop_depth=0):
-        term =self.term.to_python(loop_depth)
+        term = self.term.to_python(loop_depth)
+        if term.type == JX_BOOLEAN:
+            return term
         return PythonScript(term.locals, loop_depth, JX_BOOLEAN, with_var("f", term.source, "bool(f)"), self, FALSE)

@@ -17,11 +17,13 @@ class PythonScript(PythonScript_):
     def __str__(self):
         missing = self.miss.partial_eval(Python)
         if missing is FALSE:
-            return self.partial_eval(Python).to_python(loop_depth).source
+            return self.partial_eval(Python).to_python(self.loop_depth).source
         elif missing is TRUE:
             return "None"
 
-        return "None if (" + missing.to_python(loop_depth).source + ") else (" + self.source + ")"
+        missing = missing.to_python(self.loop_depth)
+
+        return f"None if {missing.source}) else ({self.source})"
 
     def __add__(self, other):
         return str(self) + str(other)
@@ -51,6 +53,3 @@ class PythonScript(PythonScript_):
             return True
         else:
             return False
-
-
-export("jx_python.expressions._utils", PythonScript)

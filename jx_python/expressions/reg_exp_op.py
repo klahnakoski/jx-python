@@ -9,16 +9,21 @@
 #
 import re
 
-from mo_logs.strings import quote
-
 from jx_base.expressions import RegExpOp as RegExpOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_python.expressions import Python
+from jx_python.utils import merge_locals
+from mo_json import JX_BOOLEAN
 
 
 class RegExpOp(RegExpOp_):
     def to_python(self, loop_depth=0):
+        pattern = self.pattern.partial_eval(Python).to_python(loop_depth)
+        expr = self.expr.partial_eval(Python).to_python(loop_depth)
         return PythonScript(
-            {"re": re},
+            merge_locals(pattern.locals, expr.locals, re=re),
             loop_depth,
-            ("re.match(" + quote(self.pattern.value + "$") + ", " + self.expr.to_python(loop_depth) + ")"),
+            JX_BOOLEAN,
+            f"re.match({pattern.source}, {expr.source})",
+            self
         )

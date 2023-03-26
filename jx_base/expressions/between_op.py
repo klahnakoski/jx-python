@@ -85,9 +85,9 @@ class BetweenOp(Expression):
 
     def __data__(self):
         if is_op(self.value, Variable) and is_literal(self.prefix) and is_literal(self.suffix):
-            output = to_data({"between": {self.value.var: [self.prefix.value, self.suffix.value,]}})
+            output = to_data({"between": {self.value.var: [self.prefix.value, self.suffix.value]}})
         else:
-            output = to_data({"between": [self.value.__data__(), self.prefix.__data__(), self.suffix.__data__(),]})
+            output = to_data({"between": [self.value.__data__(), self.prefix.__data__(), self.suffix.__data__()]})
         if self.start is not NULL:
             output.start = self.start.__data__()
         if self.default is not NULL:

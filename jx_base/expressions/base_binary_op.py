@@ -7,16 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_dots import coalesce
+from mo_imports import expect
 
 from jx_base.expressions._utils import builtin_ops
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.null_op import NULL
+from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal, Literal
+from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
-from mo_imports import expect
 from mo_json.types import JX_NUMBER
-from mo_dots import coalesce
 
 OrOp, Variable = expect("OrOp", "Variable")
 
@@ -64,4 +64,4 @@ class BaseBinaryOp(Expression):
             if lhs is NULL or rhs is NULL:
                 return NULL
             return Literal(builtin_ops[self.op](lhs.value, rhs.value))
-        return self.__class__([lhs, rhs], default=default)
+        return self.__class__(lhs, rhs, default=default)

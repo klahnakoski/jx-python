@@ -20,5 +20,9 @@ class BasicEqOp(BasicEqOp_):
         lhs = self.lhs.to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)
         return PythonScript(
-            merge_locals(lhs.locals, rhs.locals), loop_depth, JX_BOOLEAN, "(" + lhs.source + ") == (" + rhs.source + ")", FALSE
+            merge_locals(lhs.locals, rhs.locals),
+            loop_depth,
+            JX_BOOLEAN,
+            "(" + lhs.source + ") == (" + rhs.source + ")",
+            FALSE,
         )

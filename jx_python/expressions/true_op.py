@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_future import extend
 
 from jx_base.expressions import TrueOp as TrueOp_, FALSE
 from jx_base.expressions.python_script import PythonScript
@@ -16,4 +16,7 @@ from mo_json import JX_BOOLEAN
 
 class TrueOp(TrueOp_):
     def to_python(self, loop_depth=0):
-        return PythonScript({}, loop_depth, loop_depth, JX_BOOLEAN, "True", self, FALSE)
+        return PythonScript({}, loop_depth, JX_BOOLEAN, "True", self, FALSE)
+
+
+extend(TrueOp_)(TrueOp.to_python)
