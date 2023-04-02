@@ -17,7 +17,9 @@ from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_json.types import JxType, array_of
+from mo_json.types import JxType, array_of, _A
+
+ARRAY_KEY = _A
 
 
 class GroupOp(GroupOp_):
@@ -29,7 +31,7 @@ class GroupOp(GroupOp_):
             merge_locals(frum.locals, group.locals, groupby=groupby),
             loop_depth,
             array_of(frum.type) | JxType(group=group.type),
-            f"""list(groupby({frum.source}, {group.source}))""",
+            f"""list(groupby({frum.source}, lambda row{loop_depth}: {group.source}))""",
             self,
         )
 
@@ -39,8 +41,6 @@ def groupby(values, func):
     for g, rows in itertools.groupby(sort_using_cmp(values, cmp=cmp), func):
         row = list(rows)
         if is_data(g):
-            for k, v in g:
-                setattr(row, k, v)
-            yield row
+            yield {ARRAY_KEY: row, **g}
         else:
             yield row

@@ -262,6 +262,7 @@ INTERNAL = (EXISTS, OBJECT, ARRAY)
 STRUCT = (OBJECT, ARRAY)
 
 _B, _I, _N, _T, _D, _S, _A, _J = "~b~", "~i~", "~n~", "~t~", "~d~", "~s~", "~a~", "~j~"
+ARRAY_KEY = _A
 IS_PRIMITIVE_KEY = re.compile(r"^~[bintds]~$")
 
 JX_IS_NULL = _new(JxType)

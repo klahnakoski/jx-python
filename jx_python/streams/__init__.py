@@ -11,7 +11,7 @@ from mo_dots import exists, to_data
 from mo_future import sort_using_cmp
 from mo_imports import export
 
-from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp
+from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp, ToArrayOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
@@ -96,14 +96,8 @@ class Stream:
     # TERMINATORS
     ###########################################################################
     def to_list(self):
-        func = self.factory.build()
-        return func(self.values)
-
-        a = [
-            leaves_to_data({"group": get_attr(row2, "group"), "value": enlist(row2)})
-            for rows2 in [list(groupby(enlist(row0), add_name((to_float(first(enlist(row1)))) % (2.0), "group")))]
-            for rownum2, row2 in enumerate(rows2)
-        ]
+        func = ExpressionFactory(ToArrayOp(self.factory.expr)).build()
+        return func(self.values)[_A]
 
     def to_value(self):
         func = self.factory.build()
@@ -122,7 +116,7 @@ class Stream:
 
 
 def stream(values):
-    return Stream(values, ExpressionFactory(SelectOp(it.expr, (SelectOne(".", Variable(".")),))))
+    return Stream(values, ExpressionFactory(SelectOp(ToArrayOp(it.expr), (SelectOne(".", Variable(".")),))))
 
 
 ANNOTATIONS = {

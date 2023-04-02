@@ -7,8 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division, unicode_literals
-
 import re
 from datetime import date, datetime, timedelta
 from decimal import Decimal

@@ -7,8 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from __future__ import absolute_import, division
-
 from mo_dots import Data, is_data, leaves_to_data
 from mo_future import first
 from mo_imports import export
