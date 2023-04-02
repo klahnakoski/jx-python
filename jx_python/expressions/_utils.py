@@ -18,13 +18,7 @@ from mo_logs import strings
 from jx_python.utils import merge_locals
 from mo_json.types import JX_BOOLEAN, JX_IS_NULL, JX_NUMBER
 
-from jx_base.expressions import (
-    FALSE,
-    NULL,
-    NullOp,
-    jx_expression,
-    PythonScript, TRUE
-)
+from jx_base.expressions import FALSE, NULL, NullOp, jx_expression, PythonScript, TRUE
 from jx_base.language import Language, is_expression, is_op
 
 ToNumberOp, OrOp, ScriptOp, WhenOp, compile_expression = expect(

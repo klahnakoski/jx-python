@@ -9,6 +9,8 @@
 import os
 from unittest import TestCase, skip
 
+from mo_dots import to_data, Data
+
 from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
 from jx_python.streams.typers import ANNOTATIONS
@@ -96,11 +98,8 @@ class TestExpressionFactory(TestCase):
         result = stream(range(10)).limit(10).to_list()
         self.assertEqual(result, list(range(10)))
 
-    @skip
     def test_group1(self):
-        result = (
-            stream([1, 2, 3]).group(lambda v: v % 2).map(lambda v: {"group": v.group, "value": v.to_list()}).to_list()
-        )
+        result = stream([1, 2, 3]).group(it % 2 >> "group").map({"group": it.group, "value": it.to_list()}).to_list()
         self.assertEqual(result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}])
 
     @skip("not supported yet")

@@ -24,7 +24,7 @@ class WhenOp(WhenOp_):
             loop_depth,
             then.type | els_.type,
             f"({then.source}) if ({when.source}) else ({els_.source})",
-            self
+            self,
         )
 
 

@@ -22,6 +22,7 @@ from jx_python.expressions.find_op import FindOp
 from jx_python.expressions.first_op import FirstOp
 from jx_python.expressions.floor_op import FloorOp
 from jx_python.expressions.get_op import GetOp
+from jx_python.expressions.group_op import GroupOp
 from jx_python.expressions.gt_op import GtOp
 from jx_python.expressions.gte_op import GteOp
 from jx_python.expressions.in_op import InOp
@@ -36,6 +37,7 @@ from jx_python.expressions.min_op import MinOp
 from jx_python.expressions.missing_op import MissingOp
 from jx_python.expressions.mod_op import ModOp
 from jx_python.expressions.mul_op import MulOp
+from jx_python.expressions.name_op import NameOp
 from jx_python.expressions.ne_op import NeOp
 from jx_python.expressions.not_left_op import NotLeftOp
 from jx_python.expressions.not_op import NotOp
@@ -54,6 +56,7 @@ from jx_python.expressions.select_op import SelectOp
 from jx_python.expressions.split_op import SplitOp
 from jx_python.expressions.sub_op import SubOp
 from jx_python.expressions.suffix_op import SuffixOp
+from jx_python.expressions.to_array_op import ToArrayOp
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.expressions.to_integer_op import ToIntegerOp
 from jx_python.expressions.to_number_op import ToNumberOp

@@ -9,30 +9,38 @@
 #
 import itertools
 
-from jx_base.expressions import GroupOp as GroupOp_
+from mo_dots import is_data
+from mo_future import sort_using_cmp
+
+from jx_base.expressions import GroupOp as GroupOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
-from jx_base.utils import enlist
-from jx_python import stream
+from jx_base.language import value_compare
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_json.types import _A, JxType, array_of
+from mo_json.types import JxType, array_of
 
 
 class GroupOp(GroupOp_):
     def to_python(self, loop_depth=0):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
-        loop_depth = frum.loop_depth
         group = self.group.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
-            merge_locals(frum.locals, group.locals, stream=stream, enlist=enlist),
+            merge_locals(frum.locals, group.locals, groupby=groupby),
             loop_depth,
             array_of(frum.type) | JxType(group=group.type),
-            f"""[{group.source} for rows{loop_depth} in [enlist({frum.source})] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]""",
+            f"""list(groupby({frum.source}, {group.source}))""",
             self,
         )
 
 
-def group(values, func):
-    for g, rows in itertools.groupby(sorted(values, key=func), func):
-        yield {_A: stream(rows), "group": g}
+def groupby(values, func):
+    cmp = lambda a, b: value_compare(func(a), func(b))
+    for g, rows in itertools.groupby(sort_using_cmp(values, cmp=cmp), func):
+        row = list(rows)
+        if is_data(g):
+            for k, v in g:
+                setattr(row, k, v)
+            yield row
+        else:
+            yield row

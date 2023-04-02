@@ -222,4 +222,3 @@ class {{class_name}}(Mapping):
     output = _exec(code, name, constraint_expr.locals)
     register_data(output)
     return output
-

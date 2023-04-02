@@ -20,5 +20,9 @@ class BasicStartsWithOp(_BasicStartsWithOp):
         value = self.value.to_python(loop_depth)
         prefix = self.prefix.to_python(loop_depth)
         return PythonScript(
-            merge_locals(value.locals, prefix.locals), loop_depth, JX_BOOLEAN,  f"({value.source}).startswith({prefix.source})", self
+            merge_locals(value.locals, prefix.locals),
+            loop_depth,
+            JX_BOOLEAN,
+            f"({value.source}).startswith({prefix.source})",
+            self,
         )

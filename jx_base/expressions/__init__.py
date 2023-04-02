@@ -1,3 +1,5 @@
+from mo_dots import set_default
+
 from jx_base.expressions._utils import (
     jx_expression,
     merge_types,
@@ -70,6 +72,7 @@ from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.missing_op import MissingOp
 from jx_base.expressions.mod_op import ModOp
 from jx_base.expressions.mul_op import MulOp
+from jx_base.expressions.name_op import NameOp
 from jx_base.expressions.ne_op import NeOp
 from jx_base.expressions.nested_op import NestedOp
 from jx_base.expressions.not_left_op import NotLeftOp
@@ -112,7 +115,6 @@ from jx_base.expressions.union_op import UnionOp
 from jx_base.expressions.unix_op import UnixOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.expressions.when_op import WhenOp
-from mo_dots import set_default
 
 set_default(
     operators,
@@ -173,6 +175,7 @@ set_default(
         "mul": MulOp,
         "mult": MulOp,
         "multiply": MulOp,
+        "name": NameOp,
         "ne": NeOp,
         "neq": NeOp,
         "not": NotOp,

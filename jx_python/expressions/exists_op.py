@@ -18,4 +18,6 @@ from mo_json import JX_BOOLEAN
 class ExistsOp(ExistsOp_):
     def to_python(self, loop_depth=0):
         expr = self.expr.to_python(loop_depth)
-        return PythonScript(merge_locals(expr.locals, exists=exists), loop_depth, JX_BOOLEAN,  f"exists({expr.source})", self)
+        return PythonScript(
+            merge_locals(expr.locals, exists=exists), loop_depth, JX_BOOLEAN, f"exists({expr.source})", self
+        )

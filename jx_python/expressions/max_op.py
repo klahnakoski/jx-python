@@ -24,7 +24,7 @@ class MaxOp(MaxOp_):
             merge_locals(locals),
             loop_depth,
             union_type(*(t.type for t in terms)),
-            "max([" + ",".join(source)+"])",
+            "max([" + ",".join(source) + "])",
             self,
-            AndOp(*(t.miss for t in terms))
+            AndOp(*(t.miss for t in terms)),
         )

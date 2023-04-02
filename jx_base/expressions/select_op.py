@@ -48,8 +48,6 @@ class SelectOne:
 
 
 class SelectOp(Expression):
-    has_simple_form = True
-
     def __init__(self, frum, terms: Tuple[SelectOne], **kwargs: Dict[str, Expression]):
         """
         :param terms: list OF SelectOne DESCRIPTORS

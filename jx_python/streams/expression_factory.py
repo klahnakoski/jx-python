@@ -13,7 +13,19 @@ from jx_base.expressions import (
     CallOp,
     LastOp,
     FirstOp,
+    ModOp,
+    LtOp,
+    GtOp,
+    LteOp,
+    GteOp,
+    SelectOp,
+    NULL,
+    FALSE,
+    TRUE,
+    ToArrayOp,
+    NameOp,
 )
+from jx_base.expressions.select_op import SelectOne
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
@@ -40,6 +52,9 @@ class ExpressionFactory:
     def last(self):
         return ExpressionFactory(LastOp(self.expr))
 
+    def to_list(self):
+        return ExpressionFactory(ToArrayOp(self.expr))
+
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))
 
@@ -64,6 +79,36 @@ class ExpressionFactory:
         other = factory(other)
         return ExpressionFactory(OrOp(self.expr, other.expr))
 
+    def __mod__(self, other):
+        other = factory(other)
+        return ExpressionFactory(ModOp(self.expr, other.expr))
+
+    def __lt__(self, other):
+        other = factory(other)
+        return ExpressionFactory(LtOp(self.expr, other.expr))
+
+    def __le__(self, other):
+        other = factory(other)
+        return ExpressionFactory(LteOp(self.expr, other.expr))
+
+    def __ge__(self, other):
+        other = factory(other)
+        return ExpressionFactory(GteOp(self.expr, other.expr))
+
+    def __gt__(self, other):
+        other = factory(other)
+        return ExpressionFactory(GtOp(self.expr, other.expr))
+
+    def __rshift__(self, other):
+        if not isinstance(other, str):
+            logger.error("expecting string")
+        return ExpressionFactory(NameOp(self.expr, Literal(other)))
+
+    def __rlshift__(self, other):
+        if not isinstance(other, str):
+            logger.error("expecting string")
+        return ExpressionFactory(NameOp(self.expr, Literal(other)))
+
     def __data__(self):
         return str(self.expr)
 
@@ -72,6 +117,13 @@ def factory(expr) -> ExpressionFactory:
     """
     assemble the expression
     """
+
+    if expr is None:
+        return ExpressionFactory(NULL)
+    if expr is True:
+        return ExpressionFactory(TRUE)
+    if expr is False:
+        return ExpressionFactory(FALSE)
     if isinstance(expr, ExpressionFactory):
         return expr
 

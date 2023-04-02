@@ -9,15 +9,10 @@
 #
 
 
-from mo_dots import from_data
-from mo_future import text
-
-from jx_base.expressions.python_script import PythonScript
-from mo_json import json2value, JX_ANY
-
 from jx_base.expressions import Literal as Literal_
+from jx_base.expressions.python_script import PythonScript
 
 
 class Literal(Literal_):
     def to_python(self, loop_depth=0):
-        return PythonScript({}, loop_depth, JX_ANY, text(repr(from_data(json2value(self.json)))), self)
+        return PythonScript({}, loop_depth, self.type, self.json, self)

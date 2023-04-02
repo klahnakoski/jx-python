@@ -7,11 +7,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from mo_dots import exists
+from mo_dots import exists, to_data
 from mo_future import sort_using_cmp
 from mo_imports import export
 
-from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp
+from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
@@ -57,8 +57,13 @@ class Stream:
         return iter(func(self.values))
 
     def map(self, accessor):
-        accessor = factory(accessor)
-        fact = ExpressionFactory(SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)))
+        if isinstance(accessor, dict):
+            fact = ExpressionFactory(SelectOp(
+                self.factory.expr, tuple(SelectOne(n, factory(v).expr) for n, v in to_data(accessor).leaves())
+            ))
+        else:
+            accessor = factory(accessor)
+            fact = ExpressionFactory(SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)))
         return Stream(self.values, fact)
 
     def filter(self, expr):
@@ -84,16 +89,8 @@ class Stream:
         return Stream(list(limit()), ExpressionFactory(Variable(".")),)
 
     def group(self, expr):
-        func = factory(expr).build()
-
-        def nested(this):
-            for g, rows in group(this, func):
-                yield {
-                    _A: stream(rows),
-                    "group": g,
-                }
-
-        return stream(nested(self))
+        expr = factory(expr).expr
+        return Stream(self.values, ExpressionFactory(GroupOp(self.factory.expr, expr)))
 
     ###########################################################################
     # TERMINATORS
@@ -101,6 +98,12 @@ class Stream:
     def to_list(self):
         func = self.factory.build()
         return func(self.values)
+
+        a = [
+            leaves_to_data({"group": get_attr(row2, "group"), "value": enlist(row2)})
+            for rows2 in [list(groupby(enlist(row0), add_name((to_float(first(enlist(row1)))) % (2.0), "group")))]
+            for rownum2, row2 in enumerate(rows2)
+        ]
 
     def to_value(self):
         func = self.factory.build()

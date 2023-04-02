@@ -25,5 +25,5 @@ class BasicSubstringOp(_BasicSubstringOp):
             loop_depth,
             JX_TEXT,
             f"({value})[int({self.start.to_python(loop_depth)}):int({self.end.to_python(loop_depth)})]",
-            self
+            self,
         )

@@ -25,5 +25,5 @@ class RegExpOp(RegExpOp_):
             loop_depth,
             JX_BOOLEAN,
             f"re.match({pattern.source}, {expr.source})",
-            self
+            self,
         )
