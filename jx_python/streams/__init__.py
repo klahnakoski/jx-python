@@ -66,9 +66,9 @@ class Stream:
             fact = ExpressionFactory(SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)))
         return Stream(self.values, fact)
 
-    def filter(self, expr):
-        expr = factory(expr).expr
-        return Stream(self.values, ExpressionFactory(FilterOp(self.factory.expr, expr)),)
+    def filter(self, pred):
+        pred = factory(pred).expr
+        return Stream(self.values, ExpressionFactory(FilterOp(self.factory.expr, pred)))
 
     def distinct(self):
         return Stream(distinct(self), ExpressionFactory(Variable(".")),)

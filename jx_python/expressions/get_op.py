@@ -8,12 +8,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-
 from jx_base.expressions import GetOp as GetOp_
-from jx_base.utils import enlist, delist
 from jx_base.expressions.python_script import PythonScript
+from jx_base.utils import enlist, delist
 from jx_python.utils import merge_locals
-from mo_json import JX_ANY, ARRAY, array_of, is_many
+from mo_json import JX_ANY, ARRAY, array_of, is_many, ARRAY_KEY
 
 
 class GetOp(GetOp_):
@@ -44,9 +43,13 @@ def unit(x):
 def get_attr(value, *items):
     undo = delist
     if is_many(value):
-        undo = unit
+        undo = {ARRAY_KEY: unit}
 
-    values = enlist(value)
+    if isinstance(value, dict) and ARRAY_KEY in value:
+        values = value[ARRAY_KEY]
+    else:
+        values = enlist(value)
+
     for item in items:
         result = []
         for v in values:
@@ -58,7 +61,10 @@ def get_attr(value, *items):
                 except:
                     continue
 
-            result.extend(enlist(child))
+            if isinstance(child, dict) and ARRAY_KEY in child:
+                result.extend(child[ARRAY_KEY])
+            else:
+                result.extend(enlist(child))
 
         values = result
     return undo(values)
