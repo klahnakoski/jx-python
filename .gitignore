@@ -4,7 +4,5 @@ build
 *.egg-info
 .venv
 __pycache__
-
 /setup.py
-
 vendor/mo_future
