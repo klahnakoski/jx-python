@@ -9,17 +9,22 @@
 #
 from mo_dots import is_many
 
-from jx_base.expressions import LastOp as LastOp_
+from jx_base.expressions import LastOp as LastOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
+from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_json import member_type
+from mo_json import member_type, ARRAY_KEY
 
 
 class LastOp(LastOp_):
     def to_python(self, loop_depth=0):
-        term = self.term.to_python(loop_depth)
+        term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
         return PythonScript(
-            merge_locals(term.locals, last=last), loop_depth, member_type(term.type), f"last({term.source})", self,
+            merge_locals(term.locals, last=last, ARRAY_KEY=ARRAY_KEY),
+            loop_depth,
+            member_type(term.type),
+            f"last({term.source}[ARRAY_KEY])",
+            self,
         )
 
 
