@@ -5,4 +5,4 @@ build
 .venv
 __pycache__
 /setup.py
-vendor/mo_future
+vendor
