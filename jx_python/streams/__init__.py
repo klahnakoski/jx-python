@@ -54,7 +54,7 @@ class Stream:
 
     def __iter__(self):
         func = self.factory.build()
-        return iter(func(self.values))
+        return iter(func(self.values)[ARRAY_KEY])
 
     def map(self, accessor):
         if isinstance(accessor, dict):
