@@ -8,17 +8,17 @@
 #
 
 from mo_dots import exists, to_data
-from mo_future import sort_using_cmp
 from mo_imports import export
 
-from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp, ToArrayOp
+from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp, ToArrayOp, LimitOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
-from jx_python.utils import distinct, group
-from mo_json.types import _A
+from jx_python.utils import distinct
+from mo_future import sort_using_cmp
+from mo_json.types import ARRAY_KEY
 
 _get = object.__getattribute__
 row = Variable(".")
@@ -80,13 +80,8 @@ class Stream:
         return Stream(list(sort_using_cmp(self, value_compare)), ExpressionFactory(Variable(".")),)
 
     def limit(self, num):
-        def limit():
-            for i, v in enumerate(self):
-                if i >= num:
-                    break
-                yield v
-
-        return Stream(list(limit()), ExpressionFactory(Variable(".")),)
+        num = factory(num).expr
+        return Stream(self.values, ExpressionFactory(LimitOp(self.factory.expr, num)))
 
     def group(self, expr):
         expr = factory(expr).expr
@@ -97,7 +92,7 @@ class Stream:
     ###########################################################################
     def to_list(self):
         func = ExpressionFactory(ToArrayOp(self.factory.expr)).build()
-        return func(self.values)[_A]
+        return func(self.values)[ARRAY_KEY]
 
     def to_value(self):
         func = self.factory.build()

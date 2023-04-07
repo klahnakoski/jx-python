@@ -29,6 +29,7 @@ from jx_python.expressions.in_op import InOp
 from jx_python.expressions.last_op import LastOp
 from jx_python.expressions.leaves_op import LeavesOp
 from jx_python.expressions.length_op import LengthOp
+from jx_python.expressions.limit_op import LimitOp
 from jx_python.expressions.literal import Literal
 from jx_python.expressions.lt_op import LtOp
 from jx_python.expressions.lte_op import LteOp

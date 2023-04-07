@@ -42,7 +42,7 @@ class FirstOp(Expression):
         return self.term.vars()
 
     def map(self, map_):
-        return LastOp(self.term.map(map_))
+        return FirstOp(self.term.map(map_))
 
     def missing(self, lang):
         return self.term.missing(lang)
