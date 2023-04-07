@@ -9,22 +9,23 @@
 #
 
 
-from jx_base.expressions import EqOp as EqOp_, is_literal, FALSE, TRUE
+from jx_base.expressions import EqOp as EqOp_, is_literal, FALSE, TRUE, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
-from jx_base.utils import enlist
-from mo_json import JX_BOOLEAN
+from jx_python.expressions import Python
+from jx_python.utils import merge_locals, to_python_array
+from mo_json import JX_BOOLEAN, ARRAY_KEY, ARRAY
 
 
 class EqOp(EqOp_):
     def to_python(self, loop_depth=0):
-        lhs = self.lhs.to_python(loop_depth)
+        lhs = ToArrayOp(self.lhs).partial_eval(Python).to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)
         return PythonScript(
-            {"enlist": enlist, **rhs.locals, **lhs.locals},
+            merge_locals(rhs.locals, lhs.locals, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             JX_BOOLEAN,
-            f"({rhs.source}) in enlist({lhs.source})",
+            f"({rhs.source}) in ({to_python_array(lhs.source)})",
             self,
             FALSE,
         )

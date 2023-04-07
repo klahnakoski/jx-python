@@ -95,7 +95,7 @@ class Stream:
 
     def to_value(self):
         func = self.factory.build()
-        return delist(func(self.values))
+        return delist(func(self.values)[ARRAY_KEY])
 
     def sum(self):
         return sum(v for v in self if exists(v))
