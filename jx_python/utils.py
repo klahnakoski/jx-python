@@ -70,7 +70,7 @@ def merge_locals(*locals, **kwargs):
 
 _array_source_prefix = "{ARRAY_KEY:"
 
-def to_python_array(expression):
+def to_python_list(expression):
     """
     jx puts all arrays in typed json, like {"~a~": [content, of, list]}
     return the python array

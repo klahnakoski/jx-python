@@ -12,7 +12,7 @@ from jx_base.expressions import GetOp as GetOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_array
+from jx_python.utils import merge_locals, to_python_list
 from mo_json import JX_ANY, array_of, ARRAY_KEY
 
 
@@ -28,7 +28,7 @@ class GetOp(GetOp_):
             merge_locals(locals, frum.locals, get_attr=get_attr, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             var_type,
-            f"{{ARRAY_KEY: get_attr({to_python_array(frum.source)}, {offsets})}}",
+            f"{{ARRAY_KEY: get_attr({to_python_list(frum.source)}, {offsets})}}",
             self,
         )
 

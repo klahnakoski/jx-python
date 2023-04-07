@@ -11,7 +11,7 @@
 from jx_base.expressions import LimitOp as LimitOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_array
+from jx_python.utils import merge_locals, to_python_list
 from mo_json import member_type, ARRAY_KEY
 
 
@@ -23,6 +23,6 @@ class LimitOp(LimitOp_):
             merge_locals(frum.locals, amount.locals, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             frum.type,
-            f"{{ARRAY_KEY: ({to_python_array(frum.source)})[:{amount.source}]}}",
+            f"{{ARRAY_KEY: ({to_python_list(frum.source)})[:{amount.source}]}}",
             self
         )

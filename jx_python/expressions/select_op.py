@@ -15,7 +15,7 @@ from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.select_op import SelectOne
 from jx_base.utils import delist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_array
+from jx_python.utils import merge_locals, to_python_list
 from mo_json import array_of, ARRAY_KEY
 
 
@@ -36,11 +36,11 @@ class SelectOp(SelectOp_):
                 source = frum.source
             else:
                 # select property
-                source = f"""{{ARRAY_KEY: [delist({to_python_array(selects[0].value.source)}) for rows{loop_depth} in [{to_python_array(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
+                source = f"""{{ARRAY_KEY: [delist({to_python_list(selects[0].value.source)}) for rows{loop_depth} in [{to_python_list(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
         else:
             # structure selection
-            select_sources = ",".join(quote(s.name) + f": delist({to_python_array(s.value.source)})" for s in selects)
-            source = f"""{{ARRAY_KEY: [leaves_to_data({{{select_sources}}}) for rows{loop_depth} in [{to_python_array(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
+            select_sources = ",".join(quote(s.name) + f": delist({to_python_list(s.value.source)})" for s in selects)
+            source = f"""{{ARRAY_KEY: [leaves_to_data({{{select_sources}}}) for rows{loop_depth} in [{to_python_list(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
 
         return PythonScript(
             merge_locals(

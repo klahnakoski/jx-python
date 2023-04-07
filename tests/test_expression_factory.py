@@ -14,6 +14,7 @@ from mo_dots import to_data, Data
 from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
 from jx_python.streams.typers import ANNOTATIONS
+from mo_json import ARRAY_KEY
 
 IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
