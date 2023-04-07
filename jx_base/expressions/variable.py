@@ -57,7 +57,7 @@ class Variable(Expression):
 
     def partial_eval(self, lang):
         path = split_field(self.var)
-        if len(path) == 1 and path in ["row", "rownum", "rows"]:
+        if len(path) == 1 and path[0] in ["row", "rownum", "rows"]:
             return self
 
         base = lang.Variable("row")

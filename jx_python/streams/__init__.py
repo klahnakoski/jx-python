@@ -41,8 +41,7 @@ class Stream:
         if item in Stream.__slots__:
             return None
         accessor = ExpressionFactory(GetOp(self.factory.expr, Literal(item)))
-        fact = factory(accessor)
-        return Stream(self.values, fact)
+        return Stream(self.values, accessor)
 
     def __getitem__(self, item):
         if isinstance(item, str):

@@ -8,30 +8,27 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import GetOp as GetOp_
+from jx_base.expressions import GetOp as GetOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
-from jx_base.utils import enlist, delist
-from jx_python.utils import merge_locals
-from mo_json import JX_ANY, ARRAY, array_of, is_many, ARRAY_KEY
+from jx_base.utils import enlist
+from jx_python.expressions import Python
+from jx_python.utils import merge_locals, to_python_array
+from mo_json import JX_ANY, array_of, ARRAY_KEY
 
 
 class GetOp(GetOp_):
     def to_python(self, loop_depth=0):
         offsets, locals = zip(*((c.source, c.locals) for o in self.offsets for c in [o.to_python(loop_depth)]))
         offsets = ", ".join(offsets)
-        if not offsets.startswith("\""):
-            print("error")
-        var = self.var.to_python(loop_depth)
-        if var.type == ARRAY:
-            var_type = array_of(JX_ANY)
-        else:
-            var_type = JX_ANY
+        frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
+        # TODO: should be able to reach into frum.type to get actual type
+        var_type = array_of(JX_ANY)
 
         return PythonScript(
-            merge_locals(locals, var.locals, get_attr=get_attr),
+            merge_locals(locals, frum.locals, get_attr=get_attr, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             var_type,
-            f"get_attr({var.source}, {offsets})",
+            f"{{ARRAY_KEY: get_attr({to_python_array(frum.source)}, {offsets})}}",
             self,
         )
 
@@ -40,16 +37,7 @@ def unit(x):
     return x
 
 
-def get_attr(value, *items):
-    undo = delist
-    if is_many(value):
-        undo = {ARRAY_KEY: unit}
-
-    if isinstance(value, dict) and ARRAY_KEY in value:
-        values = value[ARRAY_KEY]
-    else:
-        values = enlist(value)
-
+def get_attr(values, *items):
     for item in items:
         result = []
         for v in values:
@@ -67,4 +55,4 @@ def get_attr(value, *items):
                 result.extend(enlist(child))
 
         values = result
-    return undo(values)
+    return values

@@ -24,7 +24,7 @@ class ToArrayOp(Expression):
         self.term = term
 
     def __data__(self):
-        return {"array": self.term.__data__()}
+        return {"to_array": self.term.__data__()}
 
     def vars(self):
         return self.term.vars()
