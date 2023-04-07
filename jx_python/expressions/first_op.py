@@ -12,7 +12,7 @@ from mo_future import first
 from jx_base.expressions import FirstOp as FirstOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals
+from jx_python.utils import merge_locals, to_python_array
 from mo_json import member_type, ARRAY_KEY
 
 
@@ -23,6 +23,6 @@ class FirstOp(FirstOp_):
             merge_locals(value.locals, first=first, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             member_type(value.type),
-            f"first({value.source}[ARRAY_KEY])",
+            f"first({to_python_array(value.source)})",
             self,
         )

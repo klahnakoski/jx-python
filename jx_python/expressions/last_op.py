@@ -12,7 +12,7 @@ from mo_dots import is_many
 from jx_base.expressions import LastOp as LastOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals
+from jx_python.utils import merge_locals, to_python_array
 from mo_json import member_type, ARRAY_KEY
 
 
@@ -23,7 +23,7 @@ class LastOp(LastOp_):
             merge_locals(term.locals, last=last, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             member_type(term.type),
-            f"last({term.source}[ARRAY_KEY])",
+            f"last({to_python_array(term.source)})",
             self,
         )
 
