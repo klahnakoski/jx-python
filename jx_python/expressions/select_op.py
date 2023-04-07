@@ -23,7 +23,10 @@ class SelectOp(SelectOp_):
     def to_python(self, loop_depth=0):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
-        selects = tuple(SelectOne(t.name, t.value.partial_eval(Python).to_python(loop_depth)) for t in self.terms)
+        selects = tuple(
+            SelectOne(t.name, ToArrayOp(t.value).partial_eval(Python).to_python(loop_depth))
+            for t in self.terms
+        )
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
@@ -33,10 +36,10 @@ class SelectOp(SelectOp_):
                 source = frum.source
             else:
                 # select property
-                source = f"""{{ARRAY_KEY: [{selects[0].value.source} for rows{loop_depth} in [{to_python_array(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
+                source = f"""{{ARRAY_KEY: [delist({to_python_array(selects[0].value.source)}) for rows{loop_depth} in [{to_python_array(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
         else:
             # structure selection
-            select_sources = ",".join(quote(s.name) + ":" + s.value.source for s in selects)
+            select_sources = ",".join(quote(s.name) + f": delist({to_python_array(s.value.source)})" for s in selects)
             source = f"""{{ARRAY_KEY: [leaves_to_data({{{select_sources}}}) for rows{loop_depth} in [{to_python_array(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth})]}}"""
 
         return PythonScript(

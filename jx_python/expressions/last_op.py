@@ -29,11 +29,6 @@ class LastOp(LastOp_):
 
 
 def last(values):
-    if isinstance(values, (tuple, list)):
-        return values[-1]
-    if is_many(values):
-        last = None
-        for v in values:
-            last = v
-        return last
-    return values
+    if not last:
+        return None
+    return values[-1]
