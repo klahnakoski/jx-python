@@ -12,7 +12,8 @@ from jx_base.expressions import FilterOp as FilterOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
+from jx_base.expressions.python_to_list_op import to_python_list
 from mo_json import ARRAY_KEY
 
 

@@ -9,12 +9,9 @@
 import os
 from unittest import TestCase, skip
 
-from mo_dots import to_data, Data
-
 from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
 from jx_python.streams.typers import ANNOTATIONS
-from mo_json import ARRAY_KEY
 
 IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
@@ -45,9 +42,9 @@ class TestExpressionFactory(TestCase):
             def __init__(self, value):
                 self.value = value
 
-        value = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
+        some = Something({"props": [{"a": 1}, {"a": 2}, {"a": 3}]})
         # attribute access will flatten
-        result = stream(value).value.map(it.props.a).to_list()
+        result = stream(some).value.map(it.props.a).to_list()
         self.assertEqual(result, [[1, 2, 3]])
 
     def test_iterator(self):
@@ -103,8 +100,17 @@ class TestExpressionFactory(TestCase):
         result = stream([1, 2, 3]).group(it % 2 >> "group").map({"group": it.group, "value": it.to_list()}).to_list()
         self.assertEqual(result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}])
 
-    @skip("not supported yet")
     def test_group2(self):
+        result = stream([1, 2, 3]).group(it % 2 >> "group").map({"group": it.group, "value": it}).to_list()
+        # [2] is returned because we assume all groups are lists
+        self.assertEqual(result, [{"group": 0, "value": [2]}, {"group": 1, "value": [1, 3]}])
+
+    def test_group3(self):
+        result = stream([1, 2, 3]).group(it % 2 >> "group").map({"group": it.group, "value": it.to_value()}).to_list()
+        self.assertEqual(result, [{"group": 0, "value": 2}, {"group": 1, "value": [1, 3]}])
+
+    @skip("not supported yet")
+    def test_group3(self):
         result = (
             stream([1, 2, 3])
             .group(lambda v: v % 2)

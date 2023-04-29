@@ -8,8 +8,6 @@
 #
 import itertools
 
-from mo_json import ARRAY_KEY
-
 
 def distinct(values):
     acc = set()
@@ -70,13 +68,18 @@ def merge_locals(*locals, **kwargs):
 
 _array_source_prefix = "{ARRAY_KEY:"
 
-def to_python_list(expression):
+
+def to_python_value(expression):
     """
     jx puts all arrays in typed json, like {"~a~": [content, of, list]}
-    return the python array
+    return the delisted array
     """
-
     if expression.startswith(_array_source_prefix) and expression.endswith("}"):
-        return expression[len(_array_source_prefix):-1]
+        expr = expression[len(_array_source_prefix):-1].strip()
     else:
-        return f"({expression})[ARRAY_KEY]"
+        expr = f"({expression})[ARRAY_KEY]"
+
+    while expr.startswith("enlist(") and expr.endswith(")"):
+        expr = expr[7:-1]
+
+    return f"delist({expr})"

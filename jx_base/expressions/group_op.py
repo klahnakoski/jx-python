@@ -10,7 +10,7 @@
 
 from jx_base.expressions.expression import Expression, MissingOp
 from jx_base.expressions.to_array_op import ToArrayOp
-from mo_json import JxType, array_of
+from mo_json import array_of
 
 
 class GroupOp(Expression):

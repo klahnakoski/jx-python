@@ -18,14 +18,11 @@ from jx_base.expressions import (
     GtOp,
     LteOp,
     GteOp,
-    SelectOp,
     NULL,
     FALSE,
     TRUE,
-    ToArrayOp,
-    NameOp,
+    NameOp, AddOp, SubOp, DivOp, MulOp, NotOp, ToArrayOp,
 )
-from jx_base.expressions.select_op import SelectOne
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
@@ -53,7 +50,7 @@ class ExpressionFactory:
         return ExpressionFactory(LastOp(self.expr))
 
     def to_list(self):
-        return ExpressionFactory(ToArrayOp(self.expr))
+        return  ExpressionFactory(ToArrayOp(self.expr))
 
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))
@@ -62,6 +59,22 @@ class ExpressionFactory:
         args = [factory(a).build() for a in args]
         kwargs = {k: factory(v).build() for k, v in kwargs.items()}
         return ExpressionFactory(CallOp(self.expr, *args, **kwargs))
+
+    def __add__(self, other):
+        other = factory(other)
+        return ExpressionFactory(AddOp(self.expr, other.expr))
+
+    def __sub__(self, other):
+        other = factory(other)
+        return ExpressionFactory(SubOp(self.expr, other.expr))
+
+    def __mul__(self, other):
+        other = factory(other)
+        return ExpressionFactory(MulOp(self.expr, other.expr))
+
+    def __truediv__(self, other):
+        other = factory(other)
+        return ExpressionFactory(DivOp(self.expr, other.expr))
 
     def __eq__(self, other):
         other = factory(other)
@@ -78,6 +91,9 @@ class ExpressionFactory:
     def __or__(self, other):
         other = factory(other)
         return ExpressionFactory(OrOp(self.expr, other.expr))
+
+    def __not__(self):
+        return ExpressionFactory(NotOp(self.expr))
 
     def __mod__(self, other):
         other = factory(other)

@@ -16,10 +16,11 @@ from jx_base.expressions import GroupOp as GroupOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
-from mo_json.types import JxType, array_of, _A
+from jx_python.utils import merge_locals
+from jx_base.expressions.python_to_list_op import to_python_list
+from mo_json.types import JxType, array_of, ARRAY_KEY
 
-ARRAY_KEY = _A
+ARRAY_KEY = ARRAY_KEY
 
 
 class GroupOp(GroupOp_):

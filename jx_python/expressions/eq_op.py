@@ -13,7 +13,8 @@ from jx_base.expressions import EqOp as EqOp_, is_literal, FALSE, TRUE, ToArrayO
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
+from jx_base.expressions.python_to_list_op import to_python_list
 from mo_json import JX_BOOLEAN, ARRAY_KEY, ARRAY
 
 

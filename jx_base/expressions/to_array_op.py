@@ -11,7 +11,11 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import NULL, Literal
+from mo_imports import expect
 from mo_json import ARRAY
+
+
+PythonToListOp = expect("PythonToListOp")
 
 
 class ToArrayOp(Expression):
@@ -39,6 +43,8 @@ class ToArrayOp(Expression):
         term = self.term.partial_eval(lang)
         if term.op == ToArrayOp.op:
             return term
+        if term.op == PythonToListOp.op:
+            return term.array
         if term is NULL:
             return Literal([])
         if self.term.type == ARRAY:

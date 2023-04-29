@@ -78,7 +78,9 @@ def enlist(value):
 
 
 def delist(values):
-    if len(values) == 0:
+    if not is_many(values):
+        return values
+    elif len(values) == 0:
         return None
     elif len(values) == 1:
         return values[0]

@@ -14,7 +14,7 @@ from jx_base.utils import enlist
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import array_of, ARRAY
-from mo_json.types import _A
+from mo_json.types import ARRAY_KEY
 
 
 class ToArrayOp(_ToArrayOp):
@@ -25,7 +25,7 @@ class ToArrayOp(_ToArrayOp):
             return PythonScript(merge_locals(term.locals, enlist=enlist), loop_depth, type, term.source, self)
 
         return PythonScript(
-            merge_locals(term.locals, enlist=enlist, ARRAY_KEY=_A),
+            merge_locals(term.locals, enlist=enlist, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             array_of(term.type),
             f"{{ARRAY_KEY: enlist({term.source})}}",

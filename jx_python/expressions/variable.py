@@ -18,6 +18,8 @@ from mo_json import JX_ANY
 
 class Variable(Variable_):
     def to_python(self, loop_depth=0):
+        if self.var == ".":
+            return PythonScript({}, loop_depth, JX_ANY, f"row{loop_depth}", self)
         if self.var not in ["row", "rownum", "rows"]:
             if loop_depth == 0:
                 # WE ASSUME THIS IS NAIVE PYTHON EXPRESSION BUILD

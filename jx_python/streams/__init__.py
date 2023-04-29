@@ -8,9 +8,10 @@
 #
 
 from mo_dots import exists, to_data
-from mo_imports import export
 
-from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, GroupOp, ToArrayOp, LimitOp
+from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, ToArrayOp, LimitOp, PythonToListOp, \
+    GroupOp
+from jx_base.expressions.map_op import MapOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
@@ -18,6 +19,8 @@ from jx_python.streams.expression_factory import ExpressionFactory, factory, it
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct
 from mo_future import sort_using_cmp
+from mo_imports import export
+from mo_json.typed_encoder import untyped
 from mo_json.types import ARRAY_KEY
 
 _get = object.__getattribute__
@@ -91,7 +94,7 @@ class Stream:
     ###########################################################################
     def to_list(self):
         func = ExpressionFactory(ToArrayOp(self.factory.expr)).build()
-        return func(self.values)[ARRAY_KEY]
+        return untyped(func(self.values))
 
     def to_value(self):
         func = self.factory.build()
