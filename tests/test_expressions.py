@@ -55,3 +55,14 @@ class TestOther(FuzzyTestCase):
         self.assertEqual(expr(), 1)
         self.assertEqual(expr.partial_eval(Python).to_python().source, "1")
 
+    def test_multiply3(self):
+        expr = jx_expression({"multiply": [2, 3, 4]})
+
+        self.assertEqual(expr(), 24)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "24")
+
+    def test_multiply4(self):
+        expr = jx_expression({"multiply": [2, None, 4]})
+
+        self.assertEqual(expr(), 8)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "8")

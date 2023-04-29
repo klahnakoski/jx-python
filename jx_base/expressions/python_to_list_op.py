@@ -7,12 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_logs import logger
 
-from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.expression import Expression
 from jx_base.language import is_op
-from jx_python.utils import _array_source_prefix
 from mo_imports import export
 from mo_json.types import JX_BOOLEAN
 
@@ -46,6 +43,9 @@ class PythonToListOp(Expression):
 
     def invert(self, lang):
         return self.missing(lang)
+
+
+_array_source_prefix = "{ARRAY_KEY:"
 
 
 def to_python_list(expression):

@@ -45,9 +45,6 @@ def simplified(func):
 
 
 def jx_expression(expr, schema=None):
-    if expr == None:
-        return None
-
     # UPDATE THE VARIABLE WITH THEIR KNOWN TYPES
     output = _jx_expression(expr, language)
     if not schema:
