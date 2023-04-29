@@ -9,7 +9,9 @@
 #
 
 
-from mo_imports import export
+from mo_logs import Log
+from mo_times import Date
+
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.expression import Expression
@@ -22,10 +24,8 @@ from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
-from mo_future import text
-from mo_json.types import JX_NUMBER, base_type, JX_PRIMITIVE
-from mo_logs import Log
-from mo_times import Date
+from mo_imports import export
+from mo_json.types import JX_NUMBER, base_type
 
 
 class ToNumberOp(Expression):
@@ -59,7 +59,7 @@ class ToNumberOp(Expression):
                 return ONE
 
             v = term.value
-            if isinstance(v, (text, Date)):
+            if isinstance(v, (str, Date)):
                 return Literal(float(v))
             elif isinstance(v, (int, float)):
                 return term

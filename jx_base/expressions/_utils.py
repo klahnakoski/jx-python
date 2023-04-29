@@ -100,7 +100,6 @@ def _jx_expression(json, lang):
 
                     return class_.define({op: [sub_json] + enlist(rhs)})
 
-        items = list(json.items())
         for op, term in items:
             # ONE OF THESE IS THE OPERATOR
             full_op = operators.get(op)

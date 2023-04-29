@@ -58,6 +58,9 @@ class ExpressionFactory:
     def to_list(self):
         return ExpressionFactory(ToArrayOp(self.expr))
 
+    def to_value(self):
+        return ExpressionFactory(ToValueOp(self.expr))
+
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))
 

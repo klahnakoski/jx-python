@@ -7,10 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+import operator
+from functools import reduce
 
+from mo_dots import exists
 
 from jx_base.expressions.base_multi_op import BaseMultiOp
 
 
 class MulOp(BaseMultiOp):
     op = "mul"
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        return reduce(operator.mul, (v for t in self.terms for v in [t(row, rownum, rows)] if exists(v)))

@@ -33,6 +33,10 @@ class Literal(Expression):
             return TRUE
         if term is False:
             return FALSE
+        if term == 0:
+            return ZERO
+        if term == 1:
+            return ONE
         if is_text(term) and not term:
             return NULL
         if is_data(term) and term.get("date"):
@@ -113,8 +117,10 @@ class Literal(Expression):
         return str(self.value)
 
 
-ZERO = Literal(0)
-ONE = Literal(1)
+ZERO = object.__new__(Literal)
+Literal.__init__(ZERO, 0)
+ONE = object.__new__(Literal)
+Literal.__init__(ONE, 1)
 
 literal_op_ids = tuple()
 

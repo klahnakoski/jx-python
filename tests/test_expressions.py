@@ -24,3 +24,34 @@ class TestOther(FuzzyTestCase):
 
         self.assertEqual(expr(), 3)
         self.assertEqual(expr.partial_eval(Python).to_python().source, "3")
+
+    def test_add2(self):
+        expr = jx_expression({"add": [1, 2, 3]})
+
+        self.assertEqual(expr(), 6)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "6")
+
+    def test_subtract(self):
+        expr = jx_expression({"subtract": [1, 2]})
+
+        self.assertEqual(expr(), -1)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "-1")
+
+    def test_multiply(self):
+        expr = jx_expression({"multiply": [2, 3]})
+
+        self.assertEqual(expr(), 6)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "6")
+
+    def test_divide(self):
+        expr = jx_expression({"divide": [6, 2]})
+
+        self.assertEqual(expr(), 3)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "3")
+
+    def test_divide2(self):
+        expr = jx_expression({"divide": [6, 0], "default": 1})
+
+        self.assertEqual(expr(), 1)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "1")
+

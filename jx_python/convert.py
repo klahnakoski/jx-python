@@ -10,7 +10,6 @@
 
 
 from mo_dots import dict_to_data
-from mo_future import text
 from mo_logs.strings import expand_template
 
 from jx_base.utils import delist
@@ -62,6 +61,6 @@ def table2csv(table_data):
     text_data = [tuple(value2json(vals, pretty=True) for vals in rows) for rows in table_data]
 
     col_widths = [max(len(t) for t in cols) for cols in zip(*text_data)]
-    template = ", ".join("{{" + text(i) + "|left_align(" + text(w) + ")}}" for i, w in enumerate(col_widths))
+    template = ", ".join(f"{{{{{i}|left_align({w}))}}}}" for i, w in enumerate(col_widths))
     output = "\n".join(expand_template(template, d) for d in text_data)
     return output

@@ -10,7 +10,6 @@
 
 
 from jx_base.expressions.expression import Expression
-from mo_future import text
 from mo_logs import Log
 from mo_math import is_integer
 
@@ -45,7 +44,7 @@ class OffsetOp(Expression):
         return self.var == other
 
     def __unicode__(self):
-        return text(self.var)
+        return str(self.var)
 
     def __str__(self):
         return str(self.var)
