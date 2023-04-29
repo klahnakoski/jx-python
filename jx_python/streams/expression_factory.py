@@ -21,7 +21,13 @@ from jx_base.expressions import (
     NULL,
     FALSE,
     TRUE,
-    NameOp, AddOp, SubOp, DivOp, MulOp, NotOp, ToArrayOp,
+    NameOp,
+    AddOp,
+    SubOp,
+    DivOp,
+    MulOp,
+    NotOp,
+    ToArrayOp,
 )
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
@@ -50,7 +56,7 @@ class ExpressionFactory:
         return ExpressionFactory(LastOp(self.expr))
 
     def to_list(self):
-        return  ExpressionFactory(ToArrayOp(self.expr))
+        return ExpressionFactory(ToArrayOp(self.expr))
 
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))

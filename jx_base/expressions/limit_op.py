@@ -57,11 +57,14 @@ class LimitOp(Expression):
             return LimitOp(frum.frum, MinOp(frum.amount, amount)).partial_eval(lang)
         elif is_op(frum, CaseOp):  # REWRITING
             return CaseOp(
-                [WhenOp(t.when, then=LimitOp(t.then, amount)) for t in frum.whens[:-1]] + [LimitOp(frum.whens[-1], amount)]
+                [WhenOp(t.when, then=LimitOp(t.then, amount)) for t in frum.whens[:-1]]
+                + [LimitOp(frum.whens[-1], amount)]
             ).partial_eval(lang)
         elif is_op(frum, WhenOp):
-            return WhenOp(frum.when, then=LimitOp(frum.then, amount), **{"else": LimitOp(frum.els_, amount)}).partial_eval(lang)
+            return WhenOp(
+                frum.when, then=LimitOp(frum.then, amount), **{"else": LimitOp(frum.els_, amount)}
+            ).partial_eval(lang)
         elif is_literal(frum) and is_literal(amount):
-            return Literal(enlist(frum.value)[:amount.value])
+            return Literal(enlist(frum.value)[: amount.value])
         else:
             return LimitOp(frum, amount)

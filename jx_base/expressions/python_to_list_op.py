@@ -55,7 +55,7 @@ def to_python_list(expression):
     """
 
     if expression.startswith(_array_source_prefix) and expression.endswith("}"):
-        return expression[len(_array_source_prefix):-1].strip()
+        return expression[len(_array_source_prefix) : -1].strip()
     else:
         return f"({expression})[ARRAY_KEY]"
 

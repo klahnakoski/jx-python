@@ -25,8 +25,7 @@ class SelectOp(SelectOp_):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
         selects = tuple(
-            SelectOne(t.name, ToArrayOp(t.value).partial_eval(Python).to_python(loop_depth))
-            for t in self.terms
+            SelectOne(t.name, ToArrayOp(t.value).partial_eval(Python).to_python(loop_depth)) for t in self.terms
         )
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
@@ -45,7 +44,11 @@ class SelectOp(SelectOp_):
 
         return PythonScript(
             merge_locals(
-                [s.value.locals for s in selects], frum.locals, leaves_to_data=leaves_to_data, delist=delist, ARRAY_KEY=ARRAY_KEY
+                [s.value.locals for s in selects],
+                frum.locals,
+                leaves_to_data=leaves_to_data,
+                delist=delist,
+                ARRAY_KEY=ARRAY_KEY,
             ),
             loop_depth,
             array_of(self.type),

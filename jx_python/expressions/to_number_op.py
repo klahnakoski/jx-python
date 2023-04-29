@@ -20,7 +20,14 @@ class ToNumberOp(NumberOp_):
         exists = self.term.exists()
         value = self.term.to_python(loop_depth)
 
-        return PythonScript(merge_locals(value.locals, to_float=to_float), loop_depth, JX_NUMBER, f"to_float({value.source})", self, exists)
+        return PythonScript(
+            merge_locals(value.locals, to_float=to_float),
+            loop_depth,
+            JX_NUMBER,
+            f"to_float({value.source})",
+            self,
+            exists,
+        )
 
 
 def to_float(value):

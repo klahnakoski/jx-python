@@ -25,5 +25,5 @@ class LimitOp(LimitOp_):
             loop_depth,
             frum.type,
             f"{{ARRAY_KEY: ({to_python_list(frum.source)})[:{amount.source}]}}",
-            self
+            self,
         )

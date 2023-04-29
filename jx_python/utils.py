@@ -75,7 +75,7 @@ def to_python_value(expression):
     return the delisted array
     """
     if expression.startswith(_array_source_prefix) and expression.endswith("}"):
-        expr = expression[len(_array_source_prefix):-1].strip()
+        expr = expression[len(_array_source_prefix) : -1].strip()
     else:
         expr = f"({expression})[ARRAY_KEY]"
 

@@ -24,7 +24,7 @@ class FilterOp(FilterOp_):
         predicate = self.predicate.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
-            merge_locals(frum.locals, predicate.locals, enlist=enlist,  ARRAY_KEY=ARRAY_KEY),
+            merge_locals(frum.locals, predicate.locals, enlist=enlist, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             frum.type,
             f"""{{ARRAY_KEY: [row{loop_depth} for rows{loop_depth} in [{to_python_list(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth}) if ({predicate.source})]}}""",

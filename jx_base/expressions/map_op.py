@@ -13,6 +13,5 @@ from jx_base.expressions.select_op import SelectOp, SelectOne
 
 
 class MapOp(Expression):
-
     def __new__(cls, frum, expr):
-        return SelectOp(frum, (SelectOne(".", expr), ))
+        return SelectOp(frum, (SelectOne(".", expr),))

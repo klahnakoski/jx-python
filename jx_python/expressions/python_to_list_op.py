@@ -18,5 +18,3 @@ class PythonToListOp(PythonToListOp_):
     def to_python(self, loop_depth=0):
         array = ToArrayOp(self.array.to_python(loop_depth))
         return PythonScript(array.locals, loop_depth, JX_ANY, to_python_list(array.source), self)
-
-

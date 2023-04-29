@@ -26,8 +26,7 @@ class NameOp(NameOp_):
         return PythonScript(
             {"add_name": add_name, **frum.locals, **_name.locals},
             loop_depth,
-            JxType(**{self._name.value:frum.type}),  # assume literal name
+            JxType(**{self._name.value: frum.type}),  # assume literal name
             f"add_name({frum.source}, {_name.source})",
-            self
+            self,
         )
-

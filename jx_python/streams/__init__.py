@@ -9,8 +9,17 @@
 
 from mo_dots import exists, to_data
 
-from jx_base.expressions import GetOp, Literal, Variable, FilterOp, SelectOp, ToArrayOp, LimitOp, PythonToListOp, \
-    GroupOp
+from jx_base.expressions import (
+    GetOp,
+    Literal,
+    Variable,
+    FilterOp,
+    SelectOp,
+    ToArrayOp,
+    LimitOp,
+    PythonToListOp,
+    GroupOp,
+)
 from jx_base.expressions.map_op import MapOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
