@@ -112,4 +112,4 @@ class BaseMultiOp(Expression):
         return output
 
 
-_jx_identity = {"add": ZERO, "mul": ONE, "cardinality": ZERO}
+_jx_identity = {"add": ZERO, "mul": ONE, "cardinality": ZERO, "sum": ZERO, "product": ONE}

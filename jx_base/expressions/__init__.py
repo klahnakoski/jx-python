@@ -106,6 +106,7 @@ from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
 from jx_base.expressions.sql_select_op import SqlSelectOp
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sub_op import SubOp
+from jx_base.expressions.sum_op import SumOp
 from jx_base.expressions.suffix_op import SuffixOp
 from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.to_boolean_op import ToBooleanOp
@@ -203,7 +204,7 @@ set_default(
         "suffix": SuffixOp,
         "sub": SubOp,
         "subtract": SubOp,
-        "sum": AddOp,
+        "sum": SumOp,
         "term": EqOp,
         "terms": InOp,
         "tuple": TupleOp,

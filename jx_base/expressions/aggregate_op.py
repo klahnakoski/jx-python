@@ -7,8 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
 from mo_imports import DelayedValue
 from jx_base.expressions.expression import Expression
 from mo_future import first
@@ -60,6 +58,7 @@ def canonical_aggregates():
     from jx_base.expressions.null_op import NullOp
     from jx_base.expressions.or_op import OrOp
     from jx_base.expressions.union_op import UnionOp
+    from jx_base.expressions.sum_op import SumOp
 
     return {
         "none": NullOp,
@@ -70,7 +69,7 @@ def canonical_aggregates():
         "max": MaxOp,
         "maximum": MaxOp,
         "add": AddOp,
-        "sum": AddOp,
+        "sum": SumOp,
         "avg": AvgOp,
         "average": AvgOp,
         "mean": AvgOp,

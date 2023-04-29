@@ -61,6 +61,9 @@ class ExpressionFactory:
     def to_value(self):
         return ExpressionFactory(ToValueOp(self.expr))
 
+    def sum(self):
+        return ExpressionFactory(AddOp(self.expr, nulls=True))
+
     def __getattr__(self, item):
         return ExpressionFactory(GetOp(self.expr, Literal(item)))
 
