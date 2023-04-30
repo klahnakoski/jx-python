@@ -12,8 +12,10 @@
 from jx_base.expressions import ToArrayOp as _ToArrayOp, PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
+from jx_python.streams import entype
 from jx_python.utils import merge_locals
 from mo_json import array_of, ARRAY
+from mo_json.typed_encoder import detype
 from mo_json.types import ARRAY_KEY
 
 
@@ -22,12 +24,12 @@ class ToArrayOp(_ToArrayOp):
         term = self.term.partial_eval(Python).to_python(loop_depth)
         type = term.type
         if type == ARRAY:
-            return PythonScript(merge_locals(term.locals, enlist=enlist), loop_depth, type, term.source, self)
+            return PythonScript(merge_locals(term.locals, enlist=enlist, entype=entype, detype=detype), loop_depth, type, term.source, self)
 
         return PythonScript(
-            merge_locals(term.locals, enlist=enlist, ARRAY_KEY=ARRAY_KEY),
+            merge_locals(term.locals, enlist=enlist, entype=entype, detype=detype, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             array_of(term.type),
-            f"{{ARRAY_KEY: enlist({term.source})}}",
+            f"entype(enlist(detype({term.source})))",
             self,
         )

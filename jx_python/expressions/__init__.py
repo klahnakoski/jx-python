@@ -48,7 +48,6 @@ from jx_python.expressions.or_op import OrOp
 from jx_python.expressions.prefix_op import PrefixOp
 from jx_python.expressions.python_function import PythonFunction
 from jx_python.expressions.python_script import PythonScript
-from jx_python.expressions.python_to_list_op import PythonToListOp
 from jx_python.expressions.range_op import RangeOp
 from jx_python.expressions.reg_exp_op import RegExpOp
 from jx_python.expressions.right_op import RightOp

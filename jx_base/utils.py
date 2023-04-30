@@ -76,7 +76,7 @@ def enlist(value):
     elif is_many(value):
         return list(value)
     elif isinstance(value, dict) and len(value)==1 and ARRAY_KEY in value:
-        return value[ARRAY_KEY]
+        raise Exception("not allowed to run enlist on typed data")
     else:
         return [value]
 

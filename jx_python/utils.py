@@ -67,6 +67,7 @@ def merge_locals(*locals, **kwargs):
 
 
 _array_source_prefix = "{ARRAY_KEY:"
+_entyped_enlist = "entype(enlist("
 
 
 def to_python_value(expression):
@@ -76,6 +77,8 @@ def to_python_value(expression):
     """
     if expression.startswith(_array_source_prefix) and expression.endswith("}"):
         expr = expression[len(_array_source_prefix) : -1].strip()
+    elif expression.startswith(_entyped_enlist) and expression.endswith("))"):
+        expr = expression[len(_entyped_enlist): -2].strip()
     else:
         expr = f"({expression})[ARRAY_KEY]"
 
@@ -83,3 +86,17 @@ def to_python_value(expression):
         expr = expr[7:-1]
 
     return f"delist({expr})"
+
+
+def to_python_list(expression):
+    """
+    jx puts all arrays in typed json, like {"~a~": [content, of, list]}
+    return the python array
+    """
+
+    if expression.startswith(_array_source_prefix) and expression.endswith("}"):
+        return expression[len(_array_source_prefix) : -1].strip()
+    elif expression.startswith("entype(enlist(") and expression.endswith("))"):
+        return expression[len("entype("): -1].strip()
+    else:
+        return f"({expression})[ARRAY_KEY]"

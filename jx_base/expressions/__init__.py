@@ -87,7 +87,6 @@ from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.prefix_op import PrefixOp
 from jx_base.expressions.python_function import PythonFunction
 from jx_base.expressions.python_script import PythonScript
-from jx_base.expressions.python_to_list_op import PythonToListOp
 from jx_base.expressions.query_op import QueryOp
 from jx_base.expressions.range_op import RangeOp
 from jx_base.expressions.reg_exp_op import RegExpOp

@@ -10,9 +10,8 @@
 from mo_dots import exists
 
 from jx_base.expressions import SumOp as SumOp_, PythonScript, ToArrayOp
-from jx_base.expressions.python_to_list_op import to_python_list
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals
+from jx_python.utils import merge_locals, to_python_list
 from mo_json import JX_NUMBER
 
 

@@ -8,20 +8,22 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_dots import Data, is_data, leaves_to_data
-from mo_future import first
-from mo_imports import export
-from mo_logs import Log, strings
+from mo_logs import Log, strings, logger
 from mo_times.dates import Date
 
 from jx_base.expressions.python_script import PythonScript
+from mo_json.typed_object import TypedObject
+from mo_future import first
+from mo_imports import export
 
 GLOBALS = {
     "Date": Date,
-    "Log": Log,
+    "logger": logger,
     "Data": Data,
     "leaves_to_data": leaves_to_data,
     "is_data": is_data,
     "first": first,
+    "TypedObject": TypedObject,
 }
 
 
@@ -40,18 +42,15 @@ def compile_expression(code: PythonScript, function_name="output"):
     try:
         exec(
             (
-                "def "
-                + function_name
-                + f"(row{loop_depth}, rownum{loop_depth}=None, rows{loop_depth}=None):\n"
-                + "    _source = "
-                + strings.quote(code.source)
-                + "\n"
-                + "    try:\n"
-                + "        return "
-                + code.source
-                + "\n"
-                + "    except Exception as e:\n"
-                + "        Log.error('Problem with dynamic function {{func|quote}}',  func=_source, cause=e)\n"
+                f"def {function_name}(row{loop_depth}, rownum{loop_depth}=None, rows{loop_depth}=None):\n"
+                + f"    if not isinstance(row{loop_depth}, TypedObject):\n"
+                + f"        logger.warning('Expecting TypedObject')\n"
+                + f"        logger.error('Expecting TypedObject')\n"
+                + f"    _source = {strings.quote(code.source)}\n"
+                + f"    try:\n"
+                + f"        return {code.source}\n"
+                + f"    except Exception as e:\n"
+                + "        logger.error('Problem with dynamic function {{func|quote}}', func=_source, cause=e)\n"
             ),
             fake_globals,
             fake_locals,

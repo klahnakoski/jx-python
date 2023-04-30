@@ -17,20 +17,18 @@ from jx_base.expressions import (
     SelectOp,
     ToArrayOp,
     LimitOp,
-    PythonToListOp,
     GroupOp,
 )
-from jx_base.expressions.map_op import MapOp
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
 from jx_base.utils import delist
 from jx_python.streams.expression_factory import ExpressionFactory, factory, it
+from mo_json.typed_object import entype
 from jx_python.streams.typers import Typer, CallableTyper
 from jx_python.utils import distinct
 from mo_future import sort_using_cmp
 from mo_imports import export
-from mo_json.typed_encoder import untyped
-from mo_json.types import ARRAY_KEY
+from mo_json.typed_encoder import detype
 
 _get = object.__getattribute__
 row = Variable(".")
@@ -65,7 +63,7 @@ class Stream:
 
     def __iter__(self):
         func = self.factory.build()
-        return iter(func(self.values)[ARRAY_KEY])
+        return iter(detype(func(entype(self.values))))
 
     def map(self, accessor):
         if isinstance(accessor, dict):
@@ -103,22 +101,22 @@ class Stream:
     ###########################################################################
     def to_list(self):
         func = ExpressionFactory(ToArrayOp(self.factory.expr)).build()
-        return untyped(func(self.values))
+        return detype(func(entype(self.values)))
 
     def to_value(self):
         func = self.factory.build()
-        return delist(func(self.values)[ARRAY_KEY])
+        return delist(detype(func(entype(self.values))))
 
     def sum(self):
         return sum(v for v in self if exists(v))
 
     def first(self):
         func = self.factory.first().build()
-        return func(self.values)
+        return detype(func(entype(self.values)))
 
     def last(self):
         func = self.factory.last().build()
-        return func(self.values)
+        return detype(func(entype(self.values)))
 
 
 def stream(values):
