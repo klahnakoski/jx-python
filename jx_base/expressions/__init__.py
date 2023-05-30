@@ -4,7 +4,7 @@ from jx_base.expressions._utils import (
     jx_expression,
     merge_types,
     operators,
-    language,
+    JX,
     _jx_expression,
 )
 from jx_base.expressions.abs_op import AbsOp
@@ -102,7 +102,7 @@ from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
 from jx_base.expressions.sql_origins_op import SqlOriginsOp
 from jx_base.expressions.sql_script import SqlScript
 from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
-from jx_base.expressions.sql_select_op import SqlSelectOp
+from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.sum_op import SumOp
@@ -165,6 +165,7 @@ set_default(
         "last": LastOp,
         "left": LeftOp,
         "length": LengthOp,
+        "limit": LimitOp,
         "literal": Literal,
         "lt": LtOp,
         "lte": LteOp,
@@ -214,7 +215,7 @@ set_default(
     },
 )
 
-language.register_ops(vars())
+JX.register_ops(vars())
 
 register_literal(NullOp)
 register_literal(FalseOp)

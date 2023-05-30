@@ -14,6 +14,7 @@ from uuid import uuid4
 from mo_dots import coalesce, listwrap, to_data, last
 from mo_dots.datas import register_data
 from mo_future import is_text, text
+from mo_imports import expect
 from mo_logs import Log
 from mo_logs.strings import expand_template, quote
 
@@ -26,13 +27,14 @@ from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
-from jx_python.expressions import Python
 from mo_json import (
     value2json,
     true,
     false,
     null,
 )
+
+Python = expect("Python")
 
 ENABLE_CONSTRAINTS = True
 

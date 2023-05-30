@@ -7,6 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.language import is_op
 from mo_dots import leaves_to_data
 from mo_logs.strings import quote
 
@@ -29,7 +30,7 @@ class SelectOp(SelectOp_):
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
-            if self.terms[0].value.op == Variable.op and self.terms[0].value.var == "row":
+            if is_op(self.terms[0].value, Variable) and self.terms[0].value.var == "row":
                 # SELECT ".", NO NEED TO LOOP
                 loop_depth = frum.loop_depth
                 source = frum.source

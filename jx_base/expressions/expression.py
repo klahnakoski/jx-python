@@ -111,7 +111,7 @@ class Expression(BaseExpression):
         """
         if self.type == BOOLEAN:
             Log.error("programmer error")
-        return self.lang.MissingOp(self)
+        return lang.MissingOp(self)
 
     def exists(self):
         """
@@ -187,6 +187,8 @@ class Expression(BaseExpression):
         return value2json(self.__data__())
 
     def __getattr__(self, item):
+        if item=="__json__":
+            raise AttributeError()
         Log.error(
             """{{type}} object has no attribute {{item}}, did you .register_ops() for {{type}}?""",
             type=self.__class__.__name__,

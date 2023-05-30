@@ -7,12 +7,13 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_collections.matrix import Matrix
-from mo_dots import is_list, from_data, Data
-
+from jx_base.expressions import jx_expression
 from jx_base.expressions.expression import Expression
+from jx_base.expressions.literal import Literal, is_literal
 from jx_base.models.container import Container
 from jx_base.utils import enlist, delist
+from mo_collections.matrix import Matrix
+from mo_dots import is_list, from_data, Data
 from mo_json.typed_encoder import ARRAY_KEY
 from mo_json.types import JX_TEXT, JX_ANY, JxType
 from mo_logs import Log
@@ -21,7 +22,14 @@ from mo_logs import Log
 class FormatOp(Expression):
     def __init__(self, frum, format):
         Expression.__init__(self, frum, format)
+        if not is_literal(format):
+            logger.error("Expecting literal format")
         self.frum, self.format = frum, format
+
+    @classmethod
+    def define(cls, expr):
+        frum, format = expr['format']
+        return FormatOp(jx_expression(frum), Literal(format))
 
     def __data__(self):
         return {"format": [self.frum.__data__(), self.format]}
@@ -48,15 +56,20 @@ class FormatOp(Expression):
             )
 
     def apply(self, container: Container):
-        result = self.frum.apply(container)
+        format = self.format.value
 
-        if self.format == "sql":
-            return result.to_sql(container.namespace)
+        result = self.frum.apply(container)
+        sql = result.to_sql(container.namespace)
+        if format == "sql":
+            return sql
+
+        # we are expecting a deep query format and deep query result
+        result = container.query(sql)
 
         # DID NOT THINK THIS FAR YET
-        if self.format == "container":
+        if format == "container":
             output = QueryTable(new_table, container=container)
-        elif self.format == "cube" or (not self.format and normalized_query.edges):
+        elif format == "cube" or (not format and normalized_query.edges):
             column_names = [None] * (max(c.push_column_index for c in index_to_columns.values()) + 1)
             for c in index_to_columns.values():
                 column_names[c.push_column_index] = c.push_column_name
@@ -178,7 +191,7 @@ class FormatOp(Expression):
             return Data(
                 meta={"format": "cube"}, edges=edges, select=select, data={k: v.cube for k, v in data_cubes.items()},
             )
-        elif self.format == "table" or (not self.format and normalized_query.groupby):
+        elif format == "table" or (not format and normalized_query.groupby):
             column_names = [None] * (max(c.push_column_index for c in index_to_columns.values()) + 1)
             for c in index_to_columns.values():
                 column_names[c.push_column_index] = c.push_column_name
@@ -201,39 +214,26 @@ class FormatOp(Expression):
                 data.append(tuple(from_data(r) for r in row))
 
             output = Data(meta={"format": "table"}, header=column_names, data=data)
-        elif self.format == "list" or (not normalized_query.edges and not normalized_query.groupby):
-            if (
-                not normalized_query.edges
-                and not normalized_query.groupby
-                and any(s["aggregate"] is not NULL for s in normalized_query.select.terms)
-            ):
-                data = Data()
-                for s in index_to_columns.values():
-                    if not data[s.push_column_name][s.push_column_child]:
-                        data[s.push_column_name][s.push_column_child] = s.pull(result.data[0])
+        elif format == "list":
+            data = []
+            for record in result.data:
+                row = Data()
+                for c in index_to_columns.values():
+                    if c.push_column_child == ".":
+                        row[c.push_list_name] = c.pull(record)
+                    elif c.num_push_columns:
+                        tuple_value = row[c.push_list_name]
+                        if not tuple_value:
+                            tuple_value = row[c.push_list_name] = [None] * c.num_push_columns
+                        tuple_value[c.push_column_child] = c.pull(record)
                     else:
-                        data[s.push_column_name][s.push_column_child] += [s.pull(result.data[0])]
-                output = Data(meta={"format": "value"}, data=delist(from_data(data)))
-            else:
-                data = []
-                for record in result.data:
-                    row = Data()
-                    for c in index_to_columns.values():
-                        if c.push_column_child == ".":
-                            row[c.push_list_name] = c.pull(record)
-                        elif c.num_push_columns:
-                            tuple_value = row[c.push_list_name]
-                            if not tuple_value:
-                                tuple_value = row[c.push_list_name] = [None] * c.num_push_columns
-                            tuple_value[c.push_column_child] = c.pull(record)
-                        else:
-                            row[c.push_list_name][c.push_column_child] = c.pull(record)
+                        row[c.push_list_name][c.push_column_child] = c.pull(record)
 
-                    data.append(row)
+                data.append(row)
 
-                output = Data(meta={"format": "list"}, data=data)
+            output = Data(meta={"format": "list"}, data=data)
         else:
-            Log.error("unknown format {{format}}", format=self.format)
+            Log.error("unknown format {{format}}", format=format)
 
 
 formats = {

@@ -32,7 +32,7 @@ Literal, TRUE, FALSE, NULL, TupleOp, Variable = expect("Literal", "TRUE", "FALSE
 
 def simplified(func):
     def mark_as_simple(self, lang):
-        if self.simplified:
+        if self.simplified and lang is self.lang:
             return self
 
         output = func(self, lang)
@@ -44,12 +44,12 @@ def simplified(func):
     return mark_as_simple
 
 
-def jx_expression(expr, schema=None):
+JX = Language(None)
+
+
+def jx_expression(expr, lang=JX):
     # UPDATE THE VARIABLE WITH THEIR KNOWN TYPES
-    output = _jx_expression(expr, language)
-    if not schema:
-        return output
-    return output.to_jx(schema).partial_eval(language)
+    return _jx_expression(expr, lang).partial_eval(lang)
 
 
 def _jx_expression(json, lang):
@@ -61,7 +61,7 @@ def _jx_expression(json, lang):
         new_op = json
         if not new_op:
             # CAN NOT BE FOUND, TRY SOME PARTIAL EVAL
-            return language[json.get_id()].partial_eval(lang)
+            return JX[json.get_id()].partial_eval(lang)
         return json
         # return new_op(expr.args)  # THIS CAN BE DONE, BUT IT NEEDS MORE CODING, AND I WOULD EXPECT IT TO BE SLOW
 
@@ -93,7 +93,7 @@ def _jx_expression(json, lang):
                     class_ = lang.ops[full_op.get_id()]
                     if not class_:
                         # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
-                        class_ = language[full_op.get_id()]
+                        class_ = JX[full_op.get_id()]
 
                     return class_.define({op: [sub_json] + enlist(rhs)})
 
@@ -104,7 +104,7 @@ def _jx_expression(json, lang):
                 class_ = lang.ops[full_op.get_id()]
                 if not class_:
                     # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
-                    class_ = language[op.get_id()]
+                    class_ = JX[op.get_id()]
 
                 return class_.define(json)
         else:
@@ -112,9 +112,6 @@ def _jx_expression(json, lang):
 
     except Exception as cause:
         Log.error("programmer error expr = {{value|quote}}", value=json, cause=cause)
-
-
-language = Language(None)
 
 
 _json_encoder = utf8_json_encoder

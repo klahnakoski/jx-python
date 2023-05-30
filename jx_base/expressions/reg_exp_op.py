@@ -32,7 +32,7 @@ class RegExpOp(Expression):
         return {"regexp": [self.expr.__data__(), self.pattern.__data__()]}
 
     def __eq__(self, other):
-        if not isinstance(other, RegExpOp):
+        if not is_op(other, RegExpOp):
             return False
         return self.expr == other.expr and self.pattern == other.pattern
 

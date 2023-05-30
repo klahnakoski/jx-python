@@ -33,7 +33,6 @@ from jx_base.expressions.from_op import FromOp
 from jx_base.expressions.leaves_op import LeavesOp
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.null_op import NULL
-from jx_base.expressions.sql_select_op import SqlSelectOp
 from jx_base.expressions.variable import Variable
 from jx_base.language import is_op
 from jx_base.models.container import Container
@@ -48,7 +47,9 @@ class SelectOne:
 
 
 class SelectOp(Expression):
-    def __init__(self, frum, terms: Tuple[SelectOne], **kwargs: Dict[str, Expression]):
+    has_simple_form = True
+
+    def __init__(self, frum, *terms: Tuple[SelectOne], **kwargs: Dict[str, Expression]):
         """
         :param terms: list OF SelectOne DESCRIPTORS
         """
@@ -85,17 +86,11 @@ class SelectOp(Expression):
                                 "expecting {{value}} a simple dot-delimited path name", value=t.value,
                             )
                         else:
-                            terms.append({
-                                "name": t.value,
-                                "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate,),
-                            })
+                            terms.append(SelectOne(t.value,AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate)))
                     else:
                         Log.error("expecting a name property")
                 else:
-                    terms.append({
-                        "name": t.name,
-                        "value": AggregateOp(FromOp(_jx_expression(t.value, cls.lang)), t.aggregate),
-                    })
+                    terms.append(SelectOne(t.name, AggregateOp(FromOp(jx_expression(t.value)), t.aggregate)))
             elif t.name == None:
                 if t.value == None:
                     Log.error("expecting select parameters to have name and value properties")
@@ -105,14 +100,11 @@ class SelectOp(Expression):
                             "expecting {{value}} a simple dot-delimited path name", value=t.value,
                         )
                     else:
-                        terms.append({
-                            "name": t.value,
-                            "value": _jx_expression(t.value, cls.lang),
-                        })
+                        terms.append(SelectOne(t.value, _jx_expression(t.value, cls.lang)))
                 else:
                     Log.error("expecting a name property")
             else:
-                terms.append({"name": t.name, "value": jx_expression(t.value)})
+                terms.append(SelectOne(t.name, jx_expression(t.value)))
         return SelectOp(frum, *terms)
 
     @simplified
@@ -135,9 +127,9 @@ class SelectOp(Expression):
                 new_terms.append(SelectOne(name, new_expr))
 
         if diff:
-            return SelectOp(self.frum.partial_eval(lang), tuple(new_terms))
+            return lang.SelectOp(self.frum.partial_eval(lang), *new_terms)
         else:
-            return SelectOp(self.frum.partial_eval(lang), self.terms)
+            return lang.SelectOp(self.frum.partial_eval(lang), *self.terms)
 
     @property
     def type(self):
@@ -145,9 +137,7 @@ class SelectOp(Expression):
 
     def apply(self, container: Container):
         result = self.frum.apply(container)
-        results = tuple(*(SelectOne(name, value.apply(result)) for name, value in self))
-        # GROUP BY COMMON TABLE
-        return SqlSelectOp(result, results)
+        return SelectOp(result, *self.terms)
 
     def __iter__(self) -> Iterable[Tuple[str, Expression, str]]:
         """

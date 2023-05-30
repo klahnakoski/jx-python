@@ -9,9 +9,6 @@
 #
 
 
-from mo_imports import export
-from mo_logs import Log
-
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -19,9 +16,10 @@ from jx_base.expressions.literal import Literal
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
+from mo_imports import export
+from mo_logs import Log
 
 
 class WhenOp(Expression):
@@ -47,7 +45,7 @@ class WhenOp(Expression):
             return self.els_(row, rownum, rows)
 
     def __eq__(self, other):
-        if not isinstance(other, WhenOp):
+        if not is_op(other, WhenOp):
             return False
         return self.when == other.when and self.then == other.then and self.els_ == other.els_
 
@@ -68,7 +66,7 @@ class WhenOp(Expression):
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
-        when = ToBooleanOp(self.when).partial_eval(lang)
+        when = lang.ToBooleanOp(self.when).partial_eval(lang)
 
         if when is TRUE:
             return self.then.partial_eval(lang)
@@ -89,9 +87,9 @@ class WhenOp(Expression):
             if els_ is FALSE:
                 return FALSE
             elif els_ is TRUE:
-                return (NotOp(when)).partial_eval(lang)
+                return lang.NotOp(when).partial_eval(lang)
 
-        return WhenOp(when, then=then, **{"else": els_})
+        return lang.WhenOp(when, then=then, **{"else": els_})
 
 
 export("jx_base.expressions.base_multi_op", WhenOp)

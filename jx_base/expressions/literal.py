@@ -9,12 +9,11 @@
 #
 
 
-from jx_base.expressions._utils import value2json
 from jx_base.expressions.expression import Expression
 from mo_dots import Null, is_data
 from mo_future import is_text
 from mo_imports import expect, export
-from mo_json.types import value_to_jx_type
+from mo_json import value2json, value_to_jx_type
 
 DateOp, FALSE, TRUE, NULL = expect("DateOp", "FALSE", "TRUE", "NULL")
 
@@ -111,7 +110,7 @@ class Literal(Expression):
         return value_to_jx_type(self._value)
 
     def partial_eval(self, lang):
-        return self
+        return lang.Literal(self.value)
 
     def str(self):
         return str(self.value)

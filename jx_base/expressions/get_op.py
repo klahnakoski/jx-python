@@ -11,6 +11,7 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import is_literal
+from jx_base.language import is_op
 from mo_json import JX_ANY
 
 
@@ -30,8 +31,8 @@ class GetOp(Expression):
         var = self.frum.partial_eval(lang)
         offsets = tuple(o.partial_eval(lang) for o in self.offsets)
         if var.op == GetOp.op:
-            return GetOp(var.frum, *var.offsets + offsets)
-        return GetOp(var, *offsets)
+            return lang.GetOp(var.frum, *var.offsets + offsets)
+        return lang.GetOp(var, *offsets)
 
     def __data__(self):
         return {"get": [self.frum.__data__(), *(o.__data__() for o in self.offsets)]}
@@ -57,7 +58,7 @@ class GetOp(Expression):
 
     def __eq__(self, other):
         return (
-            isinstance(other, GetOp)
+            is_op(other, GetOp)
             and other.frum == self.frum
             and all(o == s for s, o in zip(self.offsets, other.offsets))
         )

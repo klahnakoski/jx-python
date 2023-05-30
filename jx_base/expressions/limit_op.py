@@ -52,19 +52,18 @@ class LimitOp(Expression):
     def partial_eval(self, lang):
         frum = self.frum.partial_eval(lang)
         amount = self.amount.partial_eval(lang)
-
         if is_op(frum, LimitOp):
-            return LimitOp(frum.frum, MinOp(frum.amount, amount)).partial_eval(lang)
+            return lang.LimitOp(frum.frum, MinOp(frum.amount, amount)).partial_eval(lang)
         elif is_op(frum, CaseOp):  # REWRITING
-            return CaseOp(
-                [WhenOp(t.when, then=LimitOp(t.then, amount)) for t in frum.whens[:-1]]
-                + [LimitOp(frum.whens[-1], amount)]
+            return lang.CaseOp(
+                [lang.WhenOp(t.when, then=lang.LimitOp(t.then, amount)) for t in frum.whens[:-1]]
+                + [lang.LimitOp(frum.whens[-1], amount)]
             ).partial_eval(lang)
         elif is_op(frum, WhenOp):
-            return WhenOp(
-                frum.when, then=LimitOp(frum.then, amount), **{"else": LimitOp(frum.els_, amount)}
+            return lang.WhenOp(
+                frum.when, then=lang.LimitOp(frum.then, amount), **{"else": lang.LimitOp(frum.els_, amount)}
             ).partial_eval(lang)
         elif is_literal(frum) and is_literal(amount):
-            return Literal(enlist(frum.value)[: amount.value])
+            return lang.Literal(enlist(frum.value)[: amount.value])
         else:
-            return LimitOp(frum, amount)
+            return lang.LimitOp(frum, amount)

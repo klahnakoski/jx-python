@@ -15,6 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
+
 from mo_dots import Data, data_types, startswith_field, null_types
 from mo_dots.lists import list_types, is_many
 from mo_future import (
@@ -26,8 +27,11 @@ from mo_future import (
     function_type,
     get_function_arguments,
 )
+from mo_imports import delay_import
 from mo_logs import Log
 from mo_times import Date
+
+is_literal = delay_import("jx_base.expressions.literal.is_literal")
 
 _get = object.__getattribute__
 builtin_tuple = tuple
@@ -106,10 +110,13 @@ def partial_eval(self, lang):
     DISPATCH TO CLASS-SPECIFIC self.partial_eval(lang)
     """
     try:
-        if self.simplified:
+        if self.simplified and self.lang == lang:
             return self
         func = self.lookups["partial_eval"][lang.id]
         output = func(self, lang)
+        if output.lang is not lang and not is_literal(output) and func is not self.lookups["partial_eval"][JX.id]:
+            func(self, lang)
+            Log.error(f"expecting {lang}")
         output.simplified = True
         return output
     except Exception as cause:
@@ -248,6 +255,9 @@ class Language(object):
         return item
 
     def __str__(self):
+        return self.name
+
+    def __repr__(self):
         return self.name
 
 

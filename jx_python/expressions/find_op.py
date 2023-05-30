@@ -24,22 +24,22 @@ from mo_json import JX_INTEGER
 
 class FindOp(FindOp_):
     def partial_eval(self, lang):
-        index = BasicIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
+        index = lang.BasicIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
 
-        output = WhenOp(
-            OrOp(self.value.missing(Python), self.find.missing(Python), BasicEqOp(index, Literal(-1)),),
+        output = lang.WhenOp(
+            lang.OrOp(self.value.missing(Python), self.find.missing(Python), lang.BasicEqOp(index, Literal(-1)),),
             then=self.default,
             **{"else": index},
         ).partial_eval(lang)
         return output
 
     def missing(self, lang):
-        output = AndOp(
+        output = lang.AndOp(
             self.default.missing(Python),
             OrOp(
                 self.value.missing(Python),
                 self.find.missing(Python),
-                EqOp(BasicIndexOfOp(self.value, self.find, self.start), Literal(-1)),
+                lang.EqOp(lang.BasicIndexOfOp(self.value, self.find, self.start), Literal(-1)),
             ),
         ).partial_eval(lang)
         return output

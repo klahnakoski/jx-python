@@ -11,13 +11,12 @@
 
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.last_op import LastOp
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.language import is_op
 from mo_dots import is_many
 from mo_future import first
 from mo_imports import expect
-from mo_json.types import base_type, JX_ARRAY, ARRAY
+from mo_json.types import base_type, ARRAY
 
 WhenOp = expect("WhenOp")
 
@@ -37,6 +36,11 @@ class FirstOp(Expression):
             return first(value)
         else:
             return value
+
+    def __eq__(self, other):
+        if not is_op(other, FirstOp):
+            return False
+        return self.term == other.term
 
     def vars(self):
         return self.term.vars()

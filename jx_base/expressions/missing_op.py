@@ -47,7 +47,7 @@ class MissingOp(Expression):
         output = self.expr.missing(lang)
         if is_op(output, MissingOp):
             # break call cycle
-            return NotOp(output)
+            return lang.NotOp(output)
         else:
             return output.invert(lang)
 

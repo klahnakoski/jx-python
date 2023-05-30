@@ -10,8 +10,6 @@
 from dataclasses import dataclass
 from typing import List
 
-from jx_base.models.table import Table
-
 
 @dataclass
 class Relation:
