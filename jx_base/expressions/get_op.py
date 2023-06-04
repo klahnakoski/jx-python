@@ -37,6 +37,19 @@ class GetOp(Expression):
     def __data__(self):
         return {"get": [self.frum.__data__(), *(o.__data__() for o in self.offsets)]}
 
+    def __call__(self, row, rownum=None, rows=None):
+        output = self.frum(row, rownum, rows)
+        for o in self.offsets:
+            ov = o(row, rownum, rows)
+            try:
+                output = getattr(output, ov)
+            except:
+                try:
+                    output = output[ov]
+                except:
+                    break
+        return output
+
     @property
     def type(self):
         output = self.frum.type

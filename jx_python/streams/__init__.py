@@ -68,11 +68,12 @@ class Stream:
     def map(self, accessor):
         if isinstance(accessor, dict):
             fact = ExpressionFactory(SelectOp(
-                self.factory.expr, tuple(SelectOne(n, factory(v).expr) for n, v in to_data(accessor).leaves())
+                self.factory.expr,
+                *(SelectOne(n, factory(v).expr) for n, v in to_data(accessor).leaves())
             ))
         else:
             accessor = factory(accessor)
-            fact = ExpressionFactory(SelectOp(self.factory.expr, (SelectOne(".", accessor.expr),)))
+            fact = ExpressionFactory(SelectOp(self.factory.expr, SelectOne(".", accessor.expr)))
         return Stream(self.values, fact)
 
     def filter(self, pred):
@@ -120,7 +121,7 @@ class Stream:
 
 
 def stream(values):
-    return Stream(values, ExpressionFactory(SelectOp(ToArrayOp(it.expr), (SelectOne(".", Variable(".")),))))
+    return Stream(values, ExpressionFactory(SelectOp(ToArrayOp(it.expr), SelectOne(".", Variable(".")))))
 
 
 ANNOTATIONS = {

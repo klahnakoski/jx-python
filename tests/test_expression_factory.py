@@ -9,6 +9,8 @@
 import os
 from unittest import TestCase, skip
 
+from mo_testing.fuzzytestcase import add_error_reporting
+
 from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
 from jx_python.streams.typers import ANNOTATIONS
@@ -17,6 +19,7 @@ from mo_json import ARRAY_KEY
 IS_TRAVIS = bool(os.environ.get("TRAVIS"))
 
 
+@add_error_reporting
 class TestExpressionFactory(TestCase):
     def test_deep_iteration(self):
         class Something:

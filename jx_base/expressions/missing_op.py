@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_dots import is_missing
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -33,6 +33,9 @@ class MissingOp(Expression):
             return False
         else:
             return self.expr == other.expr
+
+    def __call__(self, row, rownum=None, rows=None):
+        return is_missing(self.expr(row, rownum, rows))
 
     def vars(self):
         return self.expr.vars()

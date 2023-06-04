@@ -7,13 +7,13 @@
 #
 
 
-from mo_testing.fuzzytestcase import FuzzyTestCase
+from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 from mo_threads import stop_main_thread
 
 from jx_base import jx_expression
 from jx_python.expressions import Python
 
-
+@add_error_reporting
 class TestOther(FuzzyTestCase):
     @classmethod
     def tearDownClass(cls):

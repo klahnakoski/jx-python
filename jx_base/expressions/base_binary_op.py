@@ -56,4 +56,4 @@ class BaseBinaryOp(Expression):
             if lhs is NULL or rhs is NULL:
                 return NULL
             return Literal(builtin_ops[self.op](lhs.value, rhs.value))
-        return self.__class__(lhs, rhs)
+        return getattr(lang, self.__class__.__name__)(lhs, rhs)
