@@ -9,8 +9,7 @@
 #
 
 
-from jx_base.domains import ALGEBRAIC, Domain, KNOWN
-from jx_base.expressions import NullOp
+import mo_dots as dot
 from mo_dots import (
     Data,
     FlatList,
@@ -19,16 +18,17 @@ from mo_dots import (
     is_data,
     is_list,
     join_field,
-    listwrap,
     split_field,
     to_data,
     list_to_data,
 )
-import mo_dots as dot
-from mo_future import transpose
 from mo_logs import Log
 from mo_math import SUM
 from mo_times.timer import Timer
+
+from jx_base.domains import ALGEBRAIC, Domain, KNOWN
+from jx_base.expressions import NullOp
+from mo_future import transpose
 
 DEFAULT_QUERY_LIMIT = 20
 

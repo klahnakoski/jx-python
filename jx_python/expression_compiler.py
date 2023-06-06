@@ -11,9 +11,8 @@
 
 import re
 
-from jx_base.utils import listwrap
+from mo_dots import Data, coalesce, is_data, leaves_to_data, listwrap
 from mo_future import first
-from mo_dots import Data, coalesce, is_data, leaves_to_data
 from mo_logs import Log, strings
 from mo_times.dates import Date
 

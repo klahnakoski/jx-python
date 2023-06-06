@@ -8,6 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_dots import is_missing
+from mo_json.typed_object import TypedObject
 
 from jx_base.expressions import MissingOp as MissingOp_, PythonScript, FALSE
 from jx_python.utils import merge_locals
@@ -18,10 +19,16 @@ class MissingOp(MissingOp_):
     def to_python(self, loop_depth=0):
         expr = self.expr.to_python(loop_depth)
         return PythonScript(
-            merge_locals(expr.locals, is_missing=is_missing),
+            merge_locals(expr.locals, missing=missing, is_missing=is_missing),
             loop_depth,
             JX_BOOLEAN,
             f"is_missing({expr.source})",
             self,
             FALSE,
         )
+
+
+def missing(value):
+    if isinstance(value, TypedObject):
+        return is_missing(value._boxed_value)
+    return is_missing(value)

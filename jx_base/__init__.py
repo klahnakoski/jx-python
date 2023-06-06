@@ -11,10 +11,8 @@
 
 from uuid import uuid4
 
-from mo_dots import coalesce, listwrap, to_data, last
+from mo_dots import coalesce, to_data, last
 from mo_dots.datas import register_data
-from mo_future import is_text, text
-from mo_imports import expect
 from mo_logs import Log
 from mo_logs.strings import expand_template, quote
 
@@ -27,6 +25,8 @@ from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
+from mo_future import is_text, text
+from mo_imports import expect
 from mo_json import (
     value2json,
     true,
@@ -54,7 +54,7 @@ def _exec(code, name, defines={}):
         Log.error("Can not make class\n{{code}}", code=code, cause=cause)
 
 
-_ = listwrap, last, true, false, null
+_ = last, true, false, null
 
 
 def _to_python(value):

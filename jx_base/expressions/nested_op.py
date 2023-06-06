@@ -9,6 +9,8 @@
 #
 
 
+from mo_dots import Null, startswith_field, coalesce
+
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
@@ -20,8 +22,7 @@ from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import IDENTITY
 from jx_base.language import is_op
-from mo_dots import Null, startswith_field, coalesce, listwrap
-from mo_imports import export, expect
+from mo_imports import export
 from mo_json.types import JX_BOOLEAN
 
 
