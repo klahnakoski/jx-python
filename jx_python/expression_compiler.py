@@ -58,19 +58,14 @@ def compile_expression(source, function_name="output"):
     try:
         exec(
             (
-                "def "
-                + function_name
-                + "(row, rownum=None, rows=None):\n"
-                + "    _source = "
-                + strings.quote(source)
-                + "\n"
-                + "    try:\n"
-                + "        return "
-                + source
-                + "\n"
-                + "    except Exception as e:\n"
-                + "        Log.error(u'Problem with dynamic function {{func|quote}}', "
-                " func=_source, cause=e)\n"
+                strings.outdent(f"""
+                def {function_name}(row, rownum=None, rows=None):
+                    _source = {strings.quote(source)}
+                    try:
+                        return {source}
+                    except Exception as e:
+                        Log.error('Problem with dynamic function {{func|quote}}', func=_source, cause=e)
+                """)
             ),
             GLOBALS,
             fake_locals,
