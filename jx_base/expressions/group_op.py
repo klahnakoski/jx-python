@@ -9,7 +9,7 @@
 #
 
 from jx_base.expressions.expression import Expression, MissingOp
-from jx_base.expressions.to_array_op import ToArrayOp
+from jx_base.expressions.array_of_op import ArrayOfOp
 from mo_json import array_of
 
 
@@ -20,7 +20,7 @@ class GroupOp(Expression):
 
     def __init__(self, frum, group):
         Expression.__init__(self, frum, group)
-        self.frum, self.group = ToArrayOp(frum), group
+        self.frum, self.group = frum, group
 
     def __data__(self):
         return {"group": [self.frum.__data(), self.group.__data__()]}

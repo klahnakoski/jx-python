@@ -52,7 +52,7 @@ class CoalesceOp(Expression):
     def partial_eval(self, lang):
         terms = []
         for t in self.terms:
-            simple = (FirstOp(t)).partial_eval(lang)
+            simple = FirstOp(t).partial_eval(lang)
             if simple is NULL:
                 pass
             elif is_literal(simple):
@@ -66,7 +66,7 @@ class CoalesceOp(Expression):
         elif len(terms) == 1:
             return terms[0]
         else:
-            return CoalesceOp(terms)
+            return CoalesceOp(*terms)
 
 
 export("jx_base.expressions.base_multi_op", CoalesceOp)

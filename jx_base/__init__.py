@@ -31,7 +31,7 @@ from mo_json import (
     value2json,
     true,
     false,
-    null,
+    null, _simple_expand,
 )
 
 Python = expect("Python")
@@ -109,7 +109,7 @@ def DataClass(name, columns, constraint=None):
     defaults = {c.name: coalesce(c.default, None) for c in columns}
     types = {c.name: coalesce(c.type, object) for c in columns}
     constraint_expr = jx_expression(not ENABLE_CONSTRAINTS or constraint).partial_eval(Python).to_python()
-    code = expand_template(
+    code = _simple_expand(
         """
 import re
 from mo_future import is_text, is_binary, Mapping
@@ -119,6 +119,7 @@ from jx_base import failure
 meta = None
 types_ = {{types}}
 defaults_ = {{defaults}}
+opener = "{"+"{"
 
 class {{class_name}}(Mapping):
     __slots__ = {{slots}}
@@ -150,12 +151,15 @@ class {{class_name}}(Mapping):
 
         illegal = set(kwargs.keys())-set({{slots}})
         if illegal:
-            Log.error("{"+"{names}} are not a valid properties", names=illegal)
+            Log.error(opener + "names}} are not a valid properties", names=illegal)
 
         self._constraint(0, [self])
 
     def __getitem__(self, item):
-        return getattr(self, item)
+        try:
+            return getattr(self, item)
+        except Exception:
+            raise KeyError(item)
 
     def __setitem__(self, item, value):
         setattr(self, item, value)
@@ -163,7 +167,7 @@ class {{class_name}}(Mapping):
 
     def __setattr__(self, item, value):
         if item not in {{slots}}:
-            Log.error("{"+"{item|quote}} not valid attribute", item=item)
+            Log.error(opener + "item|quote}} not valid attribute", item=item)
 
         if value==None and item in {{required}}:
             Log.error("Expecting property {"+"{item}}", item=item)
@@ -172,7 +176,7 @@ class {{class_name}}(Mapping):
         self._constraint(0, [self])
 
     def __getattr__(self, item):
-        Log.error("{"+"{item|quote}} not valid attribute", item=item)
+        Log.error(opener + "item|quote}} not valid attribute", item=item)
 
     def __hash__(self):
         return object.__hash__(self)
@@ -207,7 +211,7 @@ class {{class_name}}(Mapping):
         return str({{dict}})
 
 """,
-        {
+        ({
             "class_name": name,
             "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
             "required": "{" + ", ".join(quote(s) for s in required) + "}",
@@ -218,7 +222,7 @@ class {{class_name}}(Mapping):
             "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
             "constraint_expr": constraint_expr.source,
             "constraint": value2json(constraint),
-        },
+        },)
     )
 
     output = _exec(code, name, constraint_expr.locals)

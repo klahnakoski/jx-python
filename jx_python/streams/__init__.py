@@ -15,9 +15,9 @@ from jx_base.expressions import (
     Variable,
     FilterOp,
     SelectOp,
-    ToArrayOp,
+    ArrayOfOp,
     LimitOp,
-    GroupOp,
+    GroupOp, ToArrayOp,
 )
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
@@ -102,7 +102,7 @@ class Stream:
     ###########################################################################
     def to_list(self):
         func = ExpressionFactory(ToArrayOp(self.factory.expr)).build()
-        return detype(func(entype(self.values)))
+        return detype(func(self.values))
 
     def to_value(self):
         func = self.factory.build()

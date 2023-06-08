@@ -7,22 +7,22 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions import FirstOp as FirstOp_
+
+
+from jx_base.expressions import BasicAddOp as BasicAddOp_, FALSE
 from jx_base.expressions.python_script import PythonScript
-from jx_base.utils import enlist
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_future import first
-from mo_json import member_type, ARRAY_KEY
+from mo_json import JX_BOOLEAN
 
 
-class FirstOp(FirstOp_):
+class BasicAddOp(BasicAddOp_):
     def to_python(self, loop_depth=0):
-        value = self.term.partial_eval(Python).to_python(loop_depth)
+        terms = [t.partial_eval(Python).to_python(loop_depth) for t in self.terms]
         return PythonScript(
-            merge_locals(value.locals, first=first, enlist=enlist, ARRAY_KEY=ARRAY_KEY),
+            merge_locals(*(t.locals for t in terms)),
             loop_depth,
-            member_type(value.type),
-            f"first(enlist({value.source}))",
-            self,
+            JX_BOOLEAN,
+            " + ".join(f"({t.source})" for t in terms),
+            FALSE,
         )

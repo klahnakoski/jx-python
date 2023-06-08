@@ -7,27 +7,25 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions import ToArrayOp as _ToArrayOp, PythonScript
-from jx_base.language import is_op
-from jx_base.utils import enlist
+
+
+from jx_base.expressions import ArrayOfOp as _ToArrayOp, PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
-from mo_json import array_of
+from mo_json import array_of, ARRAY
 
 
-class ToArrayOp(_ToArrayOp):
+class ArrayOfOp(_ToArrayOp):
     def to_python(self, loop_depth=0):
         term = self.term.partial_eval(Python).to_python(loop_depth)
+        type = term.type
+        if type == ARRAY:
+            return PythonScript(merge_locals(term.locals), loop_depth, type, term.source, self)
+
         return PythonScript(
-            merge_locals(term.locals, enlist=enlist),
+            term.locals,
             loop_depth,
             array_of(term.type),
-            f"enlist({term.source})",
+            f"[{term.source}]",
             self,
         )
-
-    def partial_eval(self, lang):
-        term = self.term.partial_eval(lang)
-        if is_op(term, ToArrayOp):
-            return term
-        return lang.ToArrayOp(term)

@@ -32,7 +32,7 @@ class PythonFunction(PythonFunction_):
             {self._name: self.func},
             loop_depth,
             self.type,
-            f"{self._name}(row{loop_depth}, rownum{loop_depth}, rows{loop_depth})",
+            f"{self._name}(row{loop_depth})",
             self,
         )
 

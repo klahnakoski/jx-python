@@ -12,7 +12,7 @@ from jx_base.expressions import FilterOp as FilterOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
 from mo_json import ARRAY_KEY
 
 
@@ -26,6 +26,6 @@ class FilterOp(FilterOp_):
             merge_locals(frum.locals, predicate.locals, enlist=enlist, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             frum.type,
-            f"""{{ARRAY_KEY: [row{loop_depth} for rows{loop_depth} in [{to_python_list(frum.source)}] for rownum{loop_depth}, row{loop_depth} in enumerate(rows{loop_depth}) if ({predicate.source})]}}""",
+            f"""[row{loop_depth} for row{loop_depth} in {frum.source} if ({predicate.source})]""",
             self,
         )

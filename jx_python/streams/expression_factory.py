@@ -1,5 +1,3 @@
-from mo_logs import logger
-
 from jx_base import jx_expression
 from jx_base.expressions import (
     Expression,
@@ -34,6 +32,7 @@ from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
 from jx_python.streams.typers import Typer
 from mo_json import JX_ANY
+from mo_logs import logger
 
 Any = Typer(python_type=JX_ANY)
 

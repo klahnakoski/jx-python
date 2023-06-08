@@ -7,13 +7,13 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
 from jx_base.expressions import GetOp as GetOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
-from jx_base.utils import enlist
+from jx_base.utils import enlist, delist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
 from mo_json import JX_ANY, array_of, ARRAY_KEY
+from mo_json.typed_object import TypedObject
 
 
 class GetOp(GetOp_):
@@ -28,7 +28,7 @@ class GetOp(GetOp_):
             merge_locals(locals, frum.locals, get_attr=get_attr, ARRAY_KEY=ARRAY_KEY),
             loop_depth,
             var_type,
-            f"{{ARRAY_KEY: get_attr({to_python_list(frum.source)}, {offsets})}}",
+            f"get_attr({frum.source}, {offsets})",
             self,
         )
 
@@ -40,6 +40,12 @@ def unit(x):
 def get_attr(values, *items):
     for item in items:
         result = []
+        if isinstance(values, TypedObject):
+            v = values[item]
+            if v is not None:
+                values = enlist(v)
+                continue
+
         for v in values:
             try:
                 child = getattr(v, item)
@@ -49,10 +55,7 @@ def get_attr(values, *items):
                 except:
                     continue
 
-            if isinstance(child, dict) and ARRAY_KEY in child:
-                result.extend(child[ARRAY_KEY])
-            else:
-                result.extend(enlist(child))
+            result.extend(enlist(child))
 
         values = result
-    return values
+    return delist(values)

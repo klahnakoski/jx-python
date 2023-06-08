@@ -10,9 +10,9 @@
 
 from jx_base.expressions import LimitOp as LimitOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
+from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
-from mo_json import ARRAY_KEY
+from jx_python.utils import merge_locals
 
 
 class LimitOp(LimitOp_):
@@ -20,9 +20,9 @@ class LimitOp(LimitOp_):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         amount = self.amount.partial_eval(Python).to_python(loop_depth)
         return PythonScript(
-            merge_locals(frum.locals, amount.locals, ARRAY_KEY=ARRAY_KEY),
+            merge_locals(frum.locals, amount.locals, enlist=enlist),
             loop_depth,
             frum.type,
-            f"{{ARRAY_KEY: ({to_python_list(frum.source)})[:{amount.source}]}}",
+            f"{frum.source}[:{amount.source}]",
             self,
         )

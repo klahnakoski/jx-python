@@ -1,6 +1,7 @@
 from jx_python.expressions._utils import jx_expression_to_function, Python
 from jx_python.expressions.add_op import AddOp
 from jx_python.expressions.and_op import AndOp
+from jx_python.expressions.basic_add_op import BasicAddOp
 from jx_python.expressions.basic_eq_op import BasicEqOp
 from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
 from jx_python.expressions.basic_starts_with_op import BasicStartsWithOp
@@ -58,6 +59,7 @@ from jx_python.expressions.split_op import SplitOp
 from jx_python.expressions.sub_op import SubOp
 from jx_python.expressions.sum_op import SumOp
 from jx_python.expressions.suffix_op import SuffixOp
+from jx_python.expressions.array_of_op import ArrayOfOp
 from jx_python.expressions.to_array_op import ToArrayOp
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.expressions.to_integer_op import ToIntegerOp

@@ -68,4 +68,4 @@ class BasicMultiOp(Expression):
             if acc is not None:
                 terms.append(Literal(acc))
 
-            return self.__class__(terms)
+            return self.__class__(*terms)

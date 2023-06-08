@@ -107,8 +107,9 @@ from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.sum_op import SumOp
 from jx_base.expressions.suffix_op import SuffixOp
-from jx_base.expressions.to_array_op import ToArrayOp
+from jx_base.expressions.array_of_op import ArrayOfOp
 from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.to_number_op import ToNumberOp
 from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.expressions.true_op import TrueOp, TRUE
@@ -125,7 +126,7 @@ set_default(
         "add": AddOp,
         "aggregate": AggregateOp,
         "and": AndOp,
-        "array": ToArrayOp,
+        "array": ArrayOfOp,
         "avg": AvgOp,
         "basic.add": BasicAddOp,
         "basic.mul": BasicMulOp,
@@ -199,6 +200,7 @@ set_default(
         "script": ScriptOp,
         "select": SelectOp,
         "split": SplitOp,
+        "to_array": ToArrayOp,
         "to_text": ToTextOp,
         "text": ToTextOp,
         "suffix": SuffixOp,

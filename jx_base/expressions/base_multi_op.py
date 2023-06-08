@@ -83,9 +83,9 @@ class BaseMultiOp(Expression):
 
             output = WhenOp(
                 AndOp(*(t.missing(lang) for t in terms)),
-                **{"else": operators["basic." + self.op]([
+                **{"else": operators["basic." + self.op](*(
                     CoalesceOp(t, _jx_identity.get(self.op, NULL)) for t in terms
-                ])}
+                ))}
             ).partial_eval(lang)
         else:
             # CONSERVATIVE

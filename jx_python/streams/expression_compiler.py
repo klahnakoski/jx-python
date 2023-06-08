@@ -43,9 +43,6 @@ def compile_expression(code: PythonScript, function_name="output"):
         exec(
             (
                 f"def {function_name}(row{loop_depth}, rownum{loop_depth}=None, rows{loop_depth}=None):\n"
-                + f"    if not isinstance(row{loop_depth}, TypedObject):\n"
-                + f"        logger.warning('Expecting TypedObject')\n"
-                + f"        logger.error('Expecting TypedObject')\n"
                 + f"    _source = {strings.quote(code.source)}\n"
                 + f"    try:\n"
                 + f"        return {code.source}\n"

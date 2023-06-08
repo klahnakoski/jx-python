@@ -8,15 +8,21 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_dots import coalesce
+from mo_json import union_type
 
+from jx_base import Python
 from jx_base.expressions import CoalesceOp as CoalesceOp_
 from jx_base.expressions.python_script import PythonScript
+from jx_python.utils import merge_locals
 
 
 class CoalesceOp(CoalesceOp_):
     def to_python(self, loop_depth=0):
+        terms = [t.partial_eval(Python).to_python(loop_depth) for t in self.terms]
         return PythonScript(
-            {"coalesce": coalesce},
+            merge_locals(*(t.locals for t in terms), {"coalesce": coalesce}),
             loop_depth,
-            "coalesce(" + ", ".join((t).to_python(loop_depth) for t in self.terms) + ")",
+            union_type(*(t.type for t in terms)),
+            "coalesce(" + ", ".join(t.source for t in terms) + ")",
+            self,
         )

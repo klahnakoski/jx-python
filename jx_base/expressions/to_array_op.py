@@ -7,7 +7,10 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_json.types import array_of
 
+from jx_base.expressions import SelectOp, GroupOp, FilterOp
+from jx_base.language import is_op
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import NULL, Literal
@@ -26,6 +29,13 @@ class ToArrayOp(Expression):
     def __data__(self):
         return {"to_array": self.term.__data__()}
 
+    @property
+    def type(self):
+        if self.term.type == ARRAY:
+            return self.term.type
+        else:
+            return array_of(self.term.type)
+
     def vars(self):
         return self.term.vars()
 
@@ -37,7 +47,7 @@ class ToArrayOp(Expression):
 
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
-        if term.op == ToArrayOp.op:
+        if any(is_op(term, t) for t in [ToArrayOp, SelectOp, GroupOp, FilterOp]):
             return term
         if term is NULL:
             return Literal([])

@@ -10,15 +10,16 @@
 import itertools
 
 from mo_dots import is_data
-from mo_future import sort_using_cmp
+from mo_json.typed_object import TypedObject
 
 from jx_base.expressions import GroupOp as GroupOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
+from jx_base.utils import enlist
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
+from mo_future import sort_using_cmp
 from mo_json.typed_encoder import detype
-from mo_json.typed_object import entype, entype_array, TypedObject
 from mo_json.types import JxType, array_of, ARRAY_KEY
 
 ARRAY_KEY = ARRAY_KEY
@@ -30,10 +31,10 @@ class GroupOp(GroupOp_):
         group = self.group.partial_eval(Python).to_python(loop_depth)
 
         return PythonScript(
-            merge_locals(frum.locals, group.locals, groupby=groupby, detype=detype, entype=entype),
+            merge_locals(frum.locals, group.locals, groupby=groupby, enlist=enlist),
             loop_depth,
             array_of(frum.type) | JxType(group=group.type),
-            f"""{{ARRAY_KEY: groupby({frum.source}, lambda row{loop_depth}: {group.source})}}""",
+            f"""groupby({frum.source}, lambda row{loop_depth}: {group.source})""",
             self,
         )
 
@@ -41,10 +42,10 @@ class GroupOp(GroupOp_):
 def groupby(values, func):
     output = []
     cmp = lambda a, b: value_compare(detype(func(a)), detype(func(b)))
-    for g, rows in itertools.groupby(sort_using_cmp(values[ARRAY_KEY], cmp=cmp), func):
-        row = TypedObject([detype(v) for v in rows])
+    for g, rows in itertools.groupby(sort_using_cmp(values, cmp=cmp), func):
+        row = list(rows)
         if is_data(g):
-            output.append({ARRAY_KEY: row, **g})
+            output.append(TypedObject(row, **g))
         else:
-            output.append({ARRAY_KEY: row})
+            output.append(row)
     return output

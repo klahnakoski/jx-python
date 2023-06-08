@@ -7,27 +7,32 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
 from jx_base.expressions import LastOp as LastOp_, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals, to_python_list
+from jx_python.utils import merge_locals
 from mo_json import member_type, ARRAY_KEY
+from mo_json.typed_object import TypedObject
 
 
 class LastOp(LastOp_):
     def to_python(self, loop_depth=0):
         term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
         return PythonScript(
-            merge_locals(term.locals, last=last, ARRAY_KEY=ARRAY_KEY),
+            merge_locals(term.locals, last=last),
             loop_depth,
             member_type(term.type),
-            f"last({to_python_list(term.source)})",
+            f"last({term.source})",
             self,
         )
 
 
 def last(values):
-    if not last:
+    if isinstance(values, TypedObject):
+        if values[ARRAY_KEY] is not None:
+            return values[ARRAY_KEY][-1]
+        else:
+            return values
+    if not values:
         return None
     return values[-1]

@@ -127,7 +127,10 @@ class SelectOp(Expression):
                 new_terms.append(SelectOne(name, new_expr))
 
         if diff:
-            return lang.SelectOp(self.frum.partial_eval(lang), *new_terms)
+            frum = self.frum.partial_eval(lang)
+            if len(new_terms) == 1 and new_terms[0].name == "." and is_op(new_terms[0].value, Variable) and new_terms[0].value.var == "row":
+                return frum
+            return lang.SelectOp(frum, *new_terms)
         else:
             return lang.SelectOp(self.frum.partial_eval(lang), *self.terms)
 

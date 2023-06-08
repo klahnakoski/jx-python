@@ -113,16 +113,15 @@ class TestExpressionFactory(TestCase):
         result = stream([1, 2, 3]).group(it % 2 >> "group").map({"group": it.group, "value": it.to_value()}).to_list()
         self.assertEqual(result, [{"group": 0, "value": 2}, {"group": 1, "value": [1, 3]}])
 
-    def test_group3(self):
+    def test_group4(self):
         def func(v):
-            return {"group": v["group"], "value": v[ARRAY_KEY]}
+            return {"group": v["group"], "value": v}
 
         result = (
             stream([1, 2, 3])
             .group(lambda v: v % 2)
             .map(it.sum())
             .map(func)
-            # .map(lambda v: {"group": v["group"], "value": v[ARRAY_KEY]})
             .to_list()
         )
         self.assertEqual(result, [{"group": 0, "value": 2}, {"group": 1, "value": 4}])

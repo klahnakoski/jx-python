@@ -6,6 +6,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_json.typed_encoder import detype
 
 from mo_json import JxType, JX_IS_NULL
 
@@ -46,7 +47,7 @@ class Streams:
 
     def to_list(self):
         func = self.factory.build()
-        return func(self.values)
+        return detype(func(self.values))
 
 
 def stream(values):
