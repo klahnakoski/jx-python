@@ -11,6 +11,7 @@ from unittest import TestCase, skip
 
 from mo_testing.fuzzytestcase import add_error_reporting
 
+from jx_base.utils import enlist
 from jx_python.streams import stream, Typer
 from jx_python.streams.expression_factory import it
 from jx_python.streams.typers import ANNOTATIONS
@@ -124,6 +125,7 @@ class TestExpressionFactory(TestCase):
             .map(func)
             .to_list()
         )
+
         self.assertEqual(result, [{"group": 0, "value": 2}, {"group": 1, "value": 4}])
 
     def test_first(self):

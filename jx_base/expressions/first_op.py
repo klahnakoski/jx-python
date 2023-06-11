@@ -7,8 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
+from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import is_literal, Literal
@@ -56,6 +55,8 @@ class FirstOp(Expression):
 
         if base_type(term.type) != ARRAY:
             return term
+        elif is_op(term, ToArrayOp):
+            return FirstOp(term.term).partial_eval(lang)
         elif is_op(term, FirstOp):
             return term
         elif is_op(term, CaseOp):  # REWRITING

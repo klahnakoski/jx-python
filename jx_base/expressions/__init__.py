@@ -112,6 +112,7 @@ from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.to_number_op import ToNumberOp
 from jx_base.expressions.to_text_op import ToTextOp
+from jx_base.expressions.to_value_op import ToValueOp
 from jx_base.expressions.true_op import TrueOp, TRUE
 from jx_base.expressions.tuple_op import TupleOp
 from jx_base.expressions.union_op import UnionOp

@@ -12,25 +12,28 @@
 from mo_dots import exists
 
 from jx_base.expressions import Expression
-from jx_base.expressions.base_multi_op import BaseMultiOp
+from jx_base.expressions.to_array_op import ToArrayOp
 from mo_json import JX_NUMBER
 
 
 class SumOp(Expression):
     """
-    CONSERVATIVE ADDITION
+    DECISIVE ADDITION
     """
     op = "sum"
 
     has_simple_form = True
     _data_type = JX_NUMBER
 
-    def __init__(self, terms):
-        Expression.__init__(self, terms)
-        self.terms = terms
+    def __init__(self, term):
+        """
+        EXPECTING AN EXPRESSION THAT RETURNS AN ARRAY TO SUM
+        """
+        Expression.__init__(self, term)
+        self.term = term
 
     def __call__(self, row=None, rownum=None, rows=None):
-        return sum(v for v in self.terms(row, rownum, rows) if exists(v))
+        return sum(v for v in self.term(row, rownum, rows) if exists(v))
 
     def __data__(self):
         return {
@@ -47,4 +50,5 @@ class SumOp(Expression):
         self.terms.missing(lang)
 
     def partial_eval(self, lang):
-        return SumOp(self.terms.partial_eval(lang))
+        term = self.term.partial_eval(lang)
+        return SumOp(term)

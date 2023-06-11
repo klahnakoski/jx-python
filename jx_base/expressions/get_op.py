@@ -12,7 +12,7 @@
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import is_literal
 from jx_base.language import is_op
-from mo_json import JX_ANY
+from mo_json import JX_ANY, ARRAY, ARRAY_KEY, array_of
 
 
 class GetOp(Expression):
@@ -54,8 +54,12 @@ class GetOp(Expression):
     def type(self):
         output = self.frum.type
         for o in self.offsets:
+            while output == ARRAY:
+                output = output[ARRAY_KEY]
             if is_literal(o):
                 output = output[o.value]
+                if output is None:
+                    output = JX_ANY
             else:
                 output = JX_ANY
         return output

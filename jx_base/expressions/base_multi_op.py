@@ -76,6 +76,8 @@ class BaseMultiOp(Expression):
         lang = self.lang
         if len(terms) == 0:
             return Literal(literal_acc)
+        elif len(terms) == 1 and literal_acc is None:
+            return terms[0]
         elif self.decisive:
             # DECISIVE
             if literal_acc is not None:

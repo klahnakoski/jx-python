@@ -88,7 +88,9 @@ def enlist(value):
 
 
 def delist(values):
-    if not is_many(values):
+    if isinstance(values, TypedObject):
+        return delist(values._boxed_value)
+    elif not is_many(values):
         return values
     elif len(values) == 0:
         return None

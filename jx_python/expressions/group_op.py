@@ -47,5 +47,5 @@ def groupby(values, func):
         if is_data(g):
             output.append(TypedObject(row, **g))
         else:
-            output.append(row)
+            output.append(TypedObject(row, group=g))
     return output

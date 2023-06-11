@@ -65,6 +65,7 @@ from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.expressions.to_integer_op import ToIntegerOp
 from jx_python.expressions.to_number_op import ToNumberOp
 from jx_python.expressions.to_text_op import ToTextOp
+from jx_python.expressions.to_value_op import ToValueOp
 from jx_python.expressions.true_op import TrueOp
 from jx_python.expressions.tuple_op import TupleOp
 from jx_python.expressions.variable import Variable

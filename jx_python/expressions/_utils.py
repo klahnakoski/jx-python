@@ -10,7 +10,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from mo_dots import is_data, is_list, Null
+from mo_dots import is_data, is_list, Null, coalesce
 from mo_future import is_text, extend
 from mo_imports import expect, export
 from mo_logs import strings
@@ -104,17 +104,16 @@ def _binaryop_to_python(self, loop_depth, not_null=False, boolean=False):
 def multiop_to_python(self, loop_depth):
     sign, zero = _python_operators[self.op]
     if len(self.terms) == 0:
-        return (self.default).to_python(loop_depth)
-    elif self.default is NULL:
-        return sign.join("coalesce(" + t.to_python(loop_depth) + ", " + zero + ")" for t in self.terms)
-    else:
-        return (
-            "coalesce("
-            + sign.join("(" + t.to_python(loop_depth) + ")" for t in self.terms)
-            + ", "
-            + self.default.to_python(loop_depth)
-            + ")"
-        )
+        NULL.to_python(loop_depth)
+
+    terms = [t.to_python(loop_depth) for t in self.terms]
+    return PythonScript(
+        merge_locals(*(t.locals for t in terms), coalesce=coalesce),
+        loop_depth,
+        JX_NUMBER,
+        sign.join(f"coalesce({t.source}, {zero})" for t in self.terms),
+        self
+    )
 
 
 def with_var(var, expression, eval):
