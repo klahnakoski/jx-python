@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from collections import deque
 from copy import copy
@@ -16,7 +15,8 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
-from mo_dots import Data, data_types, listwrap, NullType, startswith_field, null_types
+
+from mo_dots import Data, data_types, startswith_field, null_types
 from mo_dots.lists import list_types, is_many
 from mo_future import (
     boolean_type,
@@ -27,8 +27,11 @@ from mo_future import (
     function_type,
     get_function_arguments,
 )
+from mo_imports import delay_import
 from mo_logs import Log
 from mo_times import Date
+
+is_literal = delay_import("jx_base.expressions.literal.is_literal")
 
 _get = object.__getattribute__
 builtin_tuple = tuple
@@ -107,10 +110,13 @@ def partial_eval(self, lang):
     DISPATCH TO CLASS-SPECIFIC self.partial_eval(lang)
     """
     try:
-        if self.simplified:
+        if self.simplified and self.lang == lang:
             return self
         func = self.lookups["partial_eval"][lang.id]
         output = func(self, lang)
+        if output.lang is not lang and not is_literal(output) and func is not self.lookups["partial_eval"][JX.id]:
+            func(self, lang)
+            Log.error(f"expecting {lang}")
         output.simplified = True
         return output
     except Exception as cause:
@@ -133,9 +139,7 @@ def get_dispatcher_for(name):
     return dispatcher
 
 
-BaseExpression = LanguageElement(
-    str("BaseExpression"), (object,), {"partial_eval": partial_eval}
-)
+BaseExpression = LanguageElement(str("BaseExpression"), (object,), {"partial_eval": partial_eval})
 
 
 class Language(object):
@@ -157,9 +161,7 @@ class Language(object):
             double_dispatch_methods = tuple(sorted(set(self.ops[1].lookups.keys())))
         else:
             num_ops = 1 + max(
-                obj.get_id()
-                for obj in module_vars.values()
-                if isinstance(obj, type) and hasattr(obj, ID)
+                obj.get_id() for obj in module_vars.values() if isinstance(obj, type) and hasattr(obj, ID)
             )
             self.ops = [None] * num_ops
 
@@ -195,8 +197,7 @@ class Language(object):
                         args = get_function_arguments(member)
                         if args[:2] != ("self", "lang"):
                             Log.error(
-                                "{{module}}.{{clazz}}.{{name}} is expecting (self,"
-                                " lang) parameters, minimum",
+                                "{{module}}.{{clazz}}.{{name}} is expecting (self, lang) parameters, minimum",
                                 module=new_op.__module__,
                                 clazz=new_op.__name__,
                                 name=dd_method,
@@ -256,6 +257,9 @@ class Language(object):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return self.name
+
 
 def is_op(call, op) -> bool:
     """
@@ -303,8 +307,8 @@ def value_compare(left, right, ordering=1):
             elif right == None:
                 return -ordering
 
-            left = listwrap(left)
-            right = listwrap(right)
+            left = enlist(left)
+            right = enlist(right)
             for a, b in zip(left, right):
                 c = value_compare(a, b) * ordering
                 if c != 0:
@@ -355,10 +359,7 @@ def value_compare(left, right, ordering=1):
             return 0
     except Exception as e:
         Log.error(
-            "Can not compare values {{left}} to {{right}}",
-            left=left,
-            right=right,
-            cause=e,
+            "Can not compare values {{left}} to {{right}}", left=left, right=right, cause=e,
         )
 
 

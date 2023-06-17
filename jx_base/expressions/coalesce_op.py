@@ -8,7 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from mo_imports import export
 from jx_base.expressions.and_op import AndOp
@@ -53,7 +52,7 @@ class CoalesceOp(Expression):
     def partial_eval(self, lang):
         terms = []
         for t in self.terms:
-            simple = (FirstOp(t)).partial_eval(lang)
+            simple = FirstOp(t).partial_eval(lang)
             if simple is NULL:
                 pass
             elif is_literal(simple):
@@ -67,7 +66,7 @@ class CoalesceOp(Expression):
         elif len(terms) == 1:
             return terms[0]
         else:
-            return CoalesceOp(terms)
+            return CoalesceOp(*terms)
 
 
 export("jx_base.expressions.base_multi_op", CoalesceOp)

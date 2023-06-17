@@ -8,12 +8,12 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
-from mo_imports import expect
 from jx_base.expressions.expression import Expression, _jx_expression
+from jx_base.language import is_op
 from jx_base.models.container import Container
 from mo_dots import to_data
+from mo_imports import expect
 
 Variable = expect("Variable")
 
@@ -30,8 +30,8 @@ class FromOp(Expression):
     def define(cls, expr):
         return FromOp(_jx_expression(to_data(expr)["from"], cls.lang))
 
-    def apply(self, container: Container, group_by):
-        return container.query(self.frum, group_by)
+    def apply(self, container: Container):
+        return container.query(self.frum)
 
     def __data__(self):
         return {"from": self.frum.__data__()}
@@ -59,6 +59,6 @@ class FromOp(Expression):
         return self._data_type
 
     def __eq__(self, other):
-        if isinstance(other, FromOp):
+        if is_op(other, FromOp):
             return self.frum == other.frum
         return self.frum == other

@@ -6,12 +6,9 @@
 # You can obtain one at http:# mozilla.org/MPL/2.0/.
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 from dataclasses import dataclass
 from typing import List
-
-from jx_base.models.table import Table
 
 
 @dataclass

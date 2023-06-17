@@ -7,28 +7,28 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-from __future__ import absolute_import, division, unicode_literals
 from mo_imports import DelayedValue
 from jx_base.expressions.expression import Expression
 from mo_future import first
 from jx_base.expressions.null_op import NULL
+from mo_logs import Log
 
 
 class AggregateOp(Expression):
     def __init__(self, frum, op):
         Expression.__init__(self, frum)
         if op not in canonical_aggregates:
-            Log.error(f"{op} is not a known aggrewgat")
+            Log.error(f"{op} is not a known aggregate")
 
         self.frum = frum
         self.op = canonical_aggregates[op]
 
+    def apply(self, container):
+        source = self.frum.apply(container)
+        return source.query(self.op)
+
     def __data__(self):
-        return {"aggregate": [
-            self.frum.__data__(),
-            first(self.op(NULL).__data__().keys()),
-        ]}
+        return {"aggregate": [self.frum.__data__(), first(self.op(NULL).__data__().keys())]}
 
     def vars(self):
         return self.frum.vars() | self.op.vars()
@@ -58,7 +58,9 @@ def canonical_aggregates():
     from jx_base.expressions.min_op import MinOp
     from jx_base.expressions.null_op import NullOp
     from jx_base.expressions.or_op import OrOp
+    from jx_base.expressions.percentile_op import PercentileOp
     from jx_base.expressions.union_op import UnionOp
+    from jx_base.expressions.sum_op import SumOp
 
     return {
         "none": NullOp,
@@ -66,10 +68,11 @@ def canonical_aggregates():
         "count": CountOp,
         "min": MinOp,
         "minimum": MinOp,
+        "percentile": PercentileOp,
         "max": MaxOp,
         "maximum": MaxOp,
         "add": AddOp,
-        "sum": AddOp,
+        "sum": SumOp,
         "avg": AvgOp,
         "average": AvgOp,
         "mean": AvgOp,
@@ -80,4 +83,3 @@ def canonical_aggregates():
 
 
 canonical_aggregates = DelayedValue(canonical_aggregates)
-

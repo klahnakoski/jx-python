@@ -8,52 +8,31 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from __future__ import absolute_import, division, unicode_literals
 
 import operator
 
-from jx_base.language import is_expression, Language
-from jx_base.utils import listwrap
 from mo_dots import is_sequence, is_missing, is_data
-from mo_future import (
-    get_function_name,
-    is_text,
-    text,
-    utf8_json_encoder,
-)
+from mo_future import get_function_name, is_text, text, utf8_json_encoder
 from mo_imports import expect
-from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
-from mo_json.types import union_type
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
+
+from jx_base.language import is_expression, Language
+from jx_base.utils import enlist
+from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
+from mo_json.types import union_type
 
 TYPE_CHECK = True  # A LITTLE FASTER IF False
 ALLOW_SCRIPTING = False
 EMPTY_DICT = {}
 
-Literal, TRUE, FALSE, NULL, TupleOp, Variable = expect(
-    "Literal", "TRUE", "FALSE", "NULL", "TupleOp", "Variable"
-)
-
-
-def extend(cls):
-    """
-    DECORATOR TO ADD METHODS TO CLASSES
-    :param cls: THE CLASS TO ADD THE METHOD TO
-    :return:
-    """
-
-    def extender(func):
-        setattr(cls, get_function_name(func), func)
-        return func
-
-    return extender
+Literal, TRUE, FALSE, NULL, TupleOp, Variable = expect("Literal", "TRUE", "FALSE", "NULL", "TupleOp", "Variable")
 
 
 def simplified(func):
     def mark_as_simple(self, lang):
-        if self.simplified:
+        if self.simplified and lang is self.lang:
             return self
 
         output = func(self, lang)
@@ -65,15 +44,12 @@ def simplified(func):
     return mark_as_simple
 
 
-def jx_expression(expr, schema=None):
-    if expr == None:
-        return None
+JX = Language(None)
 
+
+def jx_expression(expr, lang=JX):
     # UPDATE THE VARIABLE WITH THEIR KNOWN TYPES
-    output = _jx_expression(expr, language)
-    if not schema:
-        return output
-    return output.to_jx(schema).partial_eval(language)
+    return _jx_expression(expr, lang).partial_eval(lang)
 
 
 def _jx_expression(json, lang):
@@ -85,7 +61,7 @@ def _jx_expression(json, lang):
         new_op = json
         if not new_op:
             # CAN NOT BE FOUND, TRY SOME PARTIAL EVAL
-            return language[json.get_id()].partial_eval(lang)
+            return JX[json.get_id()].partial_eval(lang)
         return json
         # return new_op(expr.args)  # THIS CAN BE DONE, BUT IT NEEDS MORE CODING, AND I WOULD EXPECT IT TO BE SLOW
 
@@ -117,11 +93,10 @@ def _jx_expression(json, lang):
                     class_ = lang.ops[full_op.get_id()]
                     if not class_:
                         # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
-                        class_ = language[full_op.get_id()]
+                        class_ = JX[full_op.get_id()]
 
-                    return class_.define({op: [sub_json] + listwrap(rhs)})
+                    return class_.define({op: [sub_json] + enlist(rhs)})
 
-        items = list(json.items())
         for op, term in items:
             # ONE OF THESE IS THE OPERATOR
             full_op = operators.get(op)
@@ -129,7 +104,7 @@ def _jx_expression(json, lang):
                 class_ = lang.ops[full_op.get_id()]
                 if not class_:
                     # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
-                    class_ = language[op.get_id()]
+                    class_ = JX[op.get_id()]
 
                 return class_.define(json)
         else:
@@ -137,9 +112,6 @@ def _jx_expression(json, lang):
 
     except Exception as cause:
         Log.error("programmer error expr = {{value|quote}}", value=json, cause=cause)
-
-
-language = Language(None)
 
 
 _json_encoder = utf8_json_encoder
@@ -196,5 +168,5 @@ precedence = [
     "filter",
     "where",
     "edges",
-    "from"
+    "from",
 ]

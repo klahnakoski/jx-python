@@ -5,13 +5,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-from __future__ import absolute_import, division, unicode_literals
+
 
 import re
 
-from mo_dots import is_list, is_many
+from mo_dots import is_list, is_many, is_data
+from mo_json.typed_object import TypedObject
+
 from mo_future import is_text
 from mo_logs import Log
+
+from mo_json import ARRAY_KEY
 
 keyword_pattern = re.compile(r"(\w|[\\.])(\w|[\\.$-])*(?:\.(\w|[\\.$-])+)*")
 
@@ -66,12 +70,33 @@ def coalesce(*args):
     return None
 
 
-def listwrap(value):
+def enlist(value):
     if value == None:
         return []
+    if isinstance(value, TypedObject):
+        if value[ARRAY_KEY] is not None:
+            return value
+        return TypedObject([value._boxed_value], **value._attachments)
     elif is_list(value):
         return value
     elif is_many(value):
         return list(value)
+    elif is_data(value) and ARRAY_KEY in value:
+        return TypedObject(value[ARRAY_KEY], **{k: v for k, v in value.items() if k != ARRAY_KEY})
     else:
         return [value]
+
+
+def delist(values):
+    if isinstance(values, TypedObject):
+        return delist(values._boxed_value)
+    elif not is_many(values):
+        return values
+    elif len(values) == 0:
+        return None
+    elif len(values) == 1:
+        return values[0]
+    elif is_data(values) and ARRAY_KEY in values:
+        return delist(values[ARRAY_KEY])
+    else:
+        return values
