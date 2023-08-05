@@ -64,8 +64,7 @@ def next_language_id():
 def all_bases(bases):
     for b in bases:
         yield b
-        for y in all_bases(b.__bases__):
-            yield y
+        yield from all_bases(b.__bases__)
 
 
 # PROBLEM: Every operator of every language may have its own partial_eval(lang)
@@ -235,6 +234,7 @@ class Language(object):
                 if base_op and new_op is base_op:
                     # MISSED DEFINITION, ADD ONE
                     new_op = type(base_op.__name__, (base_op,), {})
+                    new_op.lang = self
                     self.ops[new_op.get_id()] = new_op
                     setattr(new_op, "lookups", base_op.lookups)
                     for n, v in base_op.lookups.items():

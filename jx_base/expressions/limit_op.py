@@ -7,17 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_dots import is_many
-
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.literal import is_literal, Literal, ZERO
+from jx_base.expressions.literal import is_literal, ZERO
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from jx_base.utils import enlist
+from mo_dots import is_many
 
 
 class LimitOp(Expression):

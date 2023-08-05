@@ -29,7 +29,7 @@ class FormatOp(Expression):
     @classmethod
     def define(cls, expr):
         frum, format = expr['format']
-        return FormatOp(jx_expression(frum), Literal(format))
+        return FormatOp(jx_expression(frum, cls.lang), Literal(format))
 
     def __data__(self):
         return {"format": [self.frum.__data__(), self.format]}

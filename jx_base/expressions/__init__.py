@@ -225,3 +225,8 @@ register_literal(FalseOp)
 register_literal(TrueOp)
 register_literal(DateOp)
 register_literal(Literal)
+
+
+for op, v in operators.items():
+    if v.lang == None:
+        logger.warning(f"Operator {op} has no language defined")
