@@ -9,13 +9,13 @@
 #
 from mo_dots import exists
 
-from jx_base.expressions import ExistsOp as ExistsOp_
+from jx_base.expressions import ExistsOp as _ExistsOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class ExistsOp(ExistsOp_):
+class ExistsOp(_ExistsOp):
     def to_python(self, loop_depth=0):
         expr = self.expr.to_python(loop_depth)
         return PythonScript(

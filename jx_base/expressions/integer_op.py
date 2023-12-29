@@ -17,7 +17,7 @@ from mo_json import JX_INTEGER
 
 
 class ToIntegerOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -39,6 +39,6 @@ class ToIntegerOp(Expression):
         term = FirstOp(self.term).partial_eval(lang)
         if is_op(term, CoalesceOp):
             return CoalesceOp(ToIntegerOp(t) for t in term.terms)
-        if term.type in JX_INTEGER:
+        if term.jx_type in JX_INTEGER:
             return term
         return ToIntegerOp(term)

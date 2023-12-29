@@ -100,7 +100,7 @@ class SqlLeftJoinsOp(Expression):
         return SqlLeftJoinsOp(self.frum.copy_and_replace(old_origin, new_origin), self.selects)
 
     @property
-    def type(self):
+    def jx_type(self):
         return JxType(**{s["name"]: s["value"] for s in self.selects})
 
     def __str__(self):

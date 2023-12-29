@@ -16,10 +16,10 @@ from mo_json.types import JX_NUMBER_TYPES, JX_NUMBER, python_type_to_jx_type
 
 
 class IsNumberOp(Expression):
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
-    def __init__(self, *term):
-        Expression.__init__(self, [term])
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
 
     def __data__(self):
@@ -44,7 +44,7 @@ class IsNumberOp(Expression):
                 return term
             else:
                 return NULL
-        elif term.type in JX_NUMBER_TYPES:
+        elif term.jx_type in JX_NUMBER_TYPES:
             return term
         else:
             return IsNumberOp(term)

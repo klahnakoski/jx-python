@@ -20,10 +20,10 @@ from mo_json.types import JX_NUMBER
 
 class BasicMultiOp(Expression):
     """
-    PLACEHOLDER FOR BASIC OPERATOR (CAN NOT DEAL WITH NULLS)
+    PLACEHOLDER FOR STRICT MULTI-VALUED OPERATIONS (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
     op = None
 
     def __init__(self, *terms):

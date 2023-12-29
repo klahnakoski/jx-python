@@ -18,7 +18,11 @@ from mo_json.types import JX_BOOLEAN
 
 
 class ToBooleanOp(Expression):
-    _data_type = JX_BOOLEAN
+    """
+    CONVERT VALUE TO BOOLEAN, OR KEEP AS BOOLEAN
+    """
+
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)
@@ -26,6 +30,9 @@ class ToBooleanOp(Expression):
 
     def __data__(self):
         return {"boolean": self.term.__data__()}
+
+    def __eq__(self, other):
+        return isinstance(other, ToBooleanOp) and self.term == other.term
 
     def vars(self):
         return self.term.vars()
@@ -40,7 +47,7 @@ class ToBooleanOp(Expression):
         term = self.term.partial_eval(lang)
         if term is NULL:
             return FALSE
-        elif term.type is JX_BOOLEAN:
+        elif term.jx_type == JX_BOOLEAN:
             return term
         elif term is self.term:
             return self

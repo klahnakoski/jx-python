@@ -43,8 +43,5 @@ class OffsetOp(Expression):
     def __eq__(self, other):
         return self.var == other
 
-    def __unicode__(self):
-        return str(self.var)
-
     def __str__(self):
         return str(self.var)

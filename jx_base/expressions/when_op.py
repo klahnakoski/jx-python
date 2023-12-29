@@ -9,7 +9,6 @@
 #
 
 
-from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal
@@ -25,11 +24,10 @@ from mo_logs import Log
 class WhenOp(Expression):
     def __init__(self, when, **clauses):
         Expression.__init__(self, when)
-
         self.when = when
         self.then = clauses.get("then", NULL)
         self.els_ = clauses.get("else", NULL)
-        self._data_type = self.then.type | self.els_.type
+        self._jx_type = self.then.jx_type | self.els_.jx_type
 
     def __data__(self):
         return {
@@ -57,12 +55,12 @@ class WhenOp(Expression):
 
     def missing(self, lang):
         return OrOp(
-            AndOp(self.when, self.then.missing(lang)), AndOp(NotOp(self.when), self.els_.missing(lang)),
+            lang.AndOp(self.when, self.then.missing(lang)), lang.AndOp(NotOp(self.when), self.els_.missing(lang)),
         ).partial_eval(lang)
 
     def invert(self, lang):
         return OrOp(
-            AndOp(self.when, self.then.invert(lang)), AndOp(NotOp(self.when), self.els_.invert(lang)),
+            lang.AndOp(self.when, self.then.invert(lang)), lang.AndOp(NotOp(self.when), self.els_.invert(lang)),
         ).partial_eval(lang)
 
     def partial_eval(self, lang):

@@ -28,7 +28,7 @@ class FormatOp(Expression):
 
     @classmethod
     def define(cls, expr):
-        frum, format = expr['format']
+        frum, format = expr["format"]
         return FormatOp(jx_expression(frum, cls.lang), Literal(format))
 
     def __data__(self):
@@ -41,11 +41,11 @@ class FormatOp(Expression):
         return FormatOp(self.frum.map(map_), self.format.map(map_))
 
     @property
-    def type(self):
+    def jx_type(self):
         if self.format == "value":
-            return self.frum.type[ARRAY_KEY]
+            return self.frum.jx_type[ARRAY_KEY]
         elif self.format == "list":
-            return self.frum.type
+            return self.frum.jx_type
         elif self.format == "cube":
             # TODO: WHAT IS THE CUBE TYPE?
             head = [c.name for c in self.frum.schema.columns]
@@ -91,9 +91,9 @@ class FormatOp(Expression):
                 for i, e in enumerate(normalized_query.edges + normalized_query.groupby):
                     allowNulls = coalesce(e.allowNulls, True)
 
-                    if e.domain.type == "set" and e.domain.partitions:
+                    if e.domain.jx_type == "set" and e.domain.partitions:
                         domain = SimpleSetDomain(partitions=e.domain.partitions.name)
-                    elif e.domain.type == "range":
+                    elif e.domain.jx_type == "range":
                         domain = e.domain
                     elif is_op(e.value, TupleOp):
                         pulls = (
@@ -138,13 +138,13 @@ class FormatOp(Expression):
             for i, e in enumerate(normalized_query.edges + normalized_query.groupby):
                 allowNulls = coalesce(e.allowNulls, True)
 
-                if e.domain.type == "set" and e.domain.partitions:
+                if e.domain.jx_type == "set" and e.domain.partitions:
                     domain = e.domain
-                elif e.domain.type == "range":
+                elif e.domain.jx_type == "range":
                     domain = e.domain
-                elif e.domain.type == "time":
+                elif e.domain.jx_type == "time":
                     domain = wrap(mo_json.scrub(e.domain))
-                elif e.domain.type == "duration":
+                elif e.domain.jx_type == "duration":
                     domain = to_data(mo_json.scrub(e.domain))
                 elif is_op(e.value, TupleOp):
                     pulls = (

@@ -30,7 +30,7 @@ class SplitOp(Expression):
         self.value, self.find = term
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.find):
+        if is_variable(self.value) and is_literal(self.find):
             return {"split": {self.value.var, self.find.value}}
         else:
             return {"split": [self.value.__data__(), self.find.__data__()]}
@@ -48,7 +48,7 @@ class SplitOp(Expression):
         find = self.find.to_es_script(not_null=True)
         index = v + ".indexOf(" + find + ", " + self.start.to_es_script() + ")"
 
-        return AndOp(
+        return lang.AndOp(
             self.default.missing(lang),
             OrOp(self.value.missing(lang), self.find.missing(lang), EqOp(ScriptOp(index), Literal(-1)),),
         )

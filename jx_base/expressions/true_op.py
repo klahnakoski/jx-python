@@ -16,7 +16,7 @@ from mo_json.types import JX_BOOLEAN
 
 
 class TrueOp(Literal):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)
@@ -50,17 +50,14 @@ class TrueOp(Literal):
         return FALSE
 
     @property
-    def type(self):
+    def jx_type(self):
         return JX_BOOLEAN
 
     def __call__(self, row=None, rownum=None, rows=None):
         return True
 
-    def __unicode__(self):
-        return "true"
-
     def __str__(self):
-        return b"true"
+        return "true"
 
     def __bool__(self):
         return True

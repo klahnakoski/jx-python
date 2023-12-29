@@ -7,21 +7,17 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_imports import DelayedValue
 from jx_base.expressions.expression import Expression
-from mo_future import first
 from jx_base.expressions.null_op import NULL
-from mo_logs import Log
+from jx_base.expressions.all_op import AllOp
+from jx_base.expressions.any_op import AnyOp
+from mo_future import first
+from mo_imports import DelayedValue
 
 
 class AggregateOp(Expression):
-    def __init__(self, frum, op):
-        Expression.__init__(self, frum)
-        if op not in canonical_aggregates:
-            Log.error(f"{op} is not a known aggregate")
-
-        self.frum = frum
-        self.op = canonical_aggregates[op]
+    def __init__(self, frum, op, **options):
+        logger.error("general aggregate not supported")
 
     def apply(self, container):
         source = self.frum.apply(container)
@@ -37,9 +33,9 @@ class AggregateOp(Expression):
         return AggregateOp(self.frum.map(mao_), self.op.map(map_))
 
     @property
-    def type(self):
+    def jx_type(self):
         # THIS CAN BE BETTER
-        return self.frum.type
+        return self.frum.jx_type
 
     def missing(self, lang):
         return self.frum.missing()
@@ -49,21 +45,17 @@ class AggregateOp(Expression):
 
 
 def canonical_aggregates():
-    from jx_base.expressions.add_op import AddOp
-    from jx_base.expressions.and_op import AndOp
     from jx_base.expressions.avg_op import AvgOp
     from jx_base.expressions.cardinality_op import CardinalityOp
     from jx_base.expressions.count_op import CountOp
     from jx_base.expressions.max_op import MaxOp
     from jx_base.expressions.min_op import MinOp
     from jx_base.expressions.null_op import NullOp
-    from jx_base.expressions.or_op import OrOp
     from jx_base.expressions.percentile_op import PercentileOp
     from jx_base.expressions.union_op import UnionOp
     from jx_base.expressions.sum_op import SumOp
 
-    return {
-        "none": NullOp,
+    lookup = {
         "cardinality": CardinalityOp,
         "count": CountOp,
         "min": MinOp,
@@ -71,15 +63,20 @@ def canonical_aggregates():
         "percentile": PercentileOp,
         "max": MaxOp,
         "maximum": MaxOp,
-        "add": AddOp,
+        "add": SumOp,
         "sum": SumOp,
         "avg": AvgOp,
         "average": AvgOp,
         "mean": AvgOp,
-        "and": AndOp,
-        "or": OrOp,
         "union": UnionOp,
+        "any": AnyOp,
+        "all": AllOp,
+        "or": AnyOp,
+        "and": AllOp,
     }
+    for _, v in list(lookup.items()):
+        lookup[v] = v
+    return lookup
 
 
 canonical_aggregates = DelayedValue(canonical_aggregates)

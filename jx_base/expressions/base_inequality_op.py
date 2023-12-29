@@ -13,14 +13,12 @@ from jx_base.expressions._utils import builtin_ops
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal, Literal
-from jx_base.expressions.variable import Variable
-from jx_base.language import is_op
 from mo_json.types import JX_BOOLEAN
 
 
 class BaseInequalityOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
     op = None
 
     def __init__(self, lhs, rhs):
@@ -33,7 +31,7 @@ class BaseInequalityOp(Expression):
         return self.op
 
     def __data__(self):
-        if is_op(self.lhs, Variable) and is_literal(self.rhs):
+        if is_variable(self.lhs) and is_literal(self.rhs):
             return {self.op: {self.lhs.var, self.rhs.value}}
         else:
             return {self.op: [self.lhs.__data__(), self.rhs.__data__()]}
@@ -60,3 +58,6 @@ class BaseInequalityOp(Expression):
             return Literal(builtin_ops[self.op](lhs, rhs))
 
         return self.__class__(lhs, rhs)
+
+
+num_calls = 0

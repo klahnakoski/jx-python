@@ -9,7 +9,6 @@
 #
 from jx_base.expressions.expression import Expression, Literal
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.get_op import GetOp
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
 from mo_dots import join_field
@@ -22,25 +21,25 @@ from mo_json.typed_encoder import inserter_type_to_json_type
 from mo_json.types import to_jx_type, JxType
 from mo_logs import Log
 
-QueryOp, SelectOp = expect("QueryOp", "SelectOp")
+QueryOp, SelectOp, GetOp = expect("QueryOp", "SelectOp", "GetOp")
 
 
 class Variable(Expression):
-    def __init__(self, var, type=None):
+    def __init__(self, var, jx_type=None):
         """
         :param var:   DOT DELIMITED PATH INTO A DOCUMENT
-        :param type:  JSON TYPE, or JX TYPE, IF KNOWN
+        :param jx_type:  JSON TYPE, or JX TYPE, IF KNOWN
         """
         Expression.__init__(self, None)
 
         self.var = get_property_name(var)
 
-        if type == None:
+        if jx_type == None:
             # MAYBE THE NAME HAS A HINT TO THE TYPE
-            self._data_type = to_jx_type(inserter_type_to_json_type.get(last(split_field(var))))
+            self._jx_type = to_jx_type(inserter_type_to_json_type.get(last(split_field(var))))
         else:
-            self._data_type = to_jx_type(type)
-        if not isinstance(self._data_type, JxType):
+            self._jx_type = to_jx_type(jx_type)
+        if not isinstance(self._jx_type, JxType):
             Log.error("expecting JX type")
 
     def __call__(self, row, rownum=None, rows=None):
@@ -146,14 +145,11 @@ class Variable(Expression):
         return self.var.__hash__()
 
     def __eq__(self, other):
-        if is_op(other, Variable):
+        if is_variable(other):
             return self.var == other.var
         elif is_text(other):
             return self.var == other
         return False
-
-    def __unicode__(self):
-        return self.var
 
     def __str__(self):
         return str(self.var)
@@ -165,24 +161,24 @@ class Variable(Expression):
             return lang.MissingOp(self)
 
 
-def get_variable(expr):
+def is_variable(expr):
     """
     ATTEMPT TO SIMPLIFY EXPRESSION TO A VARIABLE
     """
     if is_op(expr, Variable):
-        return expr
-    elif is_text(expr):
-        return Variable(expr)
-    elif is_op(expr, GetOp) and is_op(expr.frum, Variable) and expr.frum.var=="row" and all(is_op(o, Literal) for o in expr.offsets):
-        return Variable(join_field(o.value for o in expr.offsets))
-    else:
-        expr
+        return True
+    elif is_op(expr, GetOp) and is_op(expr.frum, Variable) and all(is_op(o, Literal) for o in expr.offsets):
+        return True
+    return False
 
 
 IDENTITY = Variable(".")
 
+
 export("jx_base.expressions._utils", Variable)
 export("jx_base.expressions.expression", Variable)
 export("jx_base.expressions.base_binary_op", Variable)
+export("jx_base.expressions.base_binary_op", is_variable)
 export("jx_base.expressions.basic_in_op", Variable)
+export("jx_base.expressions.basic_in_op", is_variable)
 export("jx_base.expressions.from_op", Variable)

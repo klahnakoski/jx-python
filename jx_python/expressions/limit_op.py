@@ -8,21 +8,21 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import LimitOp as LimitOp_, ToArrayOp
+from jx_base.expressions import LimitOp as _LimitOp, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 
 
-class LimitOp(LimitOp_):
+class LimitOp(_LimitOp):
     def to_python(self, loop_depth=0):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         amount = self.amount.partial_eval(Python).to_python(loop_depth)
         return PythonScript(
             merge_locals(frum.locals, amount.locals, enlist=enlist),
             loop_depth,
-            frum.type,
+            frum.jx_type,
             f"{frum.source}[:{amount.source}]",
             self,
         )

@@ -9,12 +9,23 @@
 #
 
 
-from jx_base.expressions.base_multi_op import BaseMultiOp
+from jx_base.expressions.expression import Expression
+from jx_base.expressions.literal import Literal, is_literal
+from mo_logs import logger
 
 
-class PercentileOp(BaseMultiOp):
+class PercentileOp(Expression):
     op = "percentile"
 
-    def __init__(self, *terms, default=None, nulls=False, **clauses):
-        BaseMultiOp.__init__(terms, default, nulls, **clauses)
-        self.percentile = 0.50
+    def __init__(self, frum, percentile=None):
+        BaseMultiOp.__init__(self, frum=frum)
+        if percentile is None:
+            self.percentile = Literal(0.5)
+            return
+        if is_literal(percentile):
+            if not isinstance(percentile.value, float):
+                logger.error("Expecting `percentile` to be a float")
+        if isinstance(percentile, float):
+            self.percentile = Literal(percentile)
+        else:
+            logger.error("Expecting `percentile` to be a float")

@@ -26,17 +26,14 @@ from mo_json.types import JX_TEXT
 
 class NotLeftOp(Expression):
     has_simple_form = True
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
-    def __init__(self, *term):
-        Expression.__init__(self, *term)
-        if is_data(term):
-            self.value, self.length = term.items()[0]
-        else:
-            self.value, self.length = term
+    def __init__(self, value, length):
+        Expression.__init__(self, value, length)
+        self.value, self.length = value, length
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.length):
+        if is_variable(self.value) and is_literal(self.length):
             return {"not_left": {self.value.var: self.length.value}}
         else:
             return {"not_left": [self.value.__data__(), self.length.__data__()]}

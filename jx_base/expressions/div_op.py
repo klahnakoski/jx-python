@@ -25,7 +25,7 @@ class DivOp(BaseBinaryOp):
         rhs = self.rhs(row)
         if not isinstance(lhs, (float, int)) or not rhs:
             return None
-        return lhs/rhs
+        return lhs / rhs
 
     def missing(self, lang):
         return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO)).partial_eval(lang)

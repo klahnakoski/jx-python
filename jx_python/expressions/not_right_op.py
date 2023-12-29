@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import NotRightOp as NotRightOp_
+from jx_base.expressions import NotRightOp as _NotRightOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class NotRightOp(NotRightOp_):
+class NotRightOp(_NotRightOp):
     def to_python(self, loop_depth=0):
         v = self.value.to_python(loop_depth)
         l = self.length.to_python(loop_depth)

@@ -27,7 +27,7 @@ from mo_json.types import JX_TEXT
 
 class NotRightOp(Expression):
     has_simple_form = True
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
     def __init__(self, *term):
         Expression.__init__(self, *term)
@@ -37,7 +37,7 @@ class NotRightOp(Expression):
             self.value, self.length = term
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.length):
+        if is_variable(self.value) and is_literal(self.length):
             return {"not_right": {self.value.var: self.length.value}}
         else:
             return {"not_right": [self.value.__data__(), self.length.__data__()]}

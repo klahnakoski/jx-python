@@ -20,7 +20,7 @@ class ToValueOp(_ToValueOp):
         return PythonScript(
             merge_locals(term.locals, delist=delist),
             loop_depth,
-            term.type,
+            term.jx_type,
             f"delist({term.source})",
             self,
         )

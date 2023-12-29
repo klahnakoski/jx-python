@@ -9,11 +9,11 @@
 #
 from mo_imports import export
 
-from jx_base.expressions import ScriptOp as ScriptOp_
+from jx_base.expressions import ScriptOp as _ScriptOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class ScriptOp(ScriptOp_):
+class ScriptOp(_ScriptOp):
     def to_python(self, loop_depth=0):
         return PythonScript({}, loop_depth, self.script)
 

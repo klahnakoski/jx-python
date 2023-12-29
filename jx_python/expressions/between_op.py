@@ -9,8 +9,8 @@
 #
 
 
-from jx_base.expressions import BetweenOp as BetweenOp_
+from jx_base.expressions import BetweenOp as _BetweenOp
 
 
-class BetweenOp(BetweenOp_):
+class BetweenOp(_BetweenOp):
     pass

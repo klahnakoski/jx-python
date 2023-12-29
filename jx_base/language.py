@@ -15,7 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
-
+from jx_base.utils import enlist
 from mo_dots import Data, data_types, startswith_field, null_types
 from mo_dots.lists import list_types, is_many
 from mo_future import (
@@ -242,6 +242,8 @@ class Language(object):
 
         # ENSURE THIS LANGUAGE INSTANCE POINTS TO ALL THE OPS BY NAME
         for o in self.ops[1:]:
+            if o is None:
+                print("hi")
             setattr(self, o.__name__, o)
 
     def __getitem__(self, item):

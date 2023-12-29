@@ -18,19 +18,19 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import Variable
-from jx_base.language import JX
 from jx_base.language import is_op, value_compare
 from mo_dots import is_many, is_data
 from mo_imports import expect
 from mo_imports import export
 from mo_json.types import JX_BOOLEAN
+from mo_logs import Log
 
 InOp, WhenOp = expect("InOp", "WhenOp")
 
 
 class EqOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __new__(cls, *terms):
         if is_many(terms):
@@ -57,7 +57,7 @@ class EqOp(Expression):
         if len(items) != 1:
             Log.error("expecting single property")
         op, terms = items[0]
-        if op != "eq":
+        if op not in ("eq", "term"):
             Log.error("Expecting eq op")
         if is_many(terms):
             return EqOp(*(_jx_expression(e, cls.lang) for e in terms))
@@ -76,7 +76,7 @@ class EqOp(Expression):
         self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
-        if is_op(self.lhs, Variable) and is_literal(self.rhs):
+        if is_variable(self.lhs) and is_literal(self.rhs):
             return {"eq": {self.lhs.var: self.rhs.value}}
         else:
             return {"eq": [self.lhs.__data__(), self.rhs.__data__()]}

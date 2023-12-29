@@ -15,11 +15,11 @@ from jx_base.expressions.python_script import PythonScript
 from mo_json import json2value
 from mo_logs import strings
 
-from jx_base.expressions import RowsOp as RowsOp_
+from jx_base.expressions import RowsOp as _RowsOp
 from jx_python.expressions.to_integer_op import ToIntegerOp
 
 
-class RowsOp(RowsOp_):
+class RowsOp(_RowsOp):
     def to_python(self, loop_depth=0):
         agg = "rows[rownum+" + (ToIntegerOp(self.offset)).to_python(loop_depth) + "]"
         path = split_field(json2value(self.var.json))

@@ -19,7 +19,7 @@ class UnixOp(Expression):
     """
 
     has_simple_form = True
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
     def __init__(self, *term):
         Expression.__init__(self, *term)

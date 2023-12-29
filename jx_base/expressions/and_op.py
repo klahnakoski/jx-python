@@ -9,7 +9,7 @@
 #
 
 
-from jx_base.expressions.expression import Expression
+from jx_base.expressions.base_multi_op import BaseMultiOp
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
@@ -19,13 +19,12 @@ from mo_json.types import JX_BOOLEAN
 NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 
-class AndOp(Expression):
-    _data_type = JX_BOOLEAN
-    default = TRUE  # ADD THIS TO terms FOR NO EFFECT
+class AndOp(BaseMultiOp):
+    _jx_type = JX_BOOLEAN
+    op = "and"
 
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.terms = terms
+    def __init__(self, *terms, nulls=False):
+        BaseMultiOp.__init__(self, *terms, nulls=nulls)
 
     def __data__(self):
         return {"and": [t.__data__() for t in self.terms]}
@@ -37,12 +36,9 @@ class AndOp(Expression):
         return True
 
     def __eq__(self, other):
-        if is_op(other, AndOp):
-            return all(o in self.terms for o in other.terms) and all(s in other.terms for s in self.terms)
+        if is_op(other, AndOp) and len(self.terms) == len(other.terms):
+            return all(s == o for s, o in zip(self.terms, other.terms))
         return False
-
-    def __rcontains__(self, superset):
-        return any(t in superset for t in self.terms)
 
     def vars(self):
         output = set()
@@ -54,7 +50,7 @@ class AndOp(Expression):
         return AndOp(*(t.map(map_) for t in self.terms))
 
     def missing(self, lang):
-        return FALSE
+        return OrOp(*(t.missing(lang) for t in self.terms))
 
     def invert(self, lang):
         return OrOp(*(t.invert(lang) for t in self.terms)).partial_eval(lang)
@@ -88,7 +84,7 @@ class AndOp(Expression):
                 ]
                 continue
             for and_terms in list(or_terms):
-                inv = NotOp(simple).partial_eval(lang)
+                inv = lang.NotOp(simple).partial_eval(lang)
                 if inv in and_terms:
                     or_terms.remove(and_terms)
                 elif simple not in and_terms:
@@ -102,10 +98,10 @@ class AndOp(Expression):
             elif len(and_terms) == 1:
                 return and_terms[0]
             else:
-                return AndOp(*and_terms)
+                return lang.AndOp(*and_terms, nulls=self.decisive)
 
         return OrOp(
-            *(AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0] for and_terms in or_terms)
+            *(lang.AndOp(*and_terms) if len(and_terms) > 1 else and_terms[0] for and_terms in or_terms)
         ).partial_eval(lang)
 
 

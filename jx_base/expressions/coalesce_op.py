@@ -25,7 +25,7 @@ class CoalesceOp(Expression):
     def __init__(self, *terms):
         Expression.__init__(self, *terms)
         self.terms = terms
-        self._data_type = union_type(*(t.type for t in terms))
+        self._jx_type = union_type(*(t.jx_type for t in terms))
 
     def __data__(self):
         return {"coalesce": [t.__data__() for t in self.terms]}
@@ -38,7 +38,7 @@ class CoalesceOp(Expression):
 
     def missing(self, lang):
         # RETURN true FOR RECORDS THE WOULD RETURN NULL
-        return AndOp(*(v.missing(lang) for v in self.terms))
+        return lang.AndOp(*(v.missing(lang) for v in self.terms))
 
     def vars(self):
         output = set()

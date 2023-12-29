@@ -12,13 +12,13 @@ from mo_json.typed_object import TypedObject, entype
 from jx_python.expressions._utils import with_var
 from mo_dots import exists
 
-from jx_base.expressions import SumOp as SumOp_, PythonScript, ToArrayOp
+from jx_base.expressions import SumOp as _SumOp, PythonScript, ToArrayOp
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import JX_NUMBER
 
 
-class SumOp(SumOp_):
+class SumOp(_SumOp):
     def to_python(self, loop_depth=0):
         term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
         loop_depth = term.loop_depth + 1

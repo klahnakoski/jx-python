@@ -33,7 +33,7 @@ class PythonScript(Expression):
         self.locals = locals  # Python locals for compilation to real python function
         self.loop_depth = loop_depth  # number of inner loops
         self.miss = coalesce(miss, FALSE)
-        self._data_type = type
+        self._jx_type = type
         self.source = source
         self.many = many  # True if script returns multi-value
         self.frum = frum  # THE ORIGINAL EXPRESSION THAT MADE expr

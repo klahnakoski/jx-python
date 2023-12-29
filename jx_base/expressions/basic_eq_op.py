@@ -20,11 +20,11 @@ class BasicEqOp(Expression):
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.lhs, self.rhs = terms
+    def __init__(self, lhs, rhs):
+        Expression.__init__(self, lhs, rhs)
+        self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
         return {"basic.eq": [self.lhs.__data__(), self.rhs.__data__()]}

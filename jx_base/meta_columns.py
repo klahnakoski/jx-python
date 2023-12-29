@@ -399,3 +399,4 @@ def _merge_python_type(A, B):
 
 
 export("jx_base.expressions.query_op", Column)
+export("jx_base", Column)

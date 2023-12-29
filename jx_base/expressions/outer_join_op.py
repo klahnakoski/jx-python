@@ -22,7 +22,7 @@ from mo_json.types import JX_BOOLEAN
 
 
 class OuterJoinOp(Expression):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["frum", "nests"]
@@ -65,7 +65,7 @@ class OuterJoinOp(Expression):
         if not self.nests:
             return TRUE
 
-        return OrOp([self.frum.missing(lang)] + [n.missing(lang) for n in self.nests]).partial_eval(lang)
+        return OrOp(self.frum.missing(lang), *(n.missing(lang) for n in self.nests)).partial_eval(lang)
 
     def partial_eval(self, lang):
         nests = []

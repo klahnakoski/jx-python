@@ -37,8 +37,8 @@ class NameOp(Expression):
         return NameOp(self.frum.map(map_), self._name.map(map_))
 
     @property
-    def type(self):
-        return JxType(**{self._name.value: self.frum.type})
+    def jx_type(self):
+        return JxType(**{self._name.value: self.frum.jx_type})
 
     def missing(self, lang):
         return self.frum.missing(lang)

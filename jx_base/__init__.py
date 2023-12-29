@@ -11,12 +11,8 @@
 
 from uuid import uuid4
 
-from mo_dots import coalesce, to_data, last
-from mo_dots.datas import register_data
-from mo_logs import Log
-from mo_logs.strings import expand_template, quote
-
 from jx_base.expressions import jx_expression
+from jx_base.expressions.literal import FALSE
 from jx_base.models.container import Container
 from jx_base.models.facts import Facts
 from jx_base.models.namespace import Namespace
@@ -25,16 +21,21 @@ from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
+from mo_dots import coalesce, to_data, last
+from mo_dots.datas import register_data
 from mo_future import is_text, text
 from mo_imports import expect
 from mo_json import (
     value2json,
     true,
     false,
-    null, _simple_expand,
+    null,
+    _simple_expand,
 )
+from mo_logs import Log
+from mo_logs.strings import quote
 
-Python = expect("Python")
+Python, Column = expect("Python", "Column")
 
 ENABLE_CONSTRAINTS = True
 
@@ -68,6 +69,9 @@ def failure(row, rownum, rows, constraint):
             failure(row, rownum, rows, a)
         return
     expr = jx_expression(constraint)
+    if expr is FALSE:
+        print("hi")
+        jx_expression(constraint)
 
     try:
         if not expr(row, rownum, row):
@@ -211,18 +215,20 @@ class {{class_name}}(Mapping):
         return str({{dict}})
 
 """,
-        ({
-            "class_name": name,
-            "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
-            "required": "{" + ", ".join(quote(s) for s in required) + "}",
-            "defaults": _to_python(defaults),
-            "len_slots": len(slots),
-            "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
-            "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
-            "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
-            "constraint_expr": constraint_expr.source,
-            "constraint": value2json(constraint),
-        },)
+        (
+            {
+                "class_name": name,
+                "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
+                "required": "{" + ", ".join(quote(s) for s in required) + "}",
+                "defaults": _to_python(defaults),
+                "len_slots": len(slots),
+                "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
+                "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
+                "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
+                "constraint_expr": constraint_expr.source,
+                "constraint": value2json(constraint),
+            },
+        ),
     )
 
     output = _exec(code, name, constraint_expr.locals)

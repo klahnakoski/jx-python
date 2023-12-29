@@ -30,14 +30,13 @@ from mo_logs import Log
 
 
 class BetweenOp(Expression):
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
-    def __init__(self, *value, prefix, suffix, default=NULL, start=NULL):
-        Expression.__init__(self, [])
+    def __init__(self, value, prefix, suffix, start=NULL):
+        Expression.__init__(self, value, prefix, suffix, start)
         self.value = value
         self.prefix = coalesce(prefix, NULL)
         self.suffix = coalesce(suffix, NULL)
-        self.default = coalesce(default, NULL)
         self.start = coalesce(start, NULL)
         if is_literal(self.prefix) and is_literal(self.suffix):
             pass
@@ -53,7 +52,6 @@ class BetweenOp(Expression):
                 value=jx_expression(term[0]),
                 prefix=jx_expression(term[1]),
                 suffix=jx_expression(term[2]),
-                default=jx_expression(expr.default),
                 start=jx_expression(expr.start),
             )
         elif is_data(term):
@@ -63,7 +61,6 @@ class BetweenOp(Expression):
                     value=Variable(var),
                     prefix=Literal(vals[0]),
                     suffix=Literal(vals[1]),
-                    default=jx_expression(expr.default),
                     start=jx_expression(expr.start),
                 )
             else:
@@ -72,36 +69,30 @@ class BetweenOp(Expression):
             Log.error("`between` parameters are expected to be in {var: [prefix, suffix]} form")
 
     def vars(self):
-        return self.value.vars() | self.prefix.vars() | self.suffix.vars() | self.default.vars() | self.start.vars()
+        return self.value.vars() | self.prefix.vars() | self.suffix.vars() | self.start.vars()
 
     def map(self, map_):
         return BetweenOp(
-            self.value.map(map_),
-            self.prefix.map(map_),
-            self.suffix.map(map_),
-            default=self.default.map(map_),
-            start=self.start.map(map_),
+            self.value.map(map_), self.prefix.map(map_), self.suffix.map(map_), start=self.start.map(map_),
         )
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.prefix) and is_literal(self.suffix):
+        if is_variable(self.value) and is_literal(self.prefix) and is_literal(self.suffix):
             output = to_data({"between": {self.value.var: [self.prefix.value, self.suffix.value]}})
         else:
             output = to_data({"between": [self.value.__data__(), self.prefix.__data__(), self.suffix.__data__()]})
         if self.start is not NULL:
             output.start = self.start.__data__()
-        if self.default is not NULL:
-            output.default = self.default.__data__()
         return output
 
     def partial_eval(self, lang):
         value = self.value.partial_eval(lang)
 
-        start_index = CaseOp([
+        start_index = CaseOp(
             WhenOp(self.prefix.missing(lang), then=ZERO),
             WhenOp(IsNumberOp(self.prefix), then=MaxOp(ZERO, self.prefix)),
-            FindOp([value, self.prefix], start=self.start),
-        ]).partial_eval(lang)
+            FindOp(value, self.prefix, self.start),
+        ).partial_eval(lang)
 
         len_prefix = CaseOp(
             WhenOp(self.prefix.missing(lang), then=ZERO),
@@ -109,16 +100,16 @@ class BetweenOp(Expression):
             LengthOp(self.prefix),
         ).partial_eval(lang)
 
-        end_index = CaseOp([
+        end_index = CaseOp(
             WhenOp(start_index.missing(lang), then=NULL),
             WhenOp(self.suffix.missing(lang), then=LengthOp(value)),
             WhenOp(IsNumberOp(self.suffix), then=MinOp(self.suffix, LengthOp(value))),
-            FindOp([value, self.suffix], start=AddOp(start_index, len_prefix)),
-        ]).partial_eval(lang)
+            FindOp(value, self.suffix, AddOp(start_index, len_prefix)),
+        ).partial_eval(lang)
 
         start_index = AddOp(start_index, len_prefix).partial_eval(lang)
         substring = BasicSubstringOp(value, start_index, end_index).partial_eval(lang)
 
-        between = WhenOp(end_index.missing(lang), then=self.default, **{"else": substring}).partial_eval(lang)
+        between = WhenOp(end_index.missing(lang), **{"else": substring}).partial_eval(lang)
 
         return between

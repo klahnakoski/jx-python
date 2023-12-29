@@ -18,7 +18,7 @@ class FromUnixOp(Expression):
     FOR USING ON DATABASES WHICH HAVE A DATE COLUMNS: CONVERT TO UNIX
     """
 
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
     def __init__(self, *term):
         Expression.__init__(self, *term)

@@ -1,5 +1,3 @@
-from mo_dots import set_default
-
 from jx_base.expressions._utils import (
     jx_expression,
     merge_types,
@@ -10,12 +8,16 @@ from jx_base.expressions._utils import (
 from jx_base.expressions.abs_op import AbsOp
 from jx_base.expressions.add_op import AddOp
 from jx_base.expressions.aggregate_op import AggregateOp
+from jx_base.expressions.all_op import AllOp
 from jx_base.expressions.and_op import AndOp
+from jx_base.expressions.any_op import AnyOp
+from jx_base.expressions.array_of_op import ArrayOfOp
 from jx_base.expressions.avg_op import AvgOp
 from jx_base.expressions.base_binary_op import BaseBinaryOp
 from jx_base.expressions.base_inequality_op import BaseInequalityOp
 from jx_base.expressions.base_multi_op import BaseMultiOp
 from jx_base.expressions.basic_add_op import BasicAddOp
+from jx_base.expressions.basic_boolean_op import BasicBooleanOp
 from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.basic_in_op import BasicInOp
 from jx_base.expressions.basic_index_of_op import BasicIndexOfOp
@@ -69,6 +71,7 @@ from jx_base.expressions.literal import Literal, ONE, ZERO, register_literal, is
 from jx_base.expressions.lt_op import LtOp
 from jx_base.expressions.lte_op import LteOp
 from jx_base.expressions.max_op import MaxOp
+from jx_base.expressions.most_op import MostOp
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.missing_op import MissingOp
 from jx_base.expressions.mod_op import ModOp
@@ -82,6 +85,7 @@ from jx_base.expressions.not_right_op import NotRightOp
 from jx_base.expressions.null_op import NullOp, NULL
 from jx_base.expressions.offset_op import OffsetOp
 from jx_base.expressions.or_op import OrOp
+from jx_base.expressions.least_op import LeastOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.prefix_op import PrefixOp
@@ -94,6 +98,7 @@ from jx_base.expressions.right_op import RightOp
 from jx_base.expressions.rows_op import RowsOp
 from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import SelectOp
+from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.split_op import SplitOp
 from jx_base.expressions.sql_eq_op import SqlEqOp
 from jx_base.expressions.sql_group_by_op import SqlGroupByOp
@@ -102,14 +107,13 @@ from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
 from jx_base.expressions.sql_origins_op import SqlOriginsOp
 from jx_base.expressions.sql_script import SqlScript
 from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
-from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sub_op import SubOp
-from jx_base.expressions.sum_op import SumOp
 from jx_base.expressions.suffix_op import SuffixOp
-from jx_base.expressions.array_of_op import ArrayOfOp
-from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions.sum_op import SumOp
+from jx_base.expressions.tally_op import TallyOp
 from jx_base.expressions.to_array_op import ToArrayOp
+from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.to_number_op import ToNumberOp
 from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.expressions.to_value_op import ToValueOp
@@ -119,6 +123,7 @@ from jx_base.expressions.union_op import UnionOp
 from jx_base.expressions.unix_op import UnixOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.expressions.when_op import WhenOp
+from mo_dots import set_default
 
 set_default(
     operators,
@@ -130,6 +135,7 @@ set_default(
         "array": ArrayOfOp,
         "avg": AvgOp,
         "basic.add": BasicAddOp,
+        "basic.boolean": BasicBooleanOp,
         "basic.mul": BasicMulOp,
         "between": BetweenOp,
         "cardinality": CardinalityOp,
@@ -157,13 +163,16 @@ set_default(
         "gt": GtOp,
         "gte": GteOp,
         "ge": GteOp,
+        "greatest": MostOp,
         "group": GroupOp,
         "groupby": GroupOp,
         "group by": GroupOp,
+        "group_by": GroupOp,
         "in": InOp,
         "instr": FindOp,
         "is_number": IsNumberOp,
         "is_text": IsTextOp,
+        "least": LeastOp,
         "last": LastOp,
         "left": LeftOp,
         "length": LengthOp,
@@ -177,6 +186,7 @@ set_default(
         "minus": SubOp,
         "missing": MissingOp,
         "mod": ModOp,
+        "most": MostOp,
         "mul": MulOp,
         "mult": MulOp,
         "multiply": MulOp,
@@ -208,6 +218,7 @@ set_default(
         "sub": SubOp,
         "subtract": SubOp,
         "sum": SumOp,
+        "tally": TallyOp,
         "term": EqOp,
         "terms": InOp,
         "tuple": TupleOp,

@@ -14,43 +14,29 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import ZERO, ONE
 from jx_base.expressions.literal import is_literal
-from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.variable import Variable
-from jx_base.language import is_op
 from mo_json.types import JX_NUMBER
 
 
 class FloorOp(Expression):
     has_simple_form = True
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
-    def __init__(self, *terms, default=NULL):
-        Expression.__init__(self, *terms)
-        if len(terms) == 1:
-            self.lhs = terms[0]
-            self.rhs = ONE
-        else:
-            self.lhs, self.rhs = terms
-        self.default = default
+    def __init__(self, lhs, rhs=ONE):
+        Expression.__init__(self, lhs, rhs)
+        self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
-        if is_op(self.lhs, Variable) and is_literal(self.rhs):
-            return {"floor": {self.lhs.var, self.rhs.value}, "default": self.default}
+        if is_variable(self.lhs) and is_literal(self.rhs):
+            return {"floor": {self.lhs.var, self.rhs.value}}
         else:
-            return {
-                "floor": [self.lhs.__data__(), self.rhs.__data__()],
-                "default": self.default,
-            }
+            return {"floor": [self.lhs.__data__(), self.rhs.__data__()]}
 
     def vars(self):
-        return self.lhs.vars() | self.rhs.vars() | self.default.vars()
+        return self.lhs.vars() | self.rhs.vars()
 
     def map(self, map_):
-        return FloorOp([self.lhs.map(map_), self.rhs.map(map_)], default=self.default.map(map_))
+        return FloorOp(self.lhs.map(map_), self.rhs.map(map_))
 
     def missing(self, lang):
-        if self.default.exists():
-            return FALSE
-        else:
-            return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),)
+        return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),)

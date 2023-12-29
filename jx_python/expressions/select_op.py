@@ -9,9 +9,10 @@
 #
 from mo_dots import leaves_to_data
 
-from jx_base.expressions import SelectOp as SelectOp_, Variable, ToArrayOp
+from jx_base.expressions import SelectOp as _SelectOp, Variable, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.select_op import SelectOne
+from jx_base.expressions.variable import is_variable
 from jx_base.language import is_op
 from jx_base.utils import delist
 from jx_python.expressions import Python
@@ -20,7 +21,7 @@ from mo_json import array_of, ARRAY_KEY
 from mo_logs.strings import quote
 
 
-class SelectOp(SelectOp_):
+class SelectOp(_SelectOp):
     def to_python(self, loop_depth=0):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
@@ -30,7 +31,7 @@ class SelectOp(SelectOp_):
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
-            if is_op(self.terms[0].value, Variable) and self.terms[0].value.var == "row":
+            if is_variable(self.terms[0].value) and self.terms[0].value.var == "row":
                 # SELECT ".", NO NEED TO LOOP
                 loop_depth = frum.loop_depth
                 source = frum.source
@@ -51,7 +52,7 @@ class SelectOp(SelectOp_):
                 ARRAY_KEY=ARRAY_KEY,
             ),
             loop_depth,
-            array_of(self.type),
+            array_of(self.jx_type),
             source,
             self,
         )

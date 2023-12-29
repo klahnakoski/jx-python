@@ -9,14 +9,14 @@
 #
 from mo_logs import logger
 
-from jx_base.expressions import Variable as Variable_
+from jx_base.expressions import Variable as _Variable
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions.get_op import get_attr
 from jx_python.utils import merge_locals
 from mo_json import JX_ANY
 
 
-class Variable(Variable_):
+class Variable(_Variable):
     def to_python(self, loop_depth=0):
         if self.var == ".":
             return PythonScript({}, loop_depth, JX_ANY, f"row{loop_depth}", self)

@@ -11,7 +11,7 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.to_text_op import ToTextOp
+from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.language import is_op
 from mo_json.types import JX_BOOLEAN
 
@@ -21,7 +21,7 @@ class BasicStartsWithOp(Expression):
     PLACEHOLDER FOR BASIC value.startsWith(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, *params):
         Expression.__init__(self, *params)
@@ -44,4 +44,6 @@ class BasicStartsWithOp(Expression):
         return FALSE
 
     def partial_eval(self, lang):
-        return BasicStartsWithOp(ToTextOp(self.value).partial_eval(lang), ToTextOp(self.prefix).partial_eval(lang),)
+        return lang.BasicStartsWithOp(
+            IsTextOp(self.value).partial_eval(lang), IsTextOp(self.prefix).partial_eval(lang),
+        )

@@ -9,9 +9,9 @@
 #
 
 
-from jx_base.expressions import SubOp as SubOp_
+from jx_base.expressions import SubOp as _SubOp
 from jx_python.expressions._utils import _binaryop_to_python
 
 
-class SubOp(SubOp_):
+class SubOp(_SubOp):
     to_python = _binaryop_to_python

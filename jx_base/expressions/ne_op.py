@@ -24,14 +24,14 @@ from mo_json.types import JX_BOOLEAN
 
 class NeOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, lhs, rhs):
         Expression.__init__(self, lhs, rhs)
         self.lhs, self.rhs = lhs, rhs
 
     def __data__(self):
-        if is_op(self.lhs, Variable) and is_literal(self.rhs):
+        if is_variable(self.lhs) and is_literal(self.rhs):
             return {"ne": {self.lhs.var, self.rhs.value}}
         else:
             return {"ne": [self.lhs.__data__(), self.rhs.__data__()]}
@@ -63,10 +63,10 @@ class NeOp(Expression):
             return NestedOp(
                 path=lhs.nested_path.partial_eval(lang),
                 select=IDENTITY,
-                where=AndOp(lhs.where, NeOp(lhs.select, rhs)).partial_eval(lang),
+                where=lang.AndOp(lhs.where, NeOp(lhs.select, rhs)).partial_eval(lang),
                 sort=lhs.sort.partial_eval(lang),
                 limit=lhs.limit.partial_eval(lang),
             ).partial_eval(lang)
 
-        output = AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)),).partial_eval(lang)
+        output = lang.AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)), nulls=False).partial_eval(lang)
         return output

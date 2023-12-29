@@ -295,7 +295,7 @@ def select(data, field_name):
     return list with values from field_name
     """
     if isinstance(data, Cube):
-        return data._select(_normalize_selects(data, field_name))
+        return data._select(_normalize_selects(data, field_name, "list"))
 
     if isinstance(data, PartFlatList):
         return data.select(field_name)

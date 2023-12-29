@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import NeOp as NeOp_
+from jx_base.expressions import NeOp as _NeOp
 from jx_python.expressions._utils import with_var, PythonSource
 
 
-class NeOp(NeOp_):
+class NeOp(_NeOp):
     def to_python(self, loop_depth=0):
         lhs = self.lhs.to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)

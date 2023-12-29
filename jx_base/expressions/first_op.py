@@ -21,16 +21,16 @@ WhenOp = expect("WhenOp")
 
 
 class FirstOp(Expression):
-    def __init__(self, term):
-        Expression.__init__(self, term)
-        self.term = term
-        self._data_type = self.term.type
+    def __init__(self, frum):
+        Expression.__init__(self, frum)
+        self.frum = frum
+        self._jx_type = self.frum.jx_type
 
     def __data__(self):
-        return {"first": self.term.__data__()}
+        return {"first": self.frum.__data__()}
 
     def __call__(self, row, rownum=None, rows=None):
-        value = self.term(row, rownum, rows)
+        value = self.frum(row, rownum, rows)
         if is_many(value):
             return first(value)
         else:
@@ -39,33 +39,33 @@ class FirstOp(Expression):
     def __eq__(self, other):
         if not is_op(other, FirstOp):
             return False
-        return self.term == other.term
+        return self.frum == other.frum
 
     def vars(self):
-        return self.term.vars()
+        return self.frum.vars()
 
     def map(self, map_):
-        return FirstOp(self.term.map(map_))
+        return FirstOp(self.frum.map(map_))
 
     def missing(self, lang):
-        return self.term.missing(lang)
+        return self.frum.missing(lang)
 
     def partial_eval(self, lang):
-        term = self.term.partial_eval(lang)
+        term = self.frum.partial_eval(lang)
 
-        if base_type(term.type) != ARRAY:
+        if base_type(term.jx_type) != ARRAY:
             return term
         elif is_op(term, ToArrayOp):
-            return FirstOp(term.term).partial_eval(lang)
+            return FirstOp(term.frum).partial_eval(lang)
         elif is_op(term, FirstOp):
             return term
         elif is_op(term, CaseOp):  # REWRITING
             return CaseOp(
-                [WhenOp(t.when, then=FirstOp(t.then)) for t in term.whens[:-1]] + [FirstOp(term.whens[-1])]
+                *(WhenOp(t.when, then=FirstOp(t.then)) for t in term.whens[:-1]), FirstOp(term.whens[-1])
             ).partial_eval(lang)
         elif is_op(term, WhenOp):
             return WhenOp(term.when, then=FirstOp(term.then), **{"else": FirstOp(term.els_)}).partial_eval(lang)
-        elif base_type(term.type) == ARRAY:
+        elif base_type(term.jx_type) == ARRAY:
             return term
         elif is_literal(term):
             value = term.value

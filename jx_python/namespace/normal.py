@@ -13,6 +13,8 @@ from copy import copy
 
 import mo_math
 from jx_base.namespace import Namespace
+
+from jx_base.expressions.variable import is_variable
 from mo_dots import (
     Data,
     FlatList,
@@ -104,7 +106,7 @@ class Normal(Namespace):
     def _convert_from(self, frum):
         if is_text(frum):
             return Data(name=frum)
-        elif is_op(frum, (Container, Variable)):
+        elif is_op(frum, Container) or is_variable(frum, Variable):
             return frum
         else:
             Log.error("Expecting from clause to be a name, or a container")

@@ -12,9 +12,9 @@ from typing import Tuple
 from jx_base.expressions._utils import builtin_ops, operators
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal, ZERO, ONE, is_literal
-from jx_base.expressions.true_op import TRUE
 from mo_imports import expect
 from mo_json.types import JX_NUMBER
+from mo_logs import logger
 
 AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
     "AndOp", "CoalesceOp", "NULL", "OrOp", "WhenOp", "ToNumberOp"
@@ -22,20 +22,23 @@ AndOp, CoalesceOp, NULL, OrOp, WhenOp, ToNumberOp = expect(
 
 
 class BaseMultiOp(Expression):
-    has_simple_form = True
-    _data_type = JX_NUMBER
+    """
+    conservative eval of multi-operand operators
+    """
 
-    def __init__(self, *terms, nulls=False, **clauses):
+    has_simple_form = True
+    _jx_type = JX_NUMBER
+
+    def __init__(self, *terms: Tuple[Expression], nulls=False):
+        if nulls is None:
+            logger.error("nulls must be specified")
         Expression.__init__(self, *terms)
-        self.terms: Tuple[Expression] = terms
-        # decisive==True WILL HAVE OP RETURN null ONLY IF ALL OPERANDS ARE null
-        self.decisive = nulls in (True, TRUE)
+        self.terms = terms
+        self.decisive = nulls
+        self.simplified = False
 
     def __data__(self):
-        return {
-            self.op: [t.__data__() for t in self.terms],
-            "decisive": self.decisive,
-        }
+        return {self.op: [t.__data__() for t in self.terms], "nulls": self.decisive}
 
     def vars(self):
         output = set()
@@ -44,7 +47,7 @@ class BaseMultiOp(Expression):
         return output
 
     def map(self, map_):
-        return self.__class__([t.map(map_) for t in self.terms], **{"decisive": self.decisive})
+        return self.__class__(*(t.map(map_) for t in self.terms), null=self.decisive)
 
     def missing(self, lang):
         if self.decisive:
@@ -52,19 +55,16 @@ class BaseMultiOp(Expression):
         else:
             return OrOp(*(t.missing(lang) for t in self.terms))
 
-    def exists(self):
-        if self.decisive:
-            return OrOp(*(t.exists() for t in self.terms))
-        else:
-            return AndOp(*(t.exists() for t in self.terms))
-
     def partial_eval(self, lang):
         literal_acc = None
         terms = []
         for t in self.terms:
             simple = ToNumberOp(t).partial_eval(lang)
             if simple is NULL:
-                pass
+                if self.decisive:
+                    pass
+                else:
+                    return NULL
             elif is_literal(simple):
                 if literal_acc is None:
                     literal_acc = simple.value
@@ -73,33 +73,14 @@ class BaseMultiOp(Expression):
             else:
                 terms.append(simple)
 
-        lang = self.lang
         if len(terms) == 0:
             return Literal(literal_acc)
         elif len(terms) == 1 and literal_acc is None:
             return terms[0]
-        elif self.decisive:
-            # DECISIVE
-            if literal_acc is not None:
-                terms.append(Literal(literal_acc))
-
-            output = WhenOp(
-                AndOp(*(t.missing(lang) for t in terms)),
-                **{"else": operators["basic." + self.op](*(
-                    CoalesceOp(t, _jx_identity.get(self.op, NULL)) for t in terms
-                ))}
-            ).partial_eval(lang)
         else:
-            # CONSERVATIVE
             if literal_acc is not None:
                 terms.append(Literal(literal_acc))
-
-            output = WhenOp(
-                OrOp(*(t.missing(lang) for t in terms)),
-                **{"else": operators["basic." + self.op](terms)}
-            ).partial_eval(lang)
-
-        return output
+            return self.__class__(*terms, nulls=self.decisive)
 
 
 _jx_identity = {"add": ZERO, "mul": ONE, "cardinality": ZERO, "sum": ZERO, "product": ONE}

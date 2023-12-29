@@ -9,14 +9,14 @@
 #
 
 
-from jx_base.expressions import BasicAddOp as BasicAddOp_, FALSE
+from jx_base.expressions import BasicAddOp as _BasicAddOp, FALSE
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class BasicAddOp(BasicAddOp_):
+class BasicAddOp(_BasicAddOp):
     def to_python(self, loop_depth=0):
         terms = [t.partial_eval(Python).to_python(loop_depth) for t in self.terms]
         return PythonScript(

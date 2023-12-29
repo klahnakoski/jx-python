@@ -28,7 +28,7 @@ TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expe
 
 
 class Expression(BaseExpression):
-    _data_type: JxType = JX_IS_NULL
+    _jx_type: JxType = JX_IS_NULL
     has_simple_form = False
 
     def __init__(self, *args):
@@ -69,8 +69,13 @@ class Expression(BaseExpression):
             if term == None:
                 return class_(**clauses)
             elif is_container(term):
-                terms = [jx_expression(t) for t in term]
-                return class_(*terms, **clauses)
+                terms = [_jx_expression(t, lang) for t in term]
+                try:
+                    return class_(*terms, **clauses)
+                except Exception as cause:
+                    _jx_expression(term[0], lang)
+                    print("hi")
+                    raise cause
             elif is_data(term):
                 items = items_(term)
                 if class_.has_simple_form:
@@ -109,7 +114,7 @@ class Expression(BaseExpression):
         OVERRIDE THIS METHOD TO SIMPLIFY
         :return:
         """
-        if self.type == BOOLEAN:
+        if self.jx_type == BOOLEAN:
             Log.error("programmer error")
         return lang.MissingOp(self)
 
@@ -158,8 +163,8 @@ class Expression(BaseExpression):
         return container.query(self)
 
     @property
-    def type(self) -> JxType:
-        return self._data_type
+    def jx_type(self) -> JxType:
+        return self._jx_type
 
     def __eq__(self, other):
         try:
@@ -187,7 +192,7 @@ class Expression(BaseExpression):
         return value2json(self.__data__())
 
     def __getattr__(self, item):
-        if item=="__json__":
+        if item == "__json__":
             raise AttributeError()
         Log.error(
             """{{type}} object has no attribute {{item}}, did you .register_ops() for {{type}}?""",

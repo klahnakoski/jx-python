@@ -9,22 +9,19 @@
 #
 
 
-from jx_base.expressions import MaxOp as MaxOp_, AndOp
+from jx_base.expressions import MaxOp as _MaxOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
-from jx_python.utils import merge_locals
-from mo_json import union_type
 
 
-class MaxOp(MaxOp_):
+class MaxOp(_MaxOp):
     def to_python(self, loop_depth=0):
-        terms = [t.partial_eval(Python).to_python(loop_depth) for t in self.terms]
-        source, locals = zip(*((t.source, t.locals) for t in terms))
+        frum = self.frum.partial_eval(Python).to_python(loop_depth+1)
+        source, locals = frum.source, frum.locals
         return PythonScript(
-            merge_locals(locals),
+            locals,
             loop_depth,
-            union_type(*(t.type for t in terms)),
-            "max([" + ",".join(source) + "])",
-            self,
-            AndOp(*(t.miss for t in terms)),
+            frum.jx_type,
+            f"max({source})",
+            self
         )

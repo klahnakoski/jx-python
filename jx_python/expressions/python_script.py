@@ -9,11 +9,11 @@
 #
 from mo_imports import export
 
-from jx_base.expressions import FALSE, TRUE, PythonScript as PythonScript_
+from jx_base.expressions import FALSE, TRUE, PythonScript as _PythonScript
 from jx_python.expressions import Python
 
 
-class PythonScript(PythonScript_):
+class PythonScript(_PythonScript):
     def __str__(self):
         missing = self.miss.partial_eval(Python)
         if missing is FALSE:
@@ -47,7 +47,7 @@ class PythonScript(PythonScript_):
         return {"script": self.script}
 
     def __eq__(self, other):
-        if not isinstance(other, PythonScript_):
+        if not isinstance(other, _PythonScript):
             return False
         elif self.expr == other.frum:
             return True

@@ -24,7 +24,7 @@ class BasicIndexOfOp(Expression):
     PLACEHOLDER FOR BASIC value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, value, find, start):
         Expression.__init__(self, value, find, start)

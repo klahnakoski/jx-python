@@ -7,12 +7,12 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_logs import logger
 
-
-from mo_dots import exists
+from jx_base.expressions.add_op import AddOp
 
 from jx_base.expressions import Expression
-from jx_base.expressions.to_array_op import ToArrayOp
+from mo_dots import exists
 from mo_json import JX_NUMBER
 
 
@@ -20,35 +20,42 @@ class SumOp(Expression):
     """
     DECISIVE ADDITION
     """
+
     op = "sum"
 
     has_simple_form = True
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
-    def __init__(self, term):
-        """
-        EXPECTING AN EXPRESSION THAT RETURNS AN ARRAY TO SUM
-        """
-        Expression.__init__(self, term)
-        self.term = term
+    def __new__(cls, *terms, frum=None):
+        if len(terms) > 1:
+            return AddOp(*terms, nulls=True)
+        else:
+            op = object.__new__(SumOp)
+            op.__init__(frum=frum)
+            return op
+
+    def __init__(self, *terms, frum=None):
+        if len(terms) > 1:
+            logger.error("expecting only one term")
+        if terms:
+            frum = terms[0]
+        Expression.__init__(self, frum)
+        self.frum = frum
 
     def __call__(self, row=None, rownum=None, rows=None):
-        return sum(v for v in self.term(row, rownum, rows) if exists(v))
+        return sum(v for v in self.frum(row, rownum, rows) if exists(v))
 
     def __data__(self):
-        return {
-            "sum": self.terms.__data__()
-        }
+        return {"sum": self.frum.__data__()}
 
     def vars(self):
-        return self.terms.vars()
+        return self.frum.vars()
 
     def map(self, map_):
-        return SumOp(self.terms.map(map_))
+        return SumOp(frum=self.frum.map(map_))
 
     def missing(self, lang):
-        self.terms.missing(lang)
+        self.frum.missing(lang)
 
     def partial_eval(self, lang):
-        term = self.term.partial_eval(lang)
-        return SumOp(term)
+        return SumOp(frum=self.frum.partial_eval(lang))

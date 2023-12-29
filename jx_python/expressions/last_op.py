@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions import LastOp as LastOp_, ToArrayOp
+from jx_base.expressions import LastOp as _LastOp, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
@@ -15,13 +15,13 @@ from mo_json import member_type, ARRAY_KEY
 from mo_json.typed_object import TypedObject
 
 
-class LastOp(LastOp_):
+class LastOp(_LastOp):
     def to_python(self, loop_depth=0):
         term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
         return PythonScript(
             merge_locals(term.locals, last=last),
             loop_depth,
-            member_type(term.type),
+            member_type(term.jx_type),
             f"last({term.source})",
             self,
         )

@@ -15,10 +15,10 @@ from mo_json.types import JX_BOOLEAN
 
 
 class BasicNotOp(Expression):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
-    def __init__(self, *term):
-        Expression.__init__(self, *term)
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
 
     def __data__(self):

@@ -9,12 +9,12 @@
 #
 from jx_base.expressions.python_script import PythonScript
 
-from jx_base.expressions import ToTextOp as ToTextOp_
+from jx_base.expressions import ToTextOp as _ToTextOp
 from jx_python.expressions._utils import Python
 from mo_json import JX_TEXT
 
 
-class ToTextOp(ToTextOp_):
+class ToTextOp(_ToTextOp):
     def to_python(self, loop_depth=0):
         missing = self.term.missing(Python).to_python(loop_depth)
         value = self.term.to_python(loop_depth)

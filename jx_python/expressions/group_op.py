@@ -12,7 +12,7 @@ import itertools
 from mo_dots import is_data
 from mo_json.typed_object import TypedObject
 
-from jx_base.expressions import GroupOp as GroupOp_, ToArrayOp
+from jx_base.expressions import GroupOp as _GroupOp, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_base.utils import enlist
@@ -25,7 +25,7 @@ from mo_json.types import JxType, array_of, ARRAY_KEY
 ARRAY_KEY = ARRAY_KEY
 
 
-class GroupOp(GroupOp_):
+class GroupOp(_GroupOp):
     def to_python(self, loop_depth=0):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         group = self.group.partial_eval(Python).to_python(loop_depth)
@@ -33,7 +33,7 @@ class GroupOp(GroupOp_):
         return PythonScript(
             merge_locals(frum.locals, group.locals, groupby=groupby, enlist=enlist),
             loop_depth,
-            array_of(frum.type) | JxType(group=group.type),
+            array_of(frum.jx_type) | JxType(group=group.jx_type),
             f"""groupby({frum.source}, lambda row{loop_depth}: {group.source})""",
             self,
         )

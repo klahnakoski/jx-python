@@ -10,12 +10,12 @@
 from mo_imports import export
 
 from jx_base.expressions.python_script import PythonScript
-from jx_base.expressions.to_number_op import ToNumberOp as NumberOp_
+from jx_base.expressions.to_number_op import ToNumberOp as _NumberOp
 from jx_python.utils import merge_locals
 from mo_json.types import JX_NUMBER
 
 
-class ToNumberOp(NumberOp_):
+class ToNumberOp(_NumberOp):
     def to_python(self, loop_depth=0):
         exists = self.term.exists()
         value = self.term.to_python(loop_depth)

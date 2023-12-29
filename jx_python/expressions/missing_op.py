@@ -10,12 +10,12 @@
 from mo_dots import is_missing
 from mo_json.typed_object import TypedObject
 
-from jx_base.expressions import MissingOp as MissingOp_, PythonScript, FALSE
+from jx_base.expressions import MissingOp as _MissingOp, PythonScript, FALSE
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class MissingOp(MissingOp_):
+class MissingOp(_MissingOp):
     def to_python(self, loop_depth=0):
         expr = self.expr.to_python(loop_depth)
         return PythonScript(

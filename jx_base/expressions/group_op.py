@@ -32,8 +32,8 @@ class GroupOp(Expression):
         return GroupOp(self.frum.map(map_), self.group.map(map_))
 
     @property
-    def type(self):
-        return array_of(self.frum.type)
+    def jx_type(self):
+        return array_of(self.frum.jx_type)
 
     def missing(self, lang):
         return MissingOp(self)

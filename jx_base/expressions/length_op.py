@@ -19,7 +19,7 @@ from mo_json import JX_INTEGER
 
 
 class LengthOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, term)

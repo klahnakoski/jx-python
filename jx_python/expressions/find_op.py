@@ -9,7 +9,7 @@
 #
 
 
-from jx_base.expressions import FindOp as FindOp_
+from jx_base.expressions import FindOp as _FindOp
 from jx_python.expressions._utils import with_var, Python, PythonScript
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.basic_eq_op import BasicEqOp
@@ -22,13 +22,12 @@ from jx_python.utils import merge_locals
 from mo_json import JX_INTEGER
 
 
-class FindOp(FindOp_):
+class FindOp(_FindOp):
     def partial_eval(self, lang):
         index = lang.BasicIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
 
         output = lang.WhenOp(
-            lang.OrOp(self.value.missing(Python), self.find.missing(Python), lang.BasicEqOp(index, Literal(-1)),),
-            then=self.default,
+            lang.OrOp(self.value.missing(Python), self.find.missing(Python), lang.BasicEqOp(index, Literal(-1))),
             **{"else": index},
         ).partial_eval(lang)
         return output

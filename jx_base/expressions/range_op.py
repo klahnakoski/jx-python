@@ -23,7 +23,7 @@ class RangeOp(Expression):
     """
 
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __new__(cls, term, *args):
         Expression.__new__(cls, *args)

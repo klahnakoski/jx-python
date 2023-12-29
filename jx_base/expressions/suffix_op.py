@@ -30,7 +30,7 @@ from mo_logs import Log
 
 class SuffixOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, expr, suffix):
         Expression.__init__(self, expr, suffix)
@@ -59,7 +59,7 @@ class SuffixOp(Expression):
     def __data__(self):
         if self.expr is None:
             return {"suffix": {}}
-        elif is_op(self.expr, Variable) and is_literal(self.suffix):
+        elif is_variable(self.expr) and is_literal(self.suffix):
             return {"suffix": {self.expr.var: self.suffix.value}}
         else:
             return {"suffix": [self.expr.__data__(), self.suffix.__data__()]}
@@ -95,7 +95,7 @@ class SuffixOp(Expression):
     def partial_eval(self, lang):
         if self.expr is None:
             return TRUE
-        if not is_literal(self.suffix) and self.suffix.type == STRING:
+        if not is_literal(self.suffix) and self.suffix.jx_type == STRING:
             Log.error("can only hanlde literal suffix ")
 
         return CaseOp(

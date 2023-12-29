@@ -9,13 +9,13 @@
 #
 from os.path import exists
 
-from jx_base.expressions import ConcatOp as ConcatOp_
+from jx_base.expressions import ConcatOp as _ConcatOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_TEXT
 
 
-class ConcatOp(ConcatOp_):
+class ConcatOp(_ConcatOp):
     def to_python(self, loop_depth=0):
         locals, sources = zip(*((c.locals, c.source) for t in self.terms for c in [t.to_python(loop_depth)]))
         separator = self.separator.to_python(loop_depth)

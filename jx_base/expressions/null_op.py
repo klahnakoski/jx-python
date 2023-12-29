@@ -25,7 +25,7 @@ class NullOp(Literal):
     USE IT TO EXPECT A NULL VALUE IN assertAlmostEqual
     """
 
-    _data_type = JX_IS_NULL
+    _jx_type = JX_IS_NULL
 
     @classmethod
     def define(cls, expr):
@@ -78,17 +78,14 @@ class NullOp(Literal):
         return FALSE
 
     @property
-    def type(self):
+    def jx_type(self):
         return JX_IS_NULL
 
     def __call__(self, row=None, rownum=None, rows=None):
         return Null
 
-    def __unicode__(self):
-        return "null"
-
     def __str__(self):
-        return b"null"
+        return "null"
 
     def __hash__(self):
         return id(None)

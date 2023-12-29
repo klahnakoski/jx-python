@@ -9,14 +9,14 @@
 #
 from mo_future import extend
 
-from jx_base.expressions import FalseOp as FalseOp_, FALSE
+from jx_base.expressions import FalseOp as _FalseOp, FALSE
 from jx_base.expressions.python_script import PythonScript
 from mo_json import JX_BOOLEAN
 
 
-class FalseOp(FalseOp_):
+class FalseOp(_FalseOp):
     def to_python(self, loop_depth=0):
         return PythonScript({}, loop_depth, JX_BOOLEAN, "False", self, FALSE)
 
 
-extend(FalseOp_)(FalseOp.to_python)
+extend(_FalseOp)(FalseOp.to_python)

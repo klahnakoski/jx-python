@@ -17,7 +17,7 @@ from mo_json.types import JX_BOOLEAN
 
 
 class SqlNotOp(Expression):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, *term):
         """

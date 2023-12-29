@@ -19,7 +19,7 @@ default_select = ({"name": ".", "value": IDENTITY},)
 
 
 class ESSelectOp(Expression):
-    _data_type = OBJECT
+    _jx_type = OBJECT
     has_simple_form = False
 
     def __init__(self, path="."):

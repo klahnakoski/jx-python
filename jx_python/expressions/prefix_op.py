@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import PrefixOp as PrefixOp_
+from jx_base.expressions import PrefixOp as _PrefixOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class PrefixOp(PrefixOp_):
+class PrefixOp(_PrefixOp):
     def to_python(self, loop_depth=0):
         return PythonScript(
             {},

@@ -9,10 +9,10 @@
 #
 
 
-from jx_base.expressions.base_multi_op import BaseMultiOp
+from jx_base.expressions.expression import Expression
 
 
-class CardinalityOp(BaseMultiOp):
+class CardinalityOp(Expression):
     op = "cardinality"
 
     def __call__(self, row, rownum, rows):
