@@ -24,11 +24,11 @@ class NameOp(Expression):
         if not is_literal(name):
             logger.error("expecting a literal name")
         Expression.__init__(self, frum, name)
-        self._name = name
         self.frum = frum
+        self._name = name
 
     def __data__(self):
-        return {"name": [self.frum.__data(), self._name.__data__()]}
+        return {"name": [self.frum.__data__(), self._name.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self._name.vars()

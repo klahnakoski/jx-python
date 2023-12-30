@@ -20,7 +20,7 @@ class FilterOp(Expression):
         self.frum, self.predicate = frum, predicate
 
     def __data__(self):
-        return {"filter": [self.frum.__data(), self.predicate.__data__()]}
+        return {"filter": [self.frum.__data__(), self.predicate.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self.predicate.vars()

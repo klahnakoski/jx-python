@@ -9,11 +9,10 @@
 #
 from mo_dots import leaves_to_data
 
-from jx_base.expressions import SelectOp as _SelectOp, Variable, ToArrayOp
+from jx_base.expressions import SelectOp as _SelectOp, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.select_op import SelectOne
 from jx_base.expressions.variable import is_variable
-from jx_base.language import is_op
 from jx_base.utils import delist
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
@@ -26,12 +25,12 @@ class SelectOp(_SelectOp):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
         selects = tuple(
-            SelectOne(t.name, t.value.partial_eval(Python).to_python(loop_depth)) for t in self.terms
+            SelectOne(t.name, t.expr.partial_eval(Python).to_python(loop_depth)) for t in self.terms
         )
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
-            if is_variable(self.terms[0].value) and self.terms[0].value.var == "row":
+            if is_variable(self.terms[0].expr) and self.terms[0].expr.var == "row":
                 # SELECT ".", NO NEED TO LOOP
                 loop_depth = frum.loop_depth
                 source = frum.source

@@ -94,8 +94,8 @@ class Stream:
         return Stream(self.values, ExpressionFactory(LimitOp(self.factory.expr, num)))
 
     def group(self, expr):
-        expr = factory(expr).expr
-        return Stream(self.values, ExpressionFactory(GroupOp(self.factory.expr, expr)))
+        box_expr = factory(expr).expr
+        return Stream(self.values, ExpressionFactory(GroupOp(self.factory.expr, box_expr)))
 
     ###########################################################################
     # TERMINATORS

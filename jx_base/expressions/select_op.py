@@ -7,6 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+import json
 from typing import Tuple, Iterable, Dict
 
 from jx_base.expressions._utils import TYPE_CHECK, simplified
@@ -25,7 +26,7 @@ from mo_dots import *
 from mo_future import is_text, text
 from mo_json.types import JxType
 from mo_imports import export
-from mo_json import union_type
+from mo_json import union_type, value2json
 from mo_logs import Log
 from mo_math import is_number
 
@@ -52,6 +53,10 @@ class SelectOne:
     @property
     def name(self):
         return self._value._name.value
+
+    @property
+    def expr(self):
+        return self._value.frum
 
     @property
     def default(self):
@@ -96,6 +101,14 @@ class SelectOne:
 
     def set_name(self, name):
         return SelectOne(name, self._value.frum)
+
+    def __data__(self):
+        return self._value.__data__()
+
+    def __str__(self):
+        return str(value2json(self.__data__(), pretty=True))
+
+    __repr__ = __str__
 
 
 class SelectOp(Expression):
@@ -220,7 +233,7 @@ class SelectOp(Expression):
             yield term.name, term.value
 
     def __data__(self):
-        return {"select": [self.frum.__data__()] + [{"name": name, "value": value.__data__()} for name, value in self]}
+        return {"select": [self.frum.__data__()] + [term.__data__() for term in self.terms]}
 
     def vars(self):
         return set(v for term in self.terms for v in term.value.vars())

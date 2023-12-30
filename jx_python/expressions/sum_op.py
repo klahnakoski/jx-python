@@ -20,7 +20,7 @@ from mo_json import JX_NUMBER
 
 class SumOp(_SumOp):
     def to_python(self, loop_depth=0):
-        term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
+        term = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = term.loop_depth + 1
         term_code = f"source{loop_depth}"
         source = f"""TypedObject(sum(row{loop_depth} for row{loop_depth} in {term_code} if exists(row{loop_depth})), **{term_code}._attachments)"""

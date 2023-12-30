@@ -39,7 +39,7 @@ class CommentOp(Expression):
         return result
 
     def __data__(self):
-        return {"comment": [self.frum.__data(), self.comment.__data__()]}
+        return {"comment": [self.frum.__data__(), self.comment.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self.comment.vars()

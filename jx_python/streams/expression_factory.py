@@ -1,32 +1,14 @@
-from jx_base import jx_expression
-from jx_base.expressions import (
-    Expression,
-    Variable,
-    GetOp,
-    EqOp,
-    Literal,
-    AndOp,
-    OrOp,
-    NeOp,
-    CallOp,
-    LastOp,
-    FirstOp,
-    ModOp,
-    LtOp,
-    GtOp,
-    LteOp,
-    GteOp,
-    NULL,
-    FALSE,
-    TRUE,
-    NameOp,
-    AddOp,
-    SubOp,
-    DivOp,
-    MulOp,
-    NotOp,
-    ToArrayOp, ToValueOp, SumOp,
-)
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http:# mozilla.org/MPL/2.0/.
+#
+# Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
+
+from jx_base.expressions import *
 from jx_python.expressions import Python, PythonFunction
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.streams.inspects import is_function
@@ -46,6 +28,9 @@ class ExpressionFactory:
         self.expr: Expression = expr
 
     def build(self):
+        jx = self.expr.partial_eval(Python)
+        python =jx.to_python(0)
+        print(str(self.expr.partial_eval(Python)))
         return compile_expression(self.expr.partial_eval(Python).to_python(0))
 
     def first(self):

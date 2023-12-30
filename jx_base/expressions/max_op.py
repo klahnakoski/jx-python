@@ -22,16 +22,18 @@ class MaxOp(Expression):
     _jx_type = JX_NUMBER
 
     def __new__(cls, *terms, frum=None):
-        if len(terms) > 1:
-            return MostOp(*terms, nulls=True)
-        else:
+        if frum is not None:
             op = object.__new__(MaxOp)
             op.__init__(frum=frum)
             return op
+        elif len(terms) > 1:
+            return MostOp(*terms, nulls=True)
+        else:
+            op = object.__new__(MaxOp)
+            op.__init__(frum=terms[0])
+            return op
 
     def __init__(self, *terms, frum=None):
-        if len(terms) > 1:
-            logger.error("MaxOp takes only one term")
         if terms:
             frum = terms[0]
 

@@ -24,16 +24,18 @@ class CountOp(Expression):
     op = "count"
 
     def __new__(cls, *terms, frum=None):
-        if len(terms) > 1:
-            return TallyOp(*terms, nulls=True)
-        else:
+        if frum is not None:
             op = object.__new__(CountOp)
             op.__init__(frum=frum)
             return op
+        elif len(terms) > 1:
+            return TallyOp(*terms, nulls=True)
+        else:
+            op = object.__new__(CountOp)
+            op.__init__(frum=terms[0])
+            return op
 
     def __init__(self, *terms, frum=None):
-        if len(terms) > 1:
-            logger.error("expecting only one term")
         if terms:
             frum = terms[0]
         Expression.__init__(self, frum)
