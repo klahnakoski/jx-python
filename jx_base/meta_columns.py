@@ -22,15 +22,14 @@ from mo_dots import (
     split_field,
     to_data,
 )
-from mo_future import Mapping
-from mo_future import binary_type, items, long, none_type, reduce, text
-from mo_imports import export
-from mo_logs import strings
 from mo_times.dates import Date
 
 from jx_base import DataClass
 from jx_base.models.schema import Schema
 from jx_base.utils import enlist, delist
+from mo_future import Mapping
+from mo_future import binary_type, items, long, none_type, reduce, text
+from mo_imports import export
 from mo_json import (
     INTEGER,
     NUMBER,
@@ -50,7 +49,6 @@ META_COLUMNS_TYPE_NAME = "column"
 ROOT_PATH = [META_COLUMNS_NAME]
 singlton = None
 
-strings
 
 TableDesc = DataClass(
     "Table",
