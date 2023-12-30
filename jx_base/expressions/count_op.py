@@ -21,7 +21,6 @@ class CountOp(Expression):
 
     has_simple_form = False
     _jx_type = JX_INTEGER
-    op = "count"
 
     def __new__(cls, *terms, frum=None):
         if frum is not None:

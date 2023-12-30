@@ -13,4 +13,4 @@ from jx_base.expressions.base_inequality_op import BaseInequalityOp
 
 
 class LtOp(BaseInequalityOp):
-    op = "lt"
+    pass

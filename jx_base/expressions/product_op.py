@@ -7,31 +7,30 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_logs import logger
-
-from jx_base.expressions.add_op import AddOp
+from mo_dots import exists
 
 from jx_base.expressions import Expression
-from mo_dots import exists
+from jx_base.expressions.mul_op import MulOp
 from mo_json import JX_NUMBER
 
 
-class SumOp(Expression):
+class ProductOp(Expression):
     """
-    DECISIVE ADDITION
+    DECISIVE PRODUCT (SEE MulOp FOR CONSERVATIVE PRODUCT)
     """
+
     has_simple_form = True
     _jx_type = JX_NUMBER
 
     def __new__(cls, *terms, frum=None):
         if frum is not None:
-            op = object.__new__(SumOp)
+            op = object.__new__(ProductOp)
             op.__init__(frum=frum)
             return op
         elif len(terms) > 1:
-            return AddOp(*terms, nulls=True)
+            return MulOp(*terms, nulls=True)
         else:
-            op = object.__new__(SumOp)
+            op = object.__new__(ProductOp)
             op.__init__(frum=terms[0])
             return op
 
@@ -51,10 +50,10 @@ class SumOp(Expression):
         return self.frum.vars()
 
     def map(self, map_):
-        return SumOp(frum=self.frum.map(map_))
+        return ProductOp(frum=self.frum.map(map_))
 
     def missing(self, lang):
         self.frum.missing(lang)
 
     def partial_eval(self, lang):
-        return SumOp(frum=self.frum.partial_eval(lang))
+        return ProductOp(frum=self.frum.partial_eval(lang))

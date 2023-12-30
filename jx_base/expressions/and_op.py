@@ -21,7 +21,6 @@ NotOp, OrOp, ToBooleanOp = expect("NotOp", "OrOp", "ToBooleanOp")
 
 class AndOp(BaseMultiOp):
     _jx_type = JX_BOOLEAN
-    op = "and"
 
     def __init__(self, *terms, nulls=False):
         BaseMultiOp.__init__(self, *terms, nulls=nulls)

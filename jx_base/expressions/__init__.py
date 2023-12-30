@@ -1,3 +1,5 @@
+from mo_dots import set_default
+
 from jx_base.expressions._utils import (
     jx_expression,
     merge_types,
@@ -63,6 +65,7 @@ from jx_base.expressions.is_integer_op import IsIntegerOp
 from jx_base.expressions.is_number_op import IsNumberOp
 from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.expressions.last_op import LastOp
+from jx_base.expressions.least_op import LeastOp
 from jx_base.expressions.leaves_op import LeavesOp
 from jx_base.expressions.left_op import LeftOp
 from jx_base.expressions.length_op import LengthOp
@@ -71,10 +74,10 @@ from jx_base.expressions.literal import Literal, ONE, ZERO, register_literal, is
 from jx_base.expressions.lt_op import LtOp
 from jx_base.expressions.lte_op import LteOp
 from jx_base.expressions.max_op import MaxOp
-from jx_base.expressions.most_op import MostOp
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.missing_op import MissingOp
 from jx_base.expressions.mod_op import ModOp
+from jx_base.expressions.most_op import MostOp
 from jx_base.expressions.mul_op import MulOp
 from jx_base.expressions.name_op import NameOp
 from jx_base.expressions.ne_op import NeOp
@@ -85,10 +88,10 @@ from jx_base.expressions.not_right_op import NotRightOp
 from jx_base.expressions.null_op import NullOp, NULL
 from jx_base.expressions.offset_op import OffsetOp
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.least_op import LeastOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.expressions.percentile_op import PercentileOp
 from jx_base.expressions.prefix_op import PrefixOp
+from jx_base.expressions.product_op import ProductOp
 from jx_base.expressions.python_function import PythonFunction
 from jx_base.expressions.python_script import PythonScript
 from jx_base.expressions.query_op import QueryOp
@@ -123,7 +126,6 @@ from jx_base.expressions.union_op import UnionOp
 from jx_base.expressions.unix_op import UnixOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.expressions.when_op import WhenOp
-from mo_dots import set_default
 
 set_default(
     operators,
@@ -187,9 +189,9 @@ set_default(
         "missing": MissingOp,
         "mod": ModOp,
         "most": MostOp,
-        "mul": MulOp,
-        "mult": MulOp,
-        "multiply": MulOp,
+        "mul": ProductOp,
+        "mult": ProductOp,
+        "multiply": ProductOp,
         "name": NameOp,
         "ne": NeOp,
         "neq": NeOp,
@@ -212,6 +214,7 @@ set_default(
         "select": SelectOp,
         "split": SplitOp,
         "to_array": ToArrayOp,
+        "product": ProductOp,
         "to_text": ToTextOp,
         "text": ToTextOp,
         "suffix": SuffixOp,

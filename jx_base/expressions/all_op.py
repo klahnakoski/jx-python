@@ -19,9 +19,7 @@ class AllOp(Expression):
     """
     DECISIVE AND
     """
-
     _jx_type = JX_BOOLEAN
-    op = "all"
 
     def __init__(self, frum):
         Expression.__init__(self, frum)

@@ -15,10 +15,9 @@ from mo_logs import logger
 
 
 class PercentileOp(Expression):
-    op = "percentile"
 
     def __init__(self, frum, percentile=None):
-        BaseMultiOp.__init__(self, frum=frum)
+        Expression.__init__(self, frum=frum)
         if percentile is None:
             self.percentile = Literal(0.5)
             return

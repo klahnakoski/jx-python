@@ -23,8 +23,6 @@ class Literal(Expression):
     A literal JSON document
     """
 
-    op = "literal"
-
     def __new__(cls, term):
         if term == None:
             return NULL

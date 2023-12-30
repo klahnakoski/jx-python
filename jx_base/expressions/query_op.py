@@ -56,8 +56,6 @@ class QueryOp(Expression):
         "destination",
     ]
 
-    op = "from"
-
     def __init__(
         self,
         frum,

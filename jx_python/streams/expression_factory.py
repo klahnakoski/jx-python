@@ -28,9 +28,6 @@ class ExpressionFactory:
         self.expr: Expression = expr
 
     def build(self):
-        jx = self.expr.partial_eval(Python)
-        python =jx.to_python(0)
-        print(str(self.expr.partial_eval(Python)))
         return compile_expression(self.expr.partial_eval(Python).to_python(0))
 
     def first(self):

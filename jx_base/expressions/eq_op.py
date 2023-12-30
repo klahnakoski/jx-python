@@ -17,7 +17,7 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.true_op import TRUE
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.language import is_op, value_compare
 from mo_dots import is_many, is_data
 from mo_imports import expect

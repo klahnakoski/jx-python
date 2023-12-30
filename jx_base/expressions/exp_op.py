@@ -13,4 +13,4 @@ from jx_base.expressions.base_binary_op import BaseBinaryOp
 
 
 class ExpOp(BaseBinaryOp):
-    op = "exp"
+    pass
