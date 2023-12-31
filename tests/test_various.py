@@ -32,48 +32,6 @@ class TestVarious(TestCase):
         )
 
 
-    def test_expr(self):
-        expr = jx_expression({
-            "when": {"gte": [{"count": "nested_path"}, 2]},
-            "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
-            "else": True,
-        })
-        python = expr.to_python(0)
-
-        a = (
-            (
-                not (is_missing(get_attr(enlist(row0), "nested_path")))
-                and not ((
-                    (None)
-                    if (is_missing(get_attr(enlist(row0), "nested_path")))
-                    else ((get_attr(enlist(row0), "nested_path"))[int(max([
-                        0,
-                        min([
-                            len(get_attr(enlist(row0), "nested_path"))
-                            if (get_attr(enlist(row0), "nested_path")) != None
-                            else None,
-                            (
-                                len(get_attr(enlist(row0), "nested_path"))
-                                if (get_attr(enlist(row0), "nested_path")) != None
-                                else None
-                            )
-                            - (2),
-                        ]),
-                    ])) : int(
-                        len(get_attr(enlist(row0), "nested_path"))
-                        if (get_attr(enlist(row0), "nested_path")) != None
-                        else None
-                    )])
-                ) == ".")
-            )
-            if ((sum(((0 if v == None else 1) for v in get_attr(enlist(row1), "nested_path")), 0)) >= (2))
-            else (True)
-        )
-
-
-        print(python)
-
-
 def typed_column(name, sql_key):
     if len(sql_key) > 1:
         Log.error("not expected")
