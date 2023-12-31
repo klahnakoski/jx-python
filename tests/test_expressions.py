@@ -67,3 +67,8 @@ class TestOther(FuzzyTestCase):
 
         self.assertEqual(expr(), 8)
         self.assertEqual(expr.partial_eval(Python).to_python().source, "8")
+
+    def test_count(self):
+        expr = jx_expression({"count": "nested_path"})
+        python = expr.to_python(0)
+        self.assertEqual(str(python), 'sum(((0 if v==None else 1) for v in get_attr(enlist(row0), "nested_path")), 0)')

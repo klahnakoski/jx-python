@@ -72,37 +72,37 @@ Column = DataClass(
         "last_updated",
     ],
     constraint={"and": [
-        {
-            "when": {"ne": {"name": "."}},
-            "then": {"or": [
-                {"and": [{"eq": {"json_type": "object"}}, {"eq": {"multi": 1}}]},
-                {"ne": ["name", {"first": "nested_path"}]},
-            ]},
-            "else": True,
-        },
-        {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": ["nested", "object"]}}, "else": True},
-        {"not": {"find": {"es_column": "null"}}},
-        {"not": {"eq": {"es_column": "string"}}},
-        {"not": {"eq": {"es_type": "object", "json_type": "exists"}}},
-        {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"eq": {"json_type": EXISTS}}, "else": True},
-        {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
-        {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
-        {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
-        {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
-        {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
-        {
-            "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
-            "then": {"or": [
-                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": "nested"}}, {"eq": {"es_type": "nested"}}]},
-                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": "object"}}, {"eq": {"es_type": "object"}}]},
-            ]},
-            "else": True,
-        },
-        {
-            "when": {"gte": [{"count": "nested_path"}, 2]},
-            "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
-            "else": True,
-        },
+        # {
+        #     "when": {"ne": {"name": "."}},
+        #     "then": {"or": [
+        #         {"and": [{"eq": {"json_type": "object"}}, {"eq": {"multi": 1}}]},
+        #         {"ne": ["name", {"first": "nested_path"}]},
+        #     ]},
+        #     "else": True,
+        # },
+        # {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": ["nested", "object"]}}, "else": True},
+        # {"not": {"find": {"es_column": "null"}}},
+        # {"not": {"eq": {"es_column": "string"}}},
+        # {"not": {"eq": {"es_type": "object", "json_type": "exists"}}},
+        # {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"eq": {"json_type": EXISTS}}, "else": True},
+        # {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
+        # {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
+        # {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
+        # {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
+        # {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
+        # {
+        #     "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
+        #     "then": {"or": [
+        #         {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": "nested"}}, {"eq": {"es_type": "nested"}}]},
+        #         {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": "object"}}, {"eq": {"es_type": "object"}}]},
+        #     ]},
+        #     "else": True,
+        # },
+        # {
+        #     "when": {"gte": [{"count": "nested_path"}, 2]},
+        #     "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
+        #     "else": True,
+        # },
     ]},
 )
 

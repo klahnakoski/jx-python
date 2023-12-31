@@ -6,6 +6,7 @@
 # You can obtain one at http:# mozilla.org/MPL/2.0/.
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
+from mo_dots import is_missing
 
 from jx_base.expressions.base_multi_op import BaseMultiOp
 from jx_base.expressions.false_op import FALSE
@@ -31,6 +32,9 @@ class TallyOp(BaseMultiOp):
                 return None
             total += v
         return total
+
+    def __data__(self):
+        return {"tally": [t.__data__() for t in self.terms]}
 
     def missing(self, lang):
         return FALSE

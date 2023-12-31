@@ -9,19 +9,20 @@
 #
 
 
+from mo_dots import is_data, is_missing
+
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
-from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.true_op import TRUE
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
-from mo_dots import is_data, is_missing
 from mo_future import first
 from mo_json.types import JX_BOOLEAN
 

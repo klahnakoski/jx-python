@@ -41,7 +41,10 @@ class SelectOne:
         self._value = object.__new__(NameOp)
         self._value._name = _name
         if aggregate is not NULL:
-            self._value.frum = canonical_aggregates[aggregate](frum=value)
+            if isinstance(aggregate, str):
+                self._value.frum = canonical_aggregates[aggregate](frum=value)
+            else:
+                self._value.frum = canonical_aggregates[aggregate.__class__](frum=value)
         else:
             self._value.frum = value
         if default is not NULL:
@@ -77,7 +80,7 @@ class SelectOne:
         if is_op(value, DefaultOp):
             agg = agg.frum
         if agg.__class__ in canonical_aggregates:
-            return agg.__class__
+            return agg
         return NULL
 
     @property

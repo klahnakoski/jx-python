@@ -18,9 +18,8 @@ from jx_base.expressions.max_op import MaxOp
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.sub_op import SubOp
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import is_variable
 from jx_base.expressions.when_op import WhenOp
-from jx_base.language import is_op
 from mo_json.types import JX_TEXT
 
 

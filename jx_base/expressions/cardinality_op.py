@@ -13,8 +13,14 @@ from jx_base.expressions.expression import Expression
 
 
 class CardinalityOp(Expression):
-    op = "cardinality"
+
+    def __init__(self, frum):
+        Expression.__init__(self, frum)
+        self.frum = frum
 
     def __call__(self, row, rownum, rows):
         values = self.terms(row, rownum, rows)
         return len(set(values))
+
+    def __data__(self):
+        return {"cardinality": self.frum.__data__()}

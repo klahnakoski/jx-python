@@ -7,36 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
-from jx_base.expressions.eq_op import EqOp
+from jx_base.expressions import BaseBinaryOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import ZERO, ONE
-from jx_base.expressions.literal import is_literal
-from jx_base.expressions.or_op import OrOp
+from jx_base.expressions.literal import ONE
 from mo_json.types import JX_NUMBER
 
 
-class FloorOp(Expression):
+class FloorOp(BaseBinaryOp):
     has_simple_form = True
     _jx_type = JX_NUMBER
 
     def __init__(self, lhs, rhs=ONE):
         Expression.__init__(self, lhs, rhs)
         self.lhs, self.rhs = lhs, rhs
-
-    def __data__(self):
-        if is_variable(self.lhs) and is_literal(self.rhs):
-            return {"floor": {self.lhs.var, self.rhs.value}}
-        else:
-            return {"floor": [self.lhs.__data__(), self.rhs.__data__()]}
-
-    def vars(self):
-        return self.lhs.vars() | self.rhs.vars()
-
-    def map(self, map_):
-        return FloorOp(self.lhs.map(map_), self.rhs.map(map_))
-
-    def missing(self, lang):
-        return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), EqOp(self.rhs, ZERO),)

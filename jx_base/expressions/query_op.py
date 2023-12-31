@@ -466,7 +466,7 @@ def _normalize_group(edge, dim_index, limit, schema=None):
         elif edge.endswith(".*"):
             prefix = edge[:-2]
             return list_to_data([{
-                "name": untype_path(prefix),
+                "name": ".",
                 "value": LeavesOp(Variable(prefix)),
                 "allowNulls": True,
                 "dim": dim_index,

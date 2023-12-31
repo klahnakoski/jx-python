@@ -7,38 +7,14 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.expressions.base_binary_op import BaseBinaryOp
 
-
-from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from jx_base.language import is_op
 from mo_json.types import JX_BOOLEAN
 
 
-class BasicEqOp(Expression):
+class BasicEqOp(BaseBinaryOp):
     """
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
-
     _jx_type = JX_BOOLEAN
-
-    def __init__(self, lhs, rhs):
-        Expression.__init__(self, lhs, rhs)
-        self.lhs, self.rhs = lhs, rhs
-
-    def __data__(self):
-        return {"basic.eq": [self.lhs.__data__(), self.rhs.__data__()]}
-
-    def missing(self, lang):
-        return FALSE
-
-    def vars(self):
-        return self.lhs.vars() | self.rhs.vars()
-
-    def map(self, map_):
-        return BasicEqOp(self.lhs.map(map_), self.rhs.map(map_))
-
-    def __eq__(self, other):
-        if not is_op(other, BasicEqOp):
-            return False
-        return self.lhs == other.lhs and self.rhs == other.rhs
+    op = "basic.eq"

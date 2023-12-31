@@ -7,10 +7,12 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 
+from mo_dots import exists
+
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.tally_op import TallyOp
-from mo_dots import exists
+from jx_base.expressions.true_op import TRUE
 from mo_json.types import JX_INTEGER
 
 
@@ -43,6 +45,9 @@ class CountOp(Expression):
     def __call__(self, row, rownum, rows):
         return sum((1 for t in self.frum(row, rownum, rows) if exists(t)), 0)
 
+    def __data__(self):
+        return {"count": self.frum.__data__()}
+
     def partial_eval(self, lang):
         return lang.CountOp(frum=self.frum.partial_eval(lang))
 
@@ -51,3 +56,4 @@ class CountOp(Expression):
 
     def exists(self):
         return TRUE
+

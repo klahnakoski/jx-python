@@ -7,57 +7,13 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
-
-from jx_base.expressions._utils import builtin_ops
-from jx_base.expressions.expression import Expression
+from jx_base.expressions import BaseBinaryOp
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import is_literal, Literal
 from mo_json.types import JX_BOOLEAN
 
 
-class BaseInequalityOp(Expression):
-    has_simple_form = True
+class BaseInequalityOp(BaseBinaryOp):
     _jx_type = JX_BOOLEAN
-    op = None
-
-    def __init__(self, lhs, rhs):
-        Expression.__init__(self, lhs, rhs)
-        self.lhs = lhs
-        self.rhs = rhs
-
-    @property
-    def name(self):
-        return self.op
-
-    def __data__(self):
-        if is_variable(self.lhs) and is_literal(self.rhs):
-            return {self.op: {self.lhs.var, self.rhs.value}}
-        else:
-            return {self.op: [self.lhs.__data__(), self.rhs.__data__()]}
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return self.op == other.op and self.lhs == other.lhs and self.rhs == other.rhs
-
-    def vars(self):
-        return self.lhs.vars() | self.rhs.vars()
-
-    def map(self, map_):
-        return self.__class__([self.lhs.map(map_), self.rhs.map(map_)])
 
     def missing(self, lang):
         return FALSE
-
-    def partial_eval(self, lang):
-        lhs = self.lhs.partial_eval(lang)
-        rhs = self.rhs.partial_eval(lang)
-
-        if is_literal(lhs) and is_literal(rhs):
-            return Literal(builtin_ops[self.op](lhs, rhs))
-
-        return self.__class__(lhs, rhs)
-
-
-num_calls = 0

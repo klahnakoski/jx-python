@@ -162,6 +162,7 @@ precedence = [
     "default",
     "limit",
     "skip",
+    "percentile",
     "select",
     "having",
     "group",
@@ -169,4 +170,5 @@ precedence = [
     "where",
     "edges",
     "from",
+    "value",
 ]
