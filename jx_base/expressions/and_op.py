@@ -34,21 +34,9 @@ class AndOp(BaseMultiOp):
                 return False
         return True
 
-    def __eq__(self, other):
-        if is_op(other, AndOp) and len(self.terms) == len(other.terms):
-            return all(s == o for s, o in zip(self.terms, other.terms))
-        return False
-
-    def vars(self):
-        output = set()
-        for t in self.terms:
-            output |= t.vars()
-        return output
-
-    def map(self, map_):
-        return AndOp(*(t.map(map_) for t in self.terms))
-
     def missing(self, lang):
+        if self.decisive:
+            return FALSE
         return OrOp(*(t.missing(lang) for t in self.terms))
 
     def invert(self, lang):

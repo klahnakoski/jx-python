@@ -148,8 +148,10 @@ builtin_ops = {
     "add": operator.add,
     "sub": operator.sub,
     "mul": operator.mul,
-    "max": lambda *v: max(v),
-    "min": lambda *v: min(v),
+    "max": lambda *v: max(*v),
+    "min": lambda *v: min(*v),
+    "most": lambda *v: max(*v),
+    "least": lambda *v: min(*v),
 }
 
 operators = {}

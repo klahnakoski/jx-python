@@ -9,9 +9,10 @@
 #
 from typing import Tuple
 
-from jx_base.expressions._utils import builtin_ops, operators
+from jx_base.expressions._utils import builtin_ops
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal, ZERO, ONE, is_literal
+from jx_base.language import is_op
 from mo_imports import expect
 from mo_json.types import JX_NUMBER
 from mo_logs import logger
@@ -25,7 +26,6 @@ class BaseMultiOp(Expression):
     """
     conservative eval of multi-operand operators
     """
-
     has_simple_form = True
     _jx_type = JX_NUMBER
 
@@ -36,6 +36,13 @@ class BaseMultiOp(Expression):
         self.terms = terms
         self.decisive = nulls
         self.simplified = False
+
+    def __eq__(self, other):
+        if not is_op(other, self.__class__):
+            return False
+        if len(self.terms) != len(other.terms):
+            return False
+        return all(s == o for s, o in zip(self.terms, other.terms))
 
     def __data__(self):
         return {self.op: [t.__data__() for t in self.terms], "nulls": self.decisive}

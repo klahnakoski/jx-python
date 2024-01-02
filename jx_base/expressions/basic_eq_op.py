@@ -7,14 +7,11 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions.base_binary_op import BaseBinaryOp
-
-from mo_json.types import JX_BOOLEAN
+from jx_base.expressions.base_inequality_op import BaseInequalityOp
 
 
-class BasicEqOp(BaseBinaryOp):
+class BasicEqOp(BaseInequalityOp):
     """
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
-    _jx_type = JX_BOOLEAN
     op = "basic.eq"
