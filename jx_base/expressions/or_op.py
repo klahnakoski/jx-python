@@ -20,38 +20,17 @@ from mo_json.types import JX_BOOLEAN
 
 class OrOp(BaseMultiOp):
     _jx_type = JX_BOOLEAN
-    default = FALSE  # ADD THIS TO terms FOR NO EEFECT
-
-    def __init__(self, *terms, nulls=False):
-        BaseMultiOp.__init__(self, *terms, nulls=nulls)
-
-    def __data__(self):
-        return {"or": [t.__data__() for t in self.terms]}
-
-    def vars(self):
-        output = set()
-        for t in self.terms:
-            output |= t.vars()
-        return output
-
-    def map(self, map_):
-        return OrOp(*(t.map(map_) for t in self.terms))
 
     def missing(self, lang):
-        return FALSE
+        if self.decisive:
+            return FALSE
+        return OrOp(*(t.missing(lang) for t in self.terms))
 
     def invert(self, lang):
         return lang.AndOp(*(t.invert(lang) for t in self.terms)).partial_eval(lang)
 
     def __call__(self, row=None, rownum=None, rows=None):
         return any(t(row, rownum, rows) for t in self.terms)
-
-    def __eq__(self, other):
-        if not is_op(other, OrOp):
-            return False
-        if len(self.terms) != len(other.terms):
-            return False
-        return all(t == u for t, u in zip(self.terms, other.terms))
 
     def __contains__(self, item):
         return any(item in t for t in self.terms)

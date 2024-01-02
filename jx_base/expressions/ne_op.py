@@ -10,7 +10,6 @@
 from jx_base.expressions.base_inequality_op import BaseInequalityOp
 
 from jx_base.expressions.basic_eq_op import BasicEqOp
-from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.nested_op import NestedOp
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.or_op import OrOp
@@ -43,5 +42,5 @@ class NeOp(BaseInequalityOp):
                 limit=lhs.limit.partial_eval(lang),
             ).partial_eval(lang)
 
-        output = lang.AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs)), nulls=False).partial_eval(lang)
+        output = lang.AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs))).partial_eval(lang)
         return output

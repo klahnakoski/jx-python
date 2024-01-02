@@ -22,29 +22,6 @@ class LeastOp(BaseMultiOp):
     """
     DECISIVE MINIMUM (SEE LeastOp FOR CONSERVATIVE MINIMUM)
     """
-
-    _jx_type = JX_NUMBER
-
-    def __init__(self, *terms, nulls=None):
-        BaseMultiOp.__init__(self, *terms, nulls=nulls)
-
-    def __data__(self):
-        return {
-            "min": [t.__data__() for t in self.terms],
-        }
-
-    def vars(self):
-        output = set()
-        for t in self.terms:
-            output |= t.vars()
-        return output
-
-    def map(self, map_):
-        return LeastOp(*(t.map(map_) for t in self.terms))
-
-    def missing(self, lang):
-        return OrOp(*(t.missing(lang) for t in self.terms))
-
     def partial_eval(self, lang):
         minimum = None
         terms = []
