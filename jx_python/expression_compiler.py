@@ -53,12 +53,12 @@ def compile_expression(source, function_name="output"):
     :return:  PYTHON FUNCTION
     """
 
-    fake_locals = {}
+    locals = {}
     try:
         exec(
             (
                 strings.outdent(f"""
-                def {function_name}(row, rownum=None, rows=None):
+                def {function_name}(row0, rownum0=None, rows0=None):
                     _source = {strings.quote(source)}
                     try:
                         return {source}
@@ -66,10 +66,10 @@ def compile_expression(source, function_name="output"):
                         Log.error('Problem with dynamic function {{func|quote}}', func=_source, cause=e)
                 """)
             ),
-            GLOBALS,
-            fake_locals,
+            {**GLOBALS, **source.locals},
+            locals
         )
-        func = fake_locals[function_name]
+        func = locals[function_name]
         setattr(func, "_source", source)
         return func
     except Exception as e:

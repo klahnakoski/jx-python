@@ -7,7 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_imports import export
 
 from jx_base.expressions import FALSE, TRUE, PythonScript as _PythonScript
 from jx_python.expressions import Python

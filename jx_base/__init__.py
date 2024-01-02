@@ -74,10 +74,12 @@ def failure(row, rownum, rows, constraint):
         jx_expression(constraint)
 
     try:
-        if not expr(row, rownum, row):
-            raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
+        does_pass = expr(row, rownum, row)
     except Exception as cause:
-        raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__(), cause=cause)
+        does_pass = False
+
+    if not does_pass:
+        raise Log.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
 
 
 def DataClass(name, columns, constraint=None):
@@ -215,20 +217,18 @@ class {{class_name}}(Mapping):
         return str({{dict}})
 
 """,
-        (
-            {
-                "class_name": name,
-                "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
-                "required": "{" + ", ".join(quote(s) for s in required) + "}",
-                "defaults": _to_python(defaults),
-                "len_slots": len(slots),
-                "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
-                "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
-                "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
-                "constraint_expr": constraint_expr.source,
-                "constraint": value2json(constraint),
-            },
-        ),
+        ({
+            "class_name": name,
+            "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
+            "required": "{" + ", ".join(quote(s) for s in required) + "}",
+            "defaults": _to_python(defaults),
+            "len_slots": len(slots),
+            "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
+            "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
+            "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
+            "constraint_expr": constraint_expr.source,
+            "constraint": value2json(constraint),
+        },)
     )
 
     output = _exec(code, name, constraint_expr.locals)
