@@ -11,6 +11,10 @@
 
 from uuid import uuid4
 
+from jx_base.expressions.when_op import WhenOp
+
+from jx_base.language import is_op
+
 from jx_base.expressions import jx_expression
 from jx_base.expressions.literal import FALSE
 from jx_base.models.container import Container
@@ -69,10 +73,6 @@ def failure(row, rownum, rows, constraint):
             failure(row, rownum, rows, a)
         return
     expr = jx_expression(constraint)
-    if expr is FALSE:
-        print("hi")
-        jx_expression(constraint)
-
     try:
         does_pass = expr(row, rownum, row)
     except Exception as cause:

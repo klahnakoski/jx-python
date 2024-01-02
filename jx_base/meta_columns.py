@@ -75,15 +75,15 @@ Column = DataClass(
         {
             "when": {"ne": {"name": "."}},
             "then": {"or": [
-                {"and": [{"eq": {"json_type": "object"}}, {"eq": {"multi": 1}}]},
+                {"and": [{"eq": {"json_type": OBJECT}}, {"eq": {"multi": 1}}]},
                 {"ne": ["name", {"first": "nested_path"}]},
             ]},
             "else": True,
         },
-        {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": ["nested", "object"]}}, "else": True},
+        {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT]}}, "else": True},
         {"not": {"find": {"es_column": "null"}}},
         {"not": {"eq": {"es_column": "string"}}},
-        {"not": {"eq": {"es_type": "object", "json_type": "exists"}}},
+        {"not": {"eq": {"es_type": "object", "json_type": EXISTS}}},
         {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"eq": {"json_type": EXISTS}}, "else": True},
         {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
         {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
@@ -93,8 +93,8 @@ Column = DataClass(
         {
             "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
             "then": {"or": [
-                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": "nested"}}, {"eq": {"es_type": "nested"}}]},
-                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": "object"}}, {"eq": {"es_type": "object"}}]},
+                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": ARRAY}}, {"eq": {"es_type": "nested"}}]},
+                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": OBJECT}}, {"eq": {"es_type": "object"}}]},
             ]},
             "else": True,
         },
@@ -211,65 +211,62 @@ def get_id(column):
     return column.es_index + "|" + column.es_column
 
 
-try:
-    META_COLUMNS_DESC = TableDesc(
-        name=META_COLUMNS_NAME,
-        url=None,
-        query_path=ROOT_PATH,
-        last_updated=Date.now(),
-        columns=to_data(
-            [
-                Column(
-                    name=c,
-                    es_index=META_COLUMNS_NAME,
-                    es_column=c,
-                    es_type="keyword",
-                    json_type=STRING,
-                    last_updated=Date.now(),
-                    nested_path=ROOT_PATH,
-                    multi=1,
-                )
-                for c in ["name", "es_type", "json_type", "es_column", "es_index", "partitions"]
-            ]
-            + [
-                Column(
-                    name=c,
-                    es_index=META_COLUMNS_NAME,
-                    es_column=c,
-                    es_type="integer",
-                    json_type=INTEGER,
-                    last_updated=Date.now(),
-                    nested_path=ROOT_PATH,
-                    multi=1,
-                )
-                for c in ["count", "cardinality", "multi"]
-            ]
-            + [
-                Column(
-                    name="nested_path",
-                    es_index=META_COLUMNS_NAME,
-                    es_column="nested_path",
-                    es_type="keyword",
-                    json_type=STRING,
-                    last_updated=Date.now(),
-                    nested_path=ROOT_PATH,
-                    multi=4,
-                ),
-                Column(
-                    name="last_updated",
-                    es_index=META_COLUMNS_NAME,
-                    es_column="last_updated",
-                    es_type="double",
-                    json_type=NUMBER,
-                    last_updated=Date.now(),
-                    nested_path=ROOT_PATH,
-                    multi=1,
-                ),
-            ]
-        ),
-    )
-except Exception as cause:
-    print(cause)
+META_COLUMNS_DESC = TableDesc(
+    name=META_COLUMNS_NAME,
+    url=None,
+    query_path=ROOT_PATH,
+    last_updated=Date.now(),
+    columns=to_data(
+        [
+            Column(
+                name=c,
+                es_index=META_COLUMNS_NAME,
+                es_column=c,
+                es_type="keyword",
+                json_type=STRING,
+                last_updated=Date.now(),
+                nested_path=ROOT_PATH,
+                multi=1,
+            )
+            for c in ["name", "es_type", "json_type", "es_column", "es_index", "partitions"]
+        ]
+        + [
+            Column(
+                name=c,
+                es_index=META_COLUMNS_NAME,
+                es_column=c,
+                es_type="integer",
+                json_type=INTEGER,
+                last_updated=Date.now(),
+                nested_path=ROOT_PATH,
+                multi=1,
+            )
+            for c in ["count", "cardinality", "multi"]
+        ]
+        + [
+            Column(
+                name="nested_path",
+                es_index=META_COLUMNS_NAME,
+                es_column="nested_path",
+                es_type="keyword",
+                json_type=STRING,
+                last_updated=Date.now(),
+                nested_path=ROOT_PATH,
+                multi=4,
+            ),
+            Column(
+                name="last_updated",
+                es_index=META_COLUMNS_NAME,
+                es_column="last_updated",
+                es_type="double",
+                json_type=NUMBER,
+                last_updated=Date.now(),
+                nested_path=ROOT_PATH,
+                multi=1,
+            ),
+        ]
+    ),
+)
 
 META_TABLES_DESC = TableDesc(
     name=META_TABLES_NAME,

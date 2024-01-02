@@ -10,13 +10,23 @@
 
 
 from jx_base.expressions.base_multi_op import BaseMultiOp
-from jx_base.expressions.literal import Literal, is_literal
-from jx_base.expressions.null_op import NULL
-from mo_math import MAX
 
 
 class MostOp(BaseMultiOp):
     """
     CONSERVATIVE MAXIMUM (SEE MaxOp FOR DECISIVE MAXIMUM)
     """
-    pass
+    def __call__(self, row, rownum=None, rows=None):
+        maxi = None
+        for t in self.terms:
+            v = t(row, rownum, rows)
+            if v is None:
+                if self.decisive:
+                    continue
+                else:
+                    return None
+            if maxi is None:
+                maxi = v
+            elif v > maxi:
+                maxi = v
+        return maxi

@@ -73,8 +73,6 @@ class Expression(BaseExpression):
                 try:
                     return class_(*terms, **clauses)
                 except Exception as cause:
-                    _jx_expression(term[0], lang)
-                    print("hi")
                     raise cause
             elif is_data(term):
                 items = items_(term)

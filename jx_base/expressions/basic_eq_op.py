@@ -15,3 +15,7 @@ class BasicEqOp(BaseInequalityOp):
     PLACEHOLDER FOR BASIC `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
     op = "basic.eq"
+
+
+    def __call__(self, row, rownum=None, rows=None):
+        return self.lhs(row, rownum, rows) == self.rhs(row, rownum, rows)

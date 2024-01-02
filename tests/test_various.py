@@ -34,8 +34,7 @@ class TestVarious(TestCase):
         result = func(row0)
         self.assertEqual(result, True)
 
-
-    def test_expression(self):
+    def test_column_nested_path_expression(self):
         json = {"and": [
             # {
             #     "when": {"ne": {"name": "."}},
@@ -107,15 +106,124 @@ class TestVarious(TestCase):
             json
         )
         with self.assertRaises(Exception):
-            column = AnotherColumn(
-                name=".",
+            AnotherColumn(
+                name="name",
+                es_column="es_column.~N~",
+                es_index="es_index",
+                es_type="es_type",
                 json_type=INTEGER,
-                es_type="nested",
-                es_column=typed_column(concat_field(nested_path[0], "."), "n"),
-                es_index="test",
-                cardinality=0,
                 multi=1,
-                nested_path=nested_path,
+                nested_path=".",  # never end with .
+                last_updated=Date.now(),
+            )
+
+    def test_multi(self):
+        json = {"and": [
+            {
+                "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
+                "then": {"or": [
+                    {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": ARRAY}}, {"eq": {"es_type": "nested"}}]},
+                    {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": OBJECT}}, {"eq": {"es_type": "object"}}]},
+                ]},
+                "else": True,
+            },
+        ]}
+        code = jx_expression(json).to_python(0)
+        column = Column(
+                name="name",
+                es_column="es_column.~N~",
+                es_index="es_index",
+                es_type="es_type",
+                json_type=INTEGER,
+                multi=1,
+                nested_path="a",
+                last_updated=Date.now(),
+            )
+        func = compile_expression(code)
+        result = func(column)
+        self.assertEqual(result, False)
+
+        AnotherColumn = DataClass(
+            "AnotherColumn",
+            [
+                "name",
+                "es_column",
+                "es_index",
+                "es_type",
+                "json_type",
+                "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
+                {"name": "count", "nulls": True},
+                {"name": "cardinality", "nulls": True},
+                {"name": "multi", "nulls": False},
+                {"name": "partitions", "nulls": True},
+                "last_updated",
+            ],
+            json
+        )
+        with self.assertRaises(Exception):
+            AnotherColumn(
+                name="name",
+                es_column="es_column.~N~",
+                es_index="es_index",
+                es_type="es_type",
+                json_type=INTEGER,
+                multi=1,
+                nested_path="a",
+                last_updated=Date.now(),
+            )
+
+    def test_type(self):
+        json = {"and": [
+            {
+                "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
+                "then": {"or": [
+                    {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": ARRAY}}, {"eq": {"es_type": "nested"}}]},
+                    {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": OBJECT}}, {"eq": {"es_type": "object"}}]},
+                ]},
+                "else": True,
+            },
+        ]}
+        code = jx_expression(json).to_python(0)
+        column = Column(
+                name="name",
+                es_column="es_column.~N~",
+                es_index="es_index",
+                es_type="es_type",
+                json_type=INTEGER,
+                multi=1,
+                nested_path="a",
+                last_updated=Date.now(),
+            )
+        func = compile_expression(code)
+        result = func(column)
+        self.assertEqual(result, False)
+
+        AnotherColumn = DataClass(
+            "AnotherColumn",
+            [
+                "name",
+                "es_column",
+                "es_index",
+                "es_type",
+                "json_type",
+                "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
+                {"name": "count", "nulls": True},
+                {"name": "cardinality", "nulls": True},
+                {"name": "multi", "nulls": False},
+                {"name": "partitions", "nulls": True},
+                "last_updated",
+            ],
+            json
+        )
+        with self.assertRaises(Exception):
+            AnotherColumn(
+                name="name",
+                es_column="es_column.~N~",
+                es_index="es_index",
+                es_type="es_type",
+                json_type=INTEGER,
+                multi=1,
+                nested_path="a",
                 last_updated=Date.now(),
             )
 
@@ -142,7 +250,7 @@ class TestVarious(TestCase):
             json_type=ARRAY,
             cardinality=1,
             multi=2,
-            nested_path=".",
+            nested_path="a",
             last_updated=Date.now(),
         )
 
@@ -154,7 +262,7 @@ class TestVarious(TestCase):
                 es_type="es_type",
                 json_type=INTEGER,
                 multi=1,
-                nested_path=".",  # never end with .
+                nested_path="a",
                 last_updated=Date.now(),
             )
 
@@ -166,7 +274,7 @@ class TestVarious(TestCase):
                 es_type="es_type",
                 json_type=INTEGER,
                 multi=0,
-                nested_path=".",
+                nested_path="a",
                 last_updated=Date.now(),
             )
 
@@ -177,7 +285,7 @@ class TestVarious(TestCase):
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,
-                nested_path=".",
+                nested_path="a",
                 last_updated=Date.now(),
             )
 

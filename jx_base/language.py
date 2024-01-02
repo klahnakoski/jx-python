@@ -242,8 +242,6 @@ class Language(object):
 
         # ENSURE THIS LANGUAGE INSTANCE POINTS TO ALL THE OPS BY NAME
         for o in self.ops[1:]:
-            if o is None:
-                print("hi")
             setattr(self, o.__name__, o)
 
     def __getitem__(self, item):

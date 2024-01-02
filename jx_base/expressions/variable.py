@@ -43,6 +43,13 @@ class Variable(Expression):
             Log.error("expecting JX type")
 
     def __call__(self, row, rownum=None, rows=None):
+        if self.var == "row":
+            return row
+        elif self.var == "rownum":
+            return rownum
+        elif self.var == "rows":
+            return rows
+
         path = split_field(self.var)
         for step in path:
             try:
