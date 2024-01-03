@@ -7,13 +7,14 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.expressions.and_op import AndOp
 
-
-from mo_imports import export
+from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.null_op import NULL
 from jx_base.expressions.not_op import NotOp
+from jx_base.expressions.null_op import NULL
+from mo_imports import export
 from mo_json.types import JX_BOOLEAN
 
 
@@ -51,9 +52,9 @@ class ToBooleanOp(Expression):
             return term
         elif term is self.term:
             return self
-
-        exists = NotOp(term.missing(lang)).partial_eval(lang)
-        return exists
+        return ToBooleanOp(term)
+        # exists = AndOp(NotOp(term.missing(lang)), NotOp(BasicEqOp(term, FALSE))).partial_eval(lang)
+        # return exists
 
 
 export("jx_base.expressions.and_op", ToBooleanOp)

@@ -27,6 +27,12 @@ class BasicStartsWithOp(Expression):
         Expression.__init__(self, *params)
         self.value, self.prefix = params
 
+    def __call__(self, row, rownum=None, rows=None):
+        if self.value(row, rownum, rows).startswith(self.prefix(row, rownum, rows)):
+            return True
+        else:
+            return False
+
     def __data__(self):
         return {"basic.startsWith": [self.value.__data__(), self.prefix.__data__()]}
 

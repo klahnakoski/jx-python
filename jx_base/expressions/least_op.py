@@ -9,19 +9,35 @@
 #
 
 
+from mo_math import MIN
+
 from jx_base.expressions.base_multi_op import BaseMultiOp
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
-from jx_base.expressions.or_op import OrOp
-from mo_json.types import JX_NUMBER
-from mo_math import MIN
 
 
 class LeastOp(BaseMultiOp):
     """
     DECISIVE MINIMUM (SEE LeastOp FOR CONSERVATIVE MINIMUM)
     """
+
+    def __call__(self, row, rownum=None, rows=None):
+        mini = None
+        for t in self.terms:
+            v = t(row, rownum, rows)
+            if v is None:
+                if self.decisive:
+                    continue
+                else:
+                    return None
+            if mini is None:
+                mini = v
+            elif v < mini:
+                mini = v
+        return mini
+
+
     def partial_eval(self, lang):
         minimum = None
         terms = []

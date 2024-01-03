@@ -11,6 +11,9 @@
 
 from uuid import uuid4
 
+from jx_base.utils import enlist
+from jx_python.expression_compiler import compile_expression
+
 from jx_base.expressions.when_op import WhenOp
 
 from jx_base.language import is_op
@@ -25,8 +28,10 @@ from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
-from mo_dots import coalesce, to_data, last
+from mo_dots import coalesce, to_data, last, is_missing
 from mo_dots.datas import register_data
+
+
 from mo_future import is_text, text
 from mo_imports import expect
 from mo_json import (
@@ -115,6 +120,61 @@ def DataClass(name, columns, constraint=None):
     defaults = {c.name: coalesce(c.default, None) for c in columns}
     types = {c.name: coalesce(c.type, object) for c in columns}
     constraint_expr = jx_expression(not ENABLE_CONSTRAINTS or constraint).partial_eval(Python).to_python()
+    constraint_func = compile_expression(constraint_expr)
+
+    def _constraint(row0, rownum0, rows0):
+        if not ENABLE_CONSTRAINTS:
+            return
+
+        def validate(cond):
+            expr = jx_expression(cond)
+            func = compile_expression(expr.partial_eval(Python).to_python())
+            try:
+                fvalue = func(row0, rownum0, rows0)
+                evalue = expr(row0, rownum0, rows0)
+                if fvalue == evalue:
+                    return
+            except Exception as cause:
+                from jx_python.expressions.get_op import get_attr
+
+                fvalue = func(row0, rownum0, rows0)
+                evalue = expr(row0, rownum0, rows0)
+                Log.error("Can not validate constraint\n{{code}}", code=cond, cause=cause)
+
+            if "and" in cond:
+                for i, term in enumerate(cond["and"]):
+                    validate(term)
+                return
+            elif "or" in cond:
+                for term in cond["or"]:
+                    validate(term)
+                return
+            elif "not" in cond:
+                validate(cond["not"])
+                return
+            elif "when" in cond:
+                validate(cond["when"])
+                validate(cond["then"])
+                validate(cond["else"])
+                return
+
+            fvalue = func(row0, rownum0, rows0)
+            evalue = expr(row0, rownum0, rows0)
+            Log.error("Can not validate constraint\n{{code}}", code=cond)
+
+        # USE THIS TO DEBUG CONSTRAINTS
+        # validate(constraint)
+
+        if constraint_func(row0, rownum0, rows0):
+            return
+        failure(row0, rownum0, rows0, constraint)
+        Log.error(
+            "constraint\\n{" + "{code}}\\nnot satisfied {" + "{expect}}\\n{" + "{value|indent}}",
+            code=constraint_expr,
+            expect=constraint,
+            value=row0,
+        )
+
     code = _simple_expand(
         """
 import re
@@ -129,20 +189,6 @@ opener = "{"+"{"
 
 class {{class_name}}(Mapping):
     __slots__ = {{slots}}
-
-
-    def _constraint(row0, rownum0, rows0):
-        code = {{constraint_expr|quote}}
-        import re
-        if {{constraint_expr}}:
-            return
-        failure(row0, rownum0, rows0, {{constraint}})
-        Log.error(
-            "constraint\\n{" + "{code}}\\nnot satisfied {" + "{expect}}\\n{" + "{value|indent}}",
-            code={{constraint_expr|quote}},
-            expect={{constraint}},
-            value=row
-        )
 
     def __init__(self, **kwargs):
         if not kwargs:
@@ -159,7 +205,7 @@ class {{class_name}}(Mapping):
         if illegal:
             Log.error(opener + "names}} are not a valid properties", names=illegal)
 
-        self._constraint(0, [self])
+        _constraint(self, 0, [self])
 
     def __getitem__(self, item):
         try:
@@ -179,7 +225,7 @@ class {{class_name}}(Mapping):
             Log.error("Expecting property {"+"{item}}", item=item)
 
         object.__setattr__(self, item, value)
-        self._constraint(0, [self])
+        _constraint(self, 0, [self])
 
     def __getattr__(self, item):
         Log.error(opener + "item|quote}} not valid attribute", item=item)
@@ -217,20 +263,22 @@ class {{class_name}}(Mapping):
         return str({{dict}})
 
 """,
-        ({
-            "class_name": name,
-            "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
-            "required": "{" + ", ".join(quote(s) for s in required) + "}",
-            "defaults": _to_python(defaults),
-            "len_slots": len(slots),
-            "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
-            "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
-            "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
-            "constraint_expr": constraint_expr.source,
-            "constraint": value2json(constraint),
-        },)
+        (
+            {
+                "class_name": name,
+                "slots": "(" + ", ".join(quote(s) for s in slots) + ")",
+                "required": "{" + ", ".join(quote(s) for s in required) + "}",
+                "defaults": _to_python(defaults),
+                "len_slots": len(slots),
+                "dict": "{" + ", ".join(quote(s) + ": self." + s for s in slots) + "}",
+                "assign": "; ".join("_set(output, " + quote(s) + ", self." + s + ")" for s in slots),
+                "types": "{" + ",".join(quote(k) + ": " + v.__name__ for k, v in types.items()) + "}",
+                "constraint_expr": constraint_expr.source,
+                "constraint": value2json(constraint),
+            },
+        ),
     )
 
-    output = _exec(code, name, constraint_expr.locals)
+    output = _exec(code, name, {**constraint_expr.locals, "_constraint": _constraint})
     register_data(output)
     return output

@@ -7,6 +7,8 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_dots import is_missing
+
 from jx_base.language import is_op
 
 from jx_base.expressions._utils import builtin_ops
@@ -30,6 +32,13 @@ class BaseBinaryOp(Expression):
     @property
     def name(self):
         return self.op
+
+    def __call__(self, row, rownum=None, rows=None):
+        lhs = self.lhs(row, rownum, rows)
+        rhs = self.rhs(row, rownum, rows)
+        if is_missing(lhs) or is_missing(rhs):
+            return None
+        return builtin_ops[self.op](lhs, rhs)
 
     def __data__(self):
         if is_variable(self.lhs) and is_literal(self.rhs):

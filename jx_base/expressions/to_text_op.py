@@ -27,6 +27,12 @@ class ToTextOp(Expression):
         Expression.__init__(self, term)
         self.term = term
 
+    def __call__(self, row, rownum=None, rows=None):
+        try:
+            return str(self.term(row, rownum, rows))
+        except:
+            return None
+
     def __data__(self):
         return {"to_text": self.term.__data__()}
 

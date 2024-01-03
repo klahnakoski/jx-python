@@ -24,6 +24,6 @@ class BasicIndexOfOp(_BasicIndexOfOp):
             merge_locals(value.locals, find.locals),
             loop_depth,
             JX_INTEGER,
-            with_var("f", f"({value.source}).find({find.source})", "None if f==-1 else f",),
+            f"({value.source}).find({find.source})",
             self,
         )

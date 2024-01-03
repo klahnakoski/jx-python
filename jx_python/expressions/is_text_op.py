@@ -9,7 +9,6 @@
 #
 from jx_base.expressions import IsTextOp as _IsTextOp, PythonScript
 from jx_base.expressions.to_boolean_op import ToBooleanOp
-from jx_python.utils import merge_locals
 from mo_json.types import JX_TEXT
 
 
