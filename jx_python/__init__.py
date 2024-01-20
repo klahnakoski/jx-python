@@ -1,5 +1,3 @@
-from mo_threads import stop_main_thread
-
 from jx_python import jx
 from jx_python.containers.cube import Cube
 from jx_python.containers.list import ListContainer
@@ -11,4 +9,4 @@ __all__ = ["ListContainer", "Cube", "jx", "stream", "Python", "Column"]
 
 
 def __deploy__():
-    stop_main_thread()
+    pass
