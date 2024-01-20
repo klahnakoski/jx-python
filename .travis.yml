@@ -1,7 +1,6 @@
 language: python
 cache: pip
 python:
-- 3.7.8
 - '3.8'
 - '3.9'
 install:
@@ -10,3 +9,19 @@ install:
 - pip install .
 script:
 - python -m unittest discover tests
+jobs:
+  include:
+  - name: Python 3.11
+    dist: jammy
+    python: '3.11'
+    before_install:
+    - pip install --upgrade pip
+    - pip install wheel==0.41.2
+    - pip install setuptools==65.5.0
+  - name: Python 3.12
+    dist: jammy
+    python: '3.12'
+    before_install:
+    - pip install --upgrade pip
+    - pip install wheel==0.42.0
+    - pip install setuptools==69.0.3
