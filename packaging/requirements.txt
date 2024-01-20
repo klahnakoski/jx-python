@@ -3,6 +3,7 @@ mo-dots
 mo-logs
 mo-kwargs
 mo-math
+mo-threads
 mo-times
 mo-collections
 mo-json
