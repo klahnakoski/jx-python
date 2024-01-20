@@ -59,7 +59,7 @@ TableDesc = DataClass(
 Column = DataClass(
     "Column",
     [
-        "name",
+        "name",   # ABS NAME OF COLUMN
         "es_column",
         "es_index",
         "es_type",

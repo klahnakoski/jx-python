@@ -379,7 +379,7 @@ def _normalize_edge(edge, dim_index, limit, schema=None):
             if not leaves or is_container(leaves):
                 return [Data(
                     name=edge,
-                    value=jx_expression(edge, schema=schema),
+                    value=jx_expression(edge),
                     allowNulls=True,
                     dim=dim_index,
                     domain=_normalize_domain(None, limit),

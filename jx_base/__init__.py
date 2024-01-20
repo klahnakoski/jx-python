@@ -11,15 +11,10 @@
 
 from uuid import uuid4
 
-from jx_base.utils import enlist
-from jx_python.expression_compiler import compile_expression
-
-from jx_base.expressions.when_op import WhenOp
-
-from jx_base.language import is_op
-
 from jx_base.expressions import jx_expression
 from jx_base.expressions.literal import FALSE
+from jx_base.expressions.when_op import WhenOp
+from jx_base.language import is_op
 from jx_base.models.container import Container
 from jx_base.models.facts import Facts
 from jx_base.models.namespace import Namespace
@@ -28,10 +23,9 @@ from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
-from mo_dots import coalesce, to_data, last, is_missing
+from jx_base.utils import enlist
+from mo_dots import coalesce, to_data, last
 from mo_dots.datas import register_data
-
-
 from mo_future import is_text, text
 from mo_imports import expect
 from mo_json import (
@@ -109,6 +103,7 @@ def DataClass(name, columns, constraint=None):
     :param constraint: a JSON query Expression for extra constraints (return true if all constraints are met)
     :return: The class that has been created
     """
+    from jx_python.expression_compiler import compile_expression
 
     columns = to_data([
         {"name": c, "required": True, "nulls": False, "type": object} if is_text(c) else c for c in columns

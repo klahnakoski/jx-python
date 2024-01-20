@@ -180,6 +180,7 @@ def is_variable(expr):
 
 
 IDENTITY = Variable(".")
+ROW = Variable("row")
 
 
 export("jx_base.expressions._utils", Variable)
