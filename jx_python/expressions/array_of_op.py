@@ -18,14 +18,14 @@ from mo_json import array_of, ARRAY
 class ArrayOfOp(_ToArrayOp):
     def to_python(self, loop_depth=0):
         term = self.term.partial_eval(Python).to_python(loop_depth)
-        type = term.type
+        type = term.jx_type
         if type == ARRAY:
             return PythonScript(merge_locals(term.locals), loop_depth, type, term.source, self)
 
         return PythonScript(
             term.locals,
             loop_depth,
-            array_of(term.type),
+            array_of(term.jx_type),
             f"[{term.source}]",
             self,
         )

@@ -11,11 +11,13 @@
 
 from jx_base.expressions._utils import _jx_expression
 from jx_base.expressions.expression import Expression
-from jx_base.language import JX
+from jx_base.expressions.literal import Literal
+from jx_base.models.container import Container
+from jx_base.utils import Log
 
 
 class CommentOp(Expression):
-    def __init__(self, frum, commment):
+    def __init__(self, frum, comment):
         Expression.__init__(self, frum, comment)
         self.frum = frum
         self.comment = comment
@@ -25,13 +27,19 @@ class CommentOp(Expression):
         items = list(expr.items())
         if len(items) != 1:
             Log.error("expecting comment")
-        op, params = items[0]
+        op, (frum, comment) = items[0]
         if op not in ["comment", "description", "meta"]:
             Log.error("expecting comment")
-        return _jx_expression(params[0], cls.lang)
+        return cls.lang.CommentOp(_jx_expression(frum, cls.lang), Literal(comment))
+
+    def apply(self, container: Container):
+        # TODO: ADD COMMENT TO RESULT
+        result = self.frum.apply(container)
+        result.comment = self.comment.value
+        return result
 
     def __data__(self):
-        return {"comment": [self.frum.__data(), self.comment.__data__()]}
+        return {"comment": [self.frum.__data__(), self.comment.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self.comment.vars()
@@ -40,5 +48,5 @@ class CommentOp(Expression):
         return CommentOp(self.frum.map(mao_), self.comment.map(map_))
 
     @property
-    def type(self):
-        return self.frum.type
+    def jx_type(self):
+        return self.frum.jx_type

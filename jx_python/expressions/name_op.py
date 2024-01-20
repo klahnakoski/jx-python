@@ -8,7 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import NameOp as NameOp_
+from jx_base.expressions import NameOp as _NameOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from mo_json import JxType
@@ -18,7 +18,7 @@ def add_name(value, name):
     return {name: value}
 
 
-class NameOp(NameOp_):
+class NameOp(_NameOp):
     def to_python(self, loop_depth=0):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         _name = self._name.partial_eval(Python).to_python(loop_depth)
@@ -26,7 +26,7 @@ class NameOp(NameOp_):
         return PythonScript(
             {"add_name": add_name, **frum.locals, **_name.locals},
             loop_depth,
-            JxType(**{self._name.value: frum.type}),  # assume literal name
+            JxType(**{self._name.value: frum.jx_type}),  # assume literal name
             f"add_name({frum.source}, {_name.source})",
             self,
         )

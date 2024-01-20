@@ -11,6 +11,9 @@
 
 import re
 
+from mo_dots import coalesce
+from mo_dots import is_data, is_missing
+
 from jx_base.expressions._utils import TYPE_CHECK, jx_expression
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
@@ -18,11 +21,8 @@ from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal, is_literal
 from jx_base.expressions.reg_exp_op import RegExpOp
 from jx_base.expressions.true_op import TRUE
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.expressions.when_op import WhenOp
-from jx_base.language import is_op
-from mo_dots import coalesce
-from mo_dots import is_data, is_missing
 from mo_future import first
 from mo_json.types import JX_BOOLEAN, STRING
 from mo_logs import Log
@@ -30,7 +30,7 @@ from mo_logs import Log
 
 class SuffixOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, expr, suffix):
         Expression.__init__(self, expr, suffix)
@@ -59,7 +59,7 @@ class SuffixOp(Expression):
     def __data__(self):
         if self.expr is None:
             return {"suffix": {}}
-        elif is_op(self.expr, Variable) and is_literal(self.suffix):
+        elif is_variable(self.expr) and is_literal(self.suffix):
             return {"suffix": {self.expr.var: self.suffix.value}}
         else:
             return {"suffix": [self.expr.__data__(), self.suffix.__data__()]}
@@ -95,7 +95,7 @@ class SuffixOp(Expression):
     def partial_eval(self, lang):
         if self.expr is None:
             return TRUE
-        if not is_literal(self.suffix) and self.suffix.type == STRING:
+        if not is_literal(self.suffix) and self.suffix.jx_type == STRING:
             Log.error("can only hanlde literal suffix ")
 
         return CaseOp(

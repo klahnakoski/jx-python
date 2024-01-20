@@ -9,14 +9,14 @@
 #
 import re
 
-from jx_base.expressions import RegExpOp as RegExpOp_
+from jx_base.expressions import RegExpOp as _RegExpOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class RegExpOp(RegExpOp_):
+class RegExpOp(_RegExpOp):
     def to_python(self, loop_depth=0):
         pattern = self.pattern.partial_eval(Python).to_python(loop_depth)
         expr = self.expr.partial_eval(Python).to_python(loop_depth)

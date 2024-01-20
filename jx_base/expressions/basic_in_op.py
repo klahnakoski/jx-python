@@ -9,27 +9,27 @@
 #
 
 
-from mo_imports import expect
-from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.literal import Literal, is_literal
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.literal import Literal, is_literal
 from jx_base.language import is_op
 from mo_dots import is_many
+from mo_imports import expect
 from mo_json.types import JX_BOOLEAN
 from mo_logs import Log
 
-EqOp, MissingOp, NestedOp, NotOp, NULL, Variable = expect("EqOp", "MissingOp", "NestedOp", "NotOp", "NULL", "Variable")
+EqOp, MissingOp, NestedOp, NotOp, NULL, Variable, is_variable = expect(
+    "EqOp", "MissingOp", "NestedOp", "NotOp", "NULL", "Variable", "is_variable"
+)
 
 
 class BasicInOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __new__(cls, value, superset):
-        if is_op(value, Variable) and is_op(superset, Literal):
-            if not is_many(superset.value):
-                return EqOp(value, Literal(superset.value))
+        if is_variable(value) and is_op(superset, Literal) and not is_many(superset.value):
+            return EqOp(value, Literal(superset.value))
         return object.__new__(cls)
 
     def __init__(self, value, superset):
@@ -40,7 +40,7 @@ class BasicInOp(Expression):
             Log.error("Should not happpen")
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.superset):
+        if is_variable(self.value) and is_literal(self.superset):
             return {"basic.in": {self.value.var: self.superset.value}}
         else:
             return {"basic.in": [self.value.__data__(), self.superset.__data__()]}
@@ -67,7 +67,7 @@ class BasicInOp(Expression):
             return Literal(value() in superset())
         elif is_op(value, NestedOp):
             return (
-                NestedOp(value.nested_path, None, AndOp(BasicInOp(value.select, superset), value.where),)
+                NestedOp(value.nested_path, None, lang.AndOp(BasicInOp(value.select, superset), value.where),)
                 .exists()
                 .partial_eval(lang)
             )
@@ -97,9 +97,9 @@ class BasicInOp(Expression):
 
     def __rcontains__(self, superset):
         if (
-            is_op(self.value, Variable)
+            is_variable(self.value)
             and is_op(superset, MissingOp)
-            and is_op(superset.value, Variable)
+            and is_variable(superset.value)
             and superset.value.var == self.value.var
         ):
             return True

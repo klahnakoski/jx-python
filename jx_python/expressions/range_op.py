@@ -9,8 +9,8 @@
 #
 
 
-from jx_base.expressions import RangeOp as RangeOp_
+from jx_base.expressions import RangeOp as _RangeOp
 
 
-class RangeOp(RangeOp_):
+class RangeOp(_RangeOp):
     pass

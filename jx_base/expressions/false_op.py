@@ -17,7 +17,7 @@ TRUE = expect("TRUE")
 
 
 class FalseOp(Literal):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls, *args, **kwargs)
@@ -51,17 +51,14 @@ class FalseOp(Literal):
         return TRUE
 
     @property
-    def type(self):
+    def jx_type(self):
         return JX_BOOLEAN
 
     def __call__(self, row=None, rownum=None, rows=None):
         return False
 
-    def __unicode__(self):
-        return "false"
-
     def __str__(self):
-        return b"false"
+        return "false"
 
     def __bool__(self):
         return False

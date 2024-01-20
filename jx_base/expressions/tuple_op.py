@@ -37,7 +37,7 @@ class TupleOp(Expression):
         return {"tuple": [t.__data__() for t in self.terms]}
 
     @property
-    def type(self):
+    def jx_type(self):
         return array_type(union_type(*(t.type for t in self.terms)))
 
     def vars(self):
@@ -47,7 +47,7 @@ class TupleOp(Expression):
         return output
 
     def map(self, map_):
-        return TupleOp([t.map(map_) for t in self.terms])
+        return TupleOp(*[t.map(map_) for t in self.terms])
 
     def missing(self, lang):
         return FALSE

@@ -21,16 +21,23 @@ from mo_json import JX_INTEGER
 
 class BasicIndexOfOp(Expression):
     """
-    PLACEHOLDER FOR BASIC value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
+    PLACEHOLDER FOR STRICT value.indexOf(find, start) (CAN NOT DEAL WITH NULLS)
+    RETURN -1 IF NOT FOUND
     """
 
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, value, find, start):
         Expression.__init__(self, value, find, start)
         self.value = value
         self.find = find
         self.start = start
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.value(row)
+        find = self.find(row)
+        start = self.start(row)
+        return value.find(find, start)
 
     def __data__(self):
         return {"basic.indexOf": [self.value.__data__(), self.find.__data__(), self.start.__data__()]}

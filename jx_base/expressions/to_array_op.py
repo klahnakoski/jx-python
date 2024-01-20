@@ -30,11 +30,11 @@ class ToArrayOp(Expression):
         return {"to_array": self.term.__data__()}
 
     @property
-    def type(self):
-        if self.term.type == ARRAY:
-            return self.term.type
+    def jx_type(self):
+        if self.term.jx_type == ARRAY:
+            return self.term.jx_type
         else:
-            return array_of(self.term.type)
+            return array_of(self.term.jx_type)
 
     def vars(self):
         return self.term.vars()
@@ -51,6 +51,6 @@ class ToArrayOp(Expression):
             return term
         if term is NULL:
             return Literal([])
-        if self.term.type == ARRAY:
+        if self.term.jx_type == ARRAY:
             return term
         return ToArrayOp(term)

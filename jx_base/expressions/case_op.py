@@ -40,7 +40,7 @@ class CaseOp(Expression):
 
         els_ = terms[-1]
         if is_op(els_, WhenOp):
-            self.whens = terms + [els_.els_]
+            self.whens = terms + (els_.els_,)
         else:
             self.whens = terms
 
@@ -63,22 +63,22 @@ class CaseOp(Expression):
     def missing(self, lang):
         whens = [WhenOp(w.when, then=w.then.missing(lang)) for w in self.whens[:-1]] + [self.whens[-1].missing(lang)]
 
-        return CaseOp(whens).partial_eval(lang)
+        return CaseOp(*whens).partial_eval(lang)
 
     def invert(self, lang):
         return CaseOp(
-            [WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens[:-1]] + [self.whens[-1]]
+            *(WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens[:-1]), self.whens[-1]
         ).partial_eval(lang)
 
     def partial_eval(self, lang):
-        if self.type is JX_BOOLEAN:
+        if self.jx_type is JX_BOOLEAN:
             nots = []
             ors = []
             for w in self.whens[:-1]:
-                ors.append(AndOp(*nots, w.when, w.then))
-                nots.append(NotOp(w.when))
-            ors.append(AndOp(*nots, self.whens[-1]))
-            return OrOp(*ors).partial_eval(lang)
+                ors.append(lang.AndOp(*nots, w.when, w.then))
+                nots.append(lang.NotOp(w.when))
+            ors.append(lang.AndOp(*nots, self.whens[-1]))
+            return lang.OrOp(*ors).partial_eval(lang)
 
         whens = []
         for w in self.whens[:-1]:
@@ -98,8 +98,8 @@ class CaseOp(Expression):
         elif len(whens) == 2:
             return WhenOp(whens[0].when, then=whens[0].then, **{"else": whens[1]})
         else:
-            return CaseOp(whens)
+            return CaseOp(*whens)
 
     @property
-    def type(self):
-        return union_type(*(w.then.type if is_op(w, WhenOp) else w.type for w in self.whens))
+    def jx_type(self):
+        return union_type(*(w.then.jx_type if is_op(w, WhenOp) else w.jx_type for w in self.whens))

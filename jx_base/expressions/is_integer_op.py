@@ -14,7 +14,7 @@ from mo_json import JX_INTEGER
 
 
 class IsIntegerOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, *term):
         Expression.__init__(self, [term])
@@ -35,7 +35,7 @@ class IsIntegerOp(Expression):
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
 
-        if term.type in JX_INTEGER:
+        if term.jx_type in JX_INTEGER:
             return term
         else:
             return NULL

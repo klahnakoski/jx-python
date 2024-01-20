@@ -28,8 +28,8 @@ class SqlOriginsOp(Expression):
         self.origin = origin  # PARTICULAR NODE IN TREE
 
     @property
-    def type(self):
-        return self.root.type
+    def jx_type(self):
+        return self.root.jx_type
 
     def __str__(self):
         return self.root.frum._start_str(self.origin)

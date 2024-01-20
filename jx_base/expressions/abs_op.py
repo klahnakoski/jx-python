@@ -15,7 +15,7 @@ from mo_json.types import JX_NUMBER
 
 
 class AbsOp(Expression):
-    _data_type = JX_NUMBER
+    _jx_type = JX_NUMBER
 
     def __init__(self, *term):
         Expression.__init__(self, *term)

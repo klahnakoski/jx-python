@@ -22,7 +22,7 @@ class DateOp(Literal):
     def __new__(cls, *args, **kwargs):
         return object.__new__(cls)
 
-    def __init__(self, *term):
+    def __init__(self, term):
         if is_data(term):
             term = term["date"]  # FOR WHEN WE MIGHT DO Literal({"date":term})
         self.date = term
@@ -42,7 +42,7 @@ class DateOp(Literal):
         return Date(self.date)
 
     @property
-    def type(self):
+    def jx_type(self):
         return self.date_type
 
 

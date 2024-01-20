@@ -9,12 +9,18 @@
 #
 
 
-from jx_base.expressions.base_multi_op import BaseMultiOp
+from jx_base.expressions.expression import Expression
 
 
-class CardinalityOp(BaseMultiOp):
-    op = "cardinality"
+class CardinalityOp(Expression):
+
+    def __init__(self, frum):
+        Expression.__init__(self, frum)
+        self.frum = frum
 
     def __call__(self, row, rownum, rows):
         values = self.terms(row, rownum, rows)
         return len(set(values))
+
+    def __data__(self):
+        return {"cardinality": self.frum.__data__()}

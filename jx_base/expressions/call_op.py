@@ -16,7 +16,7 @@ from mo_json.types import JX_TEXT
 
 
 class CallOp(Expression):
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
     def __init__(self, func, *args, **kwargs):
         Expression.__init__(self, *[func, *args, *(v for v in kwargs.values())])

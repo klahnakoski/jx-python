@@ -7,17 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_dots import is_many
-
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.literal import is_literal, Literal, ZERO
+from jx_base.expressions.literal import is_literal, ZERO
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
 from jx_base.utils import enlist
+from mo_dots import is_many
 
 
 class LimitOp(Expression):
@@ -25,7 +24,7 @@ class LimitOp(Expression):
         Expression.__init__(self, frum, amount)
         self.frum = frum
         self.amount = amount
-        self._data_type = self.frum.type
+        self._jx_type = self.frum.jx_type
 
     def __data__(self):
         return {"limit": [self.frum.__data__(), self.amount.__data__()]}
@@ -55,14 +54,20 @@ class LimitOp(Expression):
         if is_op(frum, LimitOp):
             return lang.LimitOp(frum.frum, MinOp(frum.amount, amount)).partial_eval(lang)
         elif is_op(frum, CaseOp):  # REWRITING
-            return lang.CaseOp(
-                [lang.WhenOp(t.when, then=lang.LimitOp(t.then, amount)) for t in frum.whens[:-1]]
-                + [lang.LimitOp(frum.whens[-1], amount)]
-            ).partial_eval(lang)
+            return (
+                lang
+                .CaseOp(
+                    *(lang.WhenOp(t.when, then=lang.LimitOp(t.then, amount)) for t in frum.whens[:-1]),
+                    lang.LimitOp(frum.whens[-1], amount)
+                )
+                .partial_eval(lang)
+            )
         elif is_op(frum, WhenOp):
-            return lang.WhenOp(
-                frum.when, then=lang.LimitOp(frum.then, amount), **{"else": lang.LimitOp(frum.els_, amount)}
-            ).partial_eval(lang)
+            return (
+                lang
+                .WhenOp(frum.when, then=lang.LimitOp(frum.then, amount), **{"else": lang.LimitOp(frum.els_, amount)})
+                .partial_eval(lang)
+            )
         elif is_literal(frum) and is_literal(amount):
             return lang.Literal(enlist(frum.value)[: amount.value])
         else:

@@ -93,7 +93,7 @@ def _jx_expression(json, lang):
                     class_ = lang.ops[full_op.get_id()]
                     if not class_:
                         # THIS LANGUAGE DOES NOT SUPPORT THIS OPERATOR, GOTO BASE LANGUAGE AND GET THE MACRO
-                        class_ = JX[full_op.get_id()]
+                        class_ = JX.ops[full_op.get_id()]
 
                     return class_.define({op: [sub_json] + enlist(rhs)})
 
@@ -148,8 +148,10 @@ builtin_ops = {
     "add": operator.add,
     "sub": operator.sub,
     "mul": operator.mul,
-    "max": lambda *v: max(v),
-    "min": lambda *v: min(v),
+    "max": lambda *v: max(*v),
+    "min": lambda *v: min(*v),
+    "most": lambda *v: max(*v),
+    "least": lambda *v: min(*v),
 }
 
 operators = {}
@@ -162,6 +164,7 @@ precedence = [
     "default",
     "limit",
     "skip",
+    "percentile",
     "select",
     "having",
     "group",
@@ -169,4 +172,5 @@ precedence = [
     "where",
     "edges",
     "from",
+    "value",
 ]

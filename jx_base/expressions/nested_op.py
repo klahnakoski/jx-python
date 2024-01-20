@@ -27,7 +27,7 @@ from mo_json.types import JX_BOOLEAN
 
 
 class NestedOp(Expression):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
     has_simple_form = False
 
     __slots__ = ["nested_path", "select", "where", "sort", "limit"]

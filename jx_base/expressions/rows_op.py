@@ -12,8 +12,7 @@
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
-from jx_base.expressions.variable import Variable
-from jx_base.language import is_op
+from jx_base.expressions.variable import is_variable
 from mo_logs import Log
 
 
@@ -23,8 +22,8 @@ class RowsOp(Expression):
     def __init__(self, *term):
         Expression.__init__(self, *term)
         self.var, self.offset = term
-        if is_op(self.var, Variable):
-            if is_op(self.var, Variable) and not any(
+        if is_variable(self.var):
+            if is_variable(self.var) and not any(
                 self.var.var.startswith(p) for p in ["row.", "rows.", "rownum"]
             ):  # VARIABLES ARE INTERPRETED LITERALLY
                 self.var = Literal(self.var.var)

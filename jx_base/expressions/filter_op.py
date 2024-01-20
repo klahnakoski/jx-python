@@ -8,10 +8,10 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from mo_dots import is_many
-
 from jx_base.expressions.expression import Expression, jx_expression, MissingOp
 from jx_base.expressions.literal import TRUE
+from jx_base.language import JX
+from mo_dots import is_many
 
 
 class FilterOp(Expression):
@@ -20,7 +20,7 @@ class FilterOp(Expression):
         self.frum, self.predicate = frum, predicate
 
     def __data__(self):
-        return {"filter": [self.frum.__data(), self.predicate.__data__()]}
+        return {"filter": [self.frum.__data__(), self.predicate.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self.predicate.vars()
@@ -29,8 +29,8 @@ class FilterOp(Expression):
         return FilterOp(self.frum.map(map_), self.predicate.map(map_))
 
     @property
-    def type(self):
-        return self.frum.type
+    def jx_type(self):
+        return self.frum.jx_type
 
     def missing(self, lang):
         return MissingOp(self)
@@ -39,9 +39,9 @@ class FilterOp(Expression):
         return self.missing(lang)
 
 
-def _normalize_where(where, schema=None):
+def _normalize_where(where, lang=JX):
     if is_many(where):
         where = {"and": where}
     elif not where:
         where = TRUE
-    return jx_expression(where, schema=schema)
+    return jx_expression(where, lang)

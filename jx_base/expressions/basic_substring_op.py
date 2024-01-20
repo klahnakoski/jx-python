@@ -19,11 +19,14 @@ class BasicSubstringOp(Expression):
     PLACEHOLDER FOR BASIC value.substring(start, end) (CAN NOT DEAL WITH NULLS)
     """
 
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.value, self.start, self.end = terms
+    def __init__(self, value, start, end):
+        Expression.__init__(self, value, start, end)
+        self.value, self.start, self.end = value, start, end
+
+    def __call__(self, row, rownum=None, rows=None):
+        return self.value(row, rownum, rows)[self.start(row, rownum, rows) : self.end(row, rownum, rows)]
 
     def __data__(self):
         return {"basic.substring": [self.value.__data__(), self.start.__data__(), self.end.__data__()]}

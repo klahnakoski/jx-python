@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import NotLeftOp as NotLeftOp_
+from jx_base.expressions import NotLeftOp as _NotLeftOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class NotLeftOp(NotLeftOp_):
+class NotLeftOp(_NotLeftOp):
     def to_python(self, loop_depth=0):
         v = self.value.to_python(loop_depth)
         l = self.length.to_python(loop_depth)

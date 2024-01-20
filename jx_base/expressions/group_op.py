@@ -9,7 +9,6 @@
 #
 
 from jx_base.expressions.expression import Expression, MissingOp
-from jx_base.expressions.array_of_op import ArrayOfOp
 from mo_json import array_of
 
 
@@ -23,7 +22,7 @@ class GroupOp(Expression):
         self.frum, self.group = frum, group
 
     def __data__(self):
-        return {"group": [self.frum.__data(), self.group.__data__()]}
+        return {"group": [self.frum.__data__(), self.group.__data__()]}
 
     def vars(self):
         return self.frum.vars() | self.group.vars()
@@ -32,8 +31,8 @@ class GroupOp(Expression):
         return GroupOp(self.frum.map(map_), self.group.map(map_))
 
     @property
-    def type(self):
-        return array_of(self.frum.type)
+    def jx_type(self):
+        return array_of(self.frum.jx_type)
 
     def missing(self, lang):
         return MissingOp(self)

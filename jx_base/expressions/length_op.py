@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from mo_dots import is_missing
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal
@@ -19,11 +19,17 @@ from mo_json import JX_INTEGER
 
 
 class LengthOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, term):
         Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if is_missing(value):
+            return None
+        return len(value)
 
     def __eq__(self, other):
         if is_op(other, LengthOp):

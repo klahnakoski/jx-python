@@ -9,13 +9,13 @@
 #
 
 
-from jx_base.expressions import BasicEqOp as BasicEqOp_, FALSE
+from jx_base.expressions import BasicEqOp as _BasicEqOp, FALSE
 from jx_base.expressions.python_script import PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class BasicEqOp(BasicEqOp_):
+class BasicEqOp(_BasicEqOp):
     def to_python(self, loop_depth=0):
         lhs = self.lhs.to_python(loop_depth)
         rhs = self.rhs.to_python(loop_depth)

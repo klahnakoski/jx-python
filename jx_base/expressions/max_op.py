@@ -10,65 +10,47 @@
 
 
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import Literal, is_literal
-from jx_base.expressions.null_op import NULL
-from mo_dots import is_many
 from mo_json.types import JX_NUMBER
-from mo_math import MAX
+from jx_base.expressions.most_op import MostOp
 
 
 class MaxOp(Expression):
-    _data_type = JX_NUMBER
+    """
+    DECISIVE MAXIMUM (SEE MostOp FOR CONSERVATIVE MAXIMUM)
+    """
 
-    def __init__(self, *terms, default=NULL):
-        Expression.__init__(self, *terms)
-        if terms == None:
-            self.terms = []
-        elif is_many(terms):
-            self.terms = [t for t in terms if t != None]
+    _jx_type = JX_NUMBER
+
+    def __new__(cls, *terms, frum=None):
+        if frum is not None:
+            op = object.__new__(MaxOp)
+            op.__init__(frum=frum)
+            return op
+        elif len(terms) > 1:
+            return MostOp(*terms, nulls=True)
         else:
-            self.terms = [terms]
-        self.default = default
+            op = object.__new__(MaxOp)
+            op.__init__(frum=terms[0])
+            return op
+
+    def __init__(self, *terms, frum=None):
+        if terms:
+            frum = terms[0]
+
+        Expression.__init__(self, frum)
+        self.frum = frum
 
     def __data__(self):
-        return {
-            "max": [t.__data__() for t in self.terms],
-            "default": self.default.__data__(),
-        }
+        return {"max": self.frum.__data__()}
 
     def vars(self):
-        output = set()
-        for t in self.terms:
-            output |= t.vars()
-        return output
+        return self.frum.vars()
 
     def map(self, map_):
-        return MaxOp(*(t.map(map_) for t in self.terms))
+        return MaxOp(frum=self.frum.map(map_))
 
     def missing(self, lang):
-        return FALSE
+        return Missing(self.frum.missing(lang))
 
     def partial_eval(self, lang):
-        maximum = None
-        terms = []
-        for t in self.terms:
-            simple = t.partial_eval(lang)
-            if simple is NULL:
-                pass
-            elif is_literal(simple):
-                maximum = MAX([maximum, simple.value])
-            else:
-                terms.append(simple)
-        if len(terms) == 0:
-            if maximum is None:
-                return NULL
-            else:
-                return Literal(maximum)
-        else:
-            if maximum is None:
-                output = MaxOp(terms)
-            else:
-                output = MaxOp([Literal(maximum)] + terms)
-
-        return output
+        return MaxOp(frum=self.frum.partial_eval(lang))

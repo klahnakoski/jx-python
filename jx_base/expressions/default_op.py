@@ -41,11 +41,11 @@ class DefaultOp(Expression):
         return self.default(row, rownum, rows)
 
     @property
-    def type(self):
-        return union_type(self.frum.type, self.default.type)
+    def jx_type(self):
+        return union_type(self.frum.jx_type, self.default.jx_type)
 
     def missing(self, lang):
-        return AndOp(self.frum.missing(), self.default.missing())
+        return lang.AndOp(self.frum.missing(lang), self.default.missing(lang))
 
     def vars(self):
         return self.frum.vars() | self.default.vars()

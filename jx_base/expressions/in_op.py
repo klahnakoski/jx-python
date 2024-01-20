@@ -10,10 +10,9 @@
 
 
 from jx_base.expressions import BasicInOp
-from jx_base.expressions.and_op import AndOp
-from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.get_op import GetOp
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.missing_op import MissingOp
@@ -21,7 +20,7 @@ from jx_base.expressions.nested_op import NestedOp
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import is_variable
 from jx_base.language import is_op
 from mo_dots import is_many
 from mo_imports import export
@@ -30,14 +29,14 @@ from mo_json.types import JX_BOOLEAN
 
 class InOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, value, superset):
         Expression.__init__(self, value, superset)
         self.value, self.superset = value, superset
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.superset):
+        if (is_variable(self.value) or is_op(self.value, GetOp)) and is_literal(self.superset):
             return {"in": {self.value.var: self.superset.value}}
         else:
             return {"in": [self.value.__data__(), self.superset.__data__()]}
@@ -69,17 +68,18 @@ class InOp(Expression):
             if is_literal(value):
                 return Literal(value() in enlist(superset.value))
             elif is_many(superset.value):
-                return InOp(value, superset)
+                return lang.InOp(value, superset)
             else:
-                return EqOp(value, superset)
+                return lang.EqOp(value, superset)
         elif is_op(value, NestedOp):
             return (
-                NestedOp(value.nested_path, None, AndOp(InOp(value.select, superset), value.where),)
+                lang
+                .NestedOp(value.nested_path, None, lang.AndOp(lang.InOp(value.select, superset), value.where),)
                 .exists()
                 .partial_eval(lang)
             )
         else:
-            return InOp(value, superset)
+            return lang.InOp(value, superset)
 
     def __call__(self, row, rownum=None, rows=None):
         return self.value(row) in self.superset(row)
@@ -98,9 +98,9 @@ class InOp(Expression):
 
     def __rcontains__(self, superset):
         if (
-            is_op(self.value, Variable)
+            is_variable(self.value)
             and is_op(superset, MissingOp)
-            and is_op(superset.value, Variable)
+            and is_variable(superset.value)
             and superset.value.var == self.value.var
         ):
             return True

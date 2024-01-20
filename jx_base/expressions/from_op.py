@@ -24,7 +24,7 @@ class FromOp(Expression):
     def __init__(self, frum):
         Expression.__init__(self, frum)
         self.frum = frum
-        self._data_type = frum.type
+        self._jx_type = frum.jx_type
 
     @classmethod
     def define(cls, expr):
@@ -52,11 +52,11 @@ class FromOp(Expression):
         return self.frum.invert()
 
     def partial_eval(self, lang):
-        return self.frum.partial_eval(lang)
+        return FromOp(self.frum.partial_eval(lang))
 
     @property
-    def type(self):
-        return self._data_type
+    def jx_type(self):
+        return self._jx_type
 
     def __eq__(self, other):
         if is_op(other, FromOp):

@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import CardinalityOp as CardinalityOp_
+from jx_base.expressions import CardinalityOp as _CardinalityOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class CardinalityOp(CardinalityOp_):
+class CardinalityOp(_CardinalityOp):
     def to_python(self, loop_depth=0):
         if not self.terms:
             return PythonScript({}, loop_depth, "0")

@@ -8,12 +8,12 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions import CallOp as CallOp_, PythonScript
+from jx_base.expressions import CallOp as _CallOp, PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_ANY
 
 
-class CallOp(CallOp_):
+class CallOp(_CallOp):
     def to_python(self, loop_depth=0):
         func = self.func.to_python(loop_depth)
         if self.args:

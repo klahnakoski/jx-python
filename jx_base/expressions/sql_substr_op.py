@@ -15,7 +15,7 @@ from mo_json import JX_INTEGER
 
 
 class SqlSubstrOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
     def __init__(self, *params):
         Expression.__init__(self, params)

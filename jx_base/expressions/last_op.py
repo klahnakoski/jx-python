@@ -21,7 +21,7 @@ class LastOp(Expression):
     def __init__(self, term):
         Expression.__init__(self, term)
         self.term = term
-        self._data_type = self.term.type
+        self._jx_type = self.term.jx_type
 
     def __data__(self):
         return {"last": self.term.__data__()}

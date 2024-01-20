@@ -9,13 +9,13 @@
 #
 
 
-from jx_base.expressions import BasicIndexOfOp as BasicIndexOfOp_
+from jx_base.expressions import BasicIndexOfOp as _BasicIndexOfOp
 from jx_python.expressions._utils import with_var, PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_INTEGER
 
 
-class BasicIndexOfOp(BasicIndexOfOp_):
+class BasicIndexOfOp(_BasicIndexOfOp):
     def to_python(self, loop_depth=0):
         find = self.find.to_python(loop_depth)
         value = self.value.to_python(loop_depth)
@@ -24,6 +24,6 @@ class BasicIndexOfOp(BasicIndexOfOp_):
             merge_locals(value.locals, find.locals),
             loop_depth,
             JX_INTEGER,
-            with_var("f", f"({value.source}).find({find.source})", "None if f==-1 else f",),
+            f"({value.source}).find({find.source})",
             self,
         )

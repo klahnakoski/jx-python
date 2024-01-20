@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions import GetOp as GetOp_, ToArrayOp
+from jx_base.expressions import GetOp as _GetOp, ToArrayOp
 from jx_base.expressions.python_script import PythonScript
 from jx_base.utils import enlist, delist
 from jx_python.expressions import Python
@@ -16,7 +16,7 @@ from mo_json import JX_ANY, array_of, ARRAY_KEY
 from mo_json.typed_object import TypedObject
 
 
-class GetOp(GetOp_):
+class GetOp(_GetOp):
     def to_python(self, loop_depth=0):
         offsets, locals = zip(*((c.source, c.locals) for o in self.offsets for c in [o.to_python(loop_depth)]))
         offsets = ", ".join(offsets)

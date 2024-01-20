@@ -9,7 +9,6 @@
 #
 
 
-from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.find_op import FindOp
@@ -18,8 +17,7 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.true_op import TRUE
-from jx_base.expressions.variable import Variable
-from jx_base.language import is_op
+from jx_base.expressions.variable import is_variable
 
 
 class SplitOp(Expression):
@@ -30,8 +28,8 @@ class SplitOp(Expression):
         self.value, self.find = term
 
     def __data__(self):
-        if is_op(self.value, Variable) and is_literal(self.find):
-            return {"split": {self.value.var, self.find.value}}
+        if is_variable(self.value) and is_literal(self.find):
+            return {"split": {self.value.var: self.find.value}}
         else:
             return {"split": [self.value.__data__(), self.find.__data__()]}
 
@@ -48,7 +46,7 @@ class SplitOp(Expression):
         find = self.find.to_es_script(not_null=True)
         index = v + ".indexOf(" + find + ", " + self.start.to_es_script() + ")"
 
-        return AndOp(
+        return lang.AndOp(
             self.default.missing(lang),
             OrOp(self.value.missing(lang), self.find.missing(lang), EqOp(ScriptOp(index), Literal(-1)),),
         )

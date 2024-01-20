@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import TupleOp as TupleOp_
+from jx_base.expressions import TupleOp as _TupleOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class TupleOp(TupleOp_):
+class TupleOp(_TupleOp):
     def to_python(self, loop_depth=0):
         if len(self.terms) == 0:
             return PythonScript({}, loop_depth, "tuple()")

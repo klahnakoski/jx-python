@@ -11,16 +11,23 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.null_op import NULL
-from mo_json import STRING
-from mo_json.types import JX_TEXT
+from jx_base.expressions.to_text_op import ToTextOp
+from jx_base.language import is_op
+from mo_json.types import JX_TEXT, base_type
 
 
 class IsTextOp(Expression):
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
-    def __init__(self, *term):
-        Expression.__init__(self, [term])
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if isinstance(value, str):
+            return value
+        return None
 
     def __data__(self):
         return {"is_text": self.term.__data__()}
@@ -32,12 +39,16 @@ class IsTextOp(Expression):
         return IsTextOp(self.term.map(map_))
 
     def missing(self, lang):
-        return self.expr.missing()
+        return self.term.missing(lang)
 
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
+        if is_op(term, IsTextOp) or is_op(term, ToTextOp):
+            term = term.term
 
-        if term.type is STRING:
+        if base_type(term.jx_type) == JX_TEXT:
             return term
+        elif JX_TEXT in term.jx_type:
+            return IsTextOp(term)
         else:
             return NULL

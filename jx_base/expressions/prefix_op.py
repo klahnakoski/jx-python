@@ -9,25 +9,27 @@
 #
 
 
+from mo_dots import is_data, is_missing
+
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.is_text_op import IsTextOp
 from jx_base.expressions.literal import is_literal, Literal
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.true_op import TRUE
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
-from mo_dots import is_data, is_missing
 from mo_future import first
 from mo_json.types import JX_BOOLEAN
 
 
 class PrefixOp(Expression):
     has_simple_form = True
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, expr, prefix):
         Expression.__init__(self, expr, prefix)
@@ -55,7 +57,7 @@ class PrefixOp(Expression):
     def __data__(self):
         if self.expr == None:
             return {"prefix": {}}
-        elif is_op(self.expr, Variable) and is_literal(self.prefix):
+        elif is_variable(self.expr) and is_literal(self.prefix):
             return {"prefix": {self.expr.var: self.prefix.value}}
         else:
             return {"prefix": [self.expr.__data__(), self.prefix.__data__()]}
@@ -84,10 +86,12 @@ class PrefixOp(Expression):
         return FALSE
 
     def partial_eval(self, lang):
+        prefix = IsTextOp(self.prefix).partial_eval(lang)
+        expr = IsTextOp(self.expr).partial_eval(lang)
         return CaseOp(
-            WhenOp(self.prefix.missing(lang), then=TRUE),
-            WhenOp(self.expr.missing(lang), then=FALSE),
-            BasicStartsWithOp(self.expr, self.prefix),
+            WhenOp(prefix.missing(lang), then=TRUE),
+            WhenOp(expr.missing(lang), then=FALSE),
+            BasicStartsWithOp(expr, prefix),
         ).partial_eval(lang)
 
     def __eq__(self, other):

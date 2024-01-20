@@ -24,6 +24,7 @@ from mo_dots import (
     dict_to_data,
     list_to_data,
     from_data,
+    is_many,
 )
 from mo_kwargs import override
 from mo_logs import Log
@@ -314,7 +315,7 @@ class SimpleSetDomain(Domain):
         if isinstance(self.key, set):
             Log.error("problem")
 
-        if not key and (len(partitions) == 0 or isinstance(partitions[0], (str, Number, tuple))):
+        if not key and (len(partitions) == 0 or isinstance(partitions[0], (str, Number)) or is_many(partitions[0])):
             # ASSUME PARTS ARE STRINGS, CONVERT TO REAL PART OBJECTS
             self.key = "value"
             self.map = {}
@@ -357,7 +358,7 @@ class SimpleSetDomain(Domain):
             self.label = coalesce(self.label, "name")
             return
         elif key == None:
-            if partitions and all(partitions.where):
+            if partitions and all(is_data(w) and ("where" in w or "esfilter" in w) for w in partitions):
                 if not all(partitions.name):
                     Log.error("Expecting all partitions to have a name")
                 self.key = "name"

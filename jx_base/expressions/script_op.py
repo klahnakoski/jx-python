@@ -25,7 +25,7 @@ class ScriptOp(Expression):
             Log.error("expecting text of a script")
         self.simplified = True
         self.script = script
-        self._data_type = data_type
+        self._jx_type = data_type
 
     @classmethod
     def define(cls, expr):
@@ -43,9 +43,6 @@ class ScriptOp(Expression):
 
     def map(self, map_):
         return self
-
-    def __unicode__(self):
-        return self.script
 
     def __str__(self):
         return str(self.script)

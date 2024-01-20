@@ -9,12 +9,12 @@
 #
 
 
-from jx_base.expressions import AndOp as AndOp_, FALSE, PythonScript, ToBooleanOp
+from jx_base.expressions import AndOp as _AndOp, FALSE, PythonScript, ToBooleanOp
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
-class AndOp(AndOp_):
+class AndOp(_AndOp):
     def to_python(self, loop_depth=0):
         if not self.terms:
             return PythonScript({}, loop_depth, JX_BOOLEAN, "True", self, FALSE)
@@ -22,4 +22,6 @@ class AndOp(AndOp_):
         sources, locals = zip(
             *((c.source, c.locals) for t in self.terms for c in [ToBooleanOp(t).to_python(loop_depth)])
         )
-        return PythonScript(merge_locals(*locals), loop_depth, JX_BOOLEAN, " and ".join(sources), self, FALSE,)
+        return PythonScript(
+            merge_locals(*locals), loop_depth, JX_BOOLEAN, " and ".join(f"({s})" for s in sources), self, FALSE,
+        )

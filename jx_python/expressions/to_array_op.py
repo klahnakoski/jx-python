@@ -20,7 +20,7 @@ class ToArrayOp(_ToArrayOp):
         return PythonScript(
             merge_locals(term.locals, enlist=enlist),
             loop_depth,
-            array_of(term.type),
+            array_of(term.jx_type),
             f"enlist({term.source})",
             self,
         )

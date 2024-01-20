@@ -9,9 +9,9 @@
 #
 
 
-from jx_base.expressions import LtOp as LtOp_
+from jx_base.expressions import LtOp as _LtOp
 from jx_python.expressions._utils import _inequality_to_python
 
 
-class LtOp(LtOp_):
+class LtOp(_LtOp):
     to_python = _inequality_to_python

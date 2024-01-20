@@ -13,8 +13,6 @@ from jx_base.expressions.base_binary_op import BaseBinaryOp
 
 
 class SubOp(BaseBinaryOp):
-    op = "sub"
-
     def __call__(self, row=None, rownum=None, rows=None):
         lhs = self.lhs(row)
         rhs = self.rhs(row)

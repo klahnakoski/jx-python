@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import RightOp as RightOp_
+from jx_base.expressions import RightOp as _RightOp
 from jx_python.expressions._utils import with_var, PythonScript
 
 
-class RightOp(RightOp_):
+class RightOp(_RightOp):
     def to_python(self, loop_depth=0):
         v = (self.value).to_python(loop_depth)
         l = (self.length).to_python(loop_depth)

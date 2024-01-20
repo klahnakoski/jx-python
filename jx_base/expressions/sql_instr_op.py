@@ -15,11 +15,11 @@ from mo_json import JX_INTEGER
 
 
 class SqlInstrOp(Expression):
-    _data_type = JX_INTEGER
+    _jx_type = JX_INTEGER
 
-    def __init__(self, *params):
-        Expression.__init__(self, params)
-        self.value, self.find = params
+    def __init__(self, value, find):
+        Expression.__init__(self, value, find)
+        self.value, self.find = value, find
 
     def __data__(self):
         return {"sql.instr": [self.value.__data__(), self.find.__data__()]}

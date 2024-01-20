@@ -22,13 +22,10 @@ from mo_dots import (
     coalesce,
     dict_to_data,
 )
-from mo_future import first, sort_using_key
-from mo_imports import export, expect, delay_import
-from mo_logs import Log
 from mo_threads import Lock
 
-from jx_base.expressions import TRUE, Variable
-from jx_base.language import is_expression, is_op
+from jx_base.expressions import TRUE
+from jx_base.language import is_expression
 from jx_base.meta_columns import get_schema_from_list
 from jx_base.models.container import Container
 from jx_base.models.namespace import Namespace
@@ -38,7 +35,10 @@ from jx_base.utils import delist, enlist
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
 from jx_python.lists.aggs import is_aggs, list_aggs
+from mo_future import first, sort_using_key
+from mo_imports import export, expect, delay_import
 from mo_json import ARRAY
+from mo_logs import Log
 
 jx = expect("jx")
 Column = delay_import("jx_base.Column")
@@ -172,7 +172,7 @@ class ListContainer(Container, Namespace, Table):
     def select(self, select):
         selects = enlist(select)
 
-        if len(selects) == 1 and is_op(selects[0].value, Variable) and selects[0].value.var == ".":
+        if len(selects) == 1 and is_variable(selects[0].value) and selects[0].value.var == ".":
             new_schema = self.schema
             if selects[0].name == ".":
                 return self
@@ -180,7 +180,7 @@ class ListContainer(Container, Namespace, Table):
             new_schema = None
 
         if is_list(select):
-            if all(is_op(s.value, Variable) and s.name == s.value.var for s in select):
+            if all(is_variable(s.value) and s.name == s.value.var for s in select):
                 names = set(s.value.var for s in select)
                 new_schema = Schema(".", [c for c in self.schema.columns if c.name in names])
 
@@ -196,7 +196,7 @@ class ListContainer(Container, Namespace, Table):
         else:
             select_value = jx_expression_to_function(select.value)
             new_data = list(map(select_value, self.data))
-            if is_op(select.value, Variable):
+            if is_variable(select.value):
                 column = dict(**first(c for c in self.schema.columns if c.name == select.value.var))
                 column.update({
                     "name": ".",

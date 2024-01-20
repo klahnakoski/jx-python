@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import FloorOp as FloorOp_
+from jx_base.expressions import FloorOp as _FloorOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class FloorOp(FloorOp_):
+class FloorOp(_FloorOp):
     def to_python(self, loop_depth=0):
         return PythonScript(
             {},

@@ -21,11 +21,17 @@ from mo_json.types import JX_TEXT, JX_IS_NULL
 
 
 class ToTextOp(Expression):
-    _data_type = JX_TEXT
+    _jx_type = JX_TEXT
 
     def __init__(self, term):
         Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        try:
+            return str(self.term(row, rownum, rows))
+        except:
+            return None
 
     def __data__(self):
         return {"to_text": self.term.__data__()}
@@ -41,7 +47,7 @@ class ToTextOp(Expression):
 
     def partial_eval(self, lang):
         term = self.term
-        if term.type is JX_IS_NULL:
+        if term.jx_type is JX_IS_NULL:
             return NULL
         term = (FirstOp(term)).partial_eval(lang)
         if is_op(term, ToTextOp):
@@ -49,7 +55,7 @@ class ToTextOp(Expression):
         elif is_op(term, CoalesceOp):
             return CoalesceOp(*((ToTextOp(t)).partial_eval(lang) for t in term.terms))
         elif is_literal(term):
-            if term.type == JX_TEXT:
+            if term.jx_type == JX_TEXT:
                 return term
             else:
                 return Literal(mo_json.value2json(term.value))

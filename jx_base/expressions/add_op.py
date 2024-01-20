@@ -8,23 +8,21 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-
-from mo_dots import exists
-
 from jx_base.expressions.base_multi_op import BaseMultiOp
+from mo_dots import is_missing
 
 
 class AddOp(BaseMultiOp):
     """
-    CONSERVATIVE ADDITION
+    CONSERVATIVE ADDITION (SEE SumOp FOR DECISIVE ADDITION)
     """
-    op = "add"
-
     def __call__(self, row=None, rownum=None, rows=None):
         output = 0
         for t in self.terms:
             v = t(row, rownum, rows)
-            if not exists(v):
+            if is_missing(v):
+                if self.decisive:
+                    continue
                 return None
             else:
                 output += v

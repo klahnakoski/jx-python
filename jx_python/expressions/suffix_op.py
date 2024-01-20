@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import SuffixOp as SuffixOp_
+from jx_base.expressions import SuffixOp as _SuffixOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class SuffixOp(SuffixOp_):
+class SuffixOp(_SuffixOp):
     def to_python(self, loop_depth=0):
         return PythonScript(
             {}, loop_depth, f"({self.expr.to_python(loop_depth)}).endswith({self.suffix.to_python(loop_depth)})",

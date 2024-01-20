@@ -7,16 +7,16 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_logs import logger
-
-from jx_base.expressions import Variable as Variable_
+from jx_base import enlist
+from jx_base.expressions import Variable as _Variable
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions.get_op import get_attr
 from jx_python.utils import merge_locals
-from mo_json import JX_ANY
+from mo_json import JX_ANY, quote
+from mo_logs import logger
 
 
-class Variable(Variable_):
+class Variable(_Variable):
     def to_python(self, loop_depth=0):
         if self.var == ".":
             return PythonScript({}, loop_depth, JX_ANY, f"row{loop_depth}", self)
@@ -24,7 +24,7 @@ class Variable(Variable_):
             if loop_depth == 0:
                 # WE ASSUME THIS IS NAIVE PYTHON EXPRESSION BUILD
                 return PythonScript(
-                    merge_locals(get_attr=get_attr), loop_depth, JX_ANY, f"get_attr(row{loop_depth}, {self.var})", self
+                    merge_locals(get_attr=get_attr, enlist=enlist), loop_depth, JX_ANY, f"get_attr(enlist(row{loop_depth}), {quote(self.var)})", self
                 )
 
             logger.error("not expected")

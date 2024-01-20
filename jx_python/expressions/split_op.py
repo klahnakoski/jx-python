@@ -9,11 +9,11 @@
 #
 
 
-from jx_base.expressions import SplitOp as SplitOp_
+from jx_base.expressions import SplitOp as _SplitOp
 from jx_base.expressions.python_script import PythonScript
 
 
-class SplitOp(SplitOp_):
+class SplitOp(_SplitOp):
     def to_python(self, loop_depth=0):
         return PythonScript(
             {},

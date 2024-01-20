@@ -25,11 +25,11 @@ class ToValueOp(Expression):
         return {"to_value": self.term.__data__()}
 
     @property
-    def type(self):
-        if self.term.type == ARRAY:
-            return self.term.type[ARRAY_KEY]
+    def jx_type(self):
+        if self.term.jx_type == ARRAY:
+            return self.term.jx_type[ARRAY_KEY]
         else:
-            return array_of(self.term.type)
+            return array_of(self.term.jx_type)
 
     def vars(self):
         return self.term.vars()

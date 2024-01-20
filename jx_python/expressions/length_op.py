@@ -9,12 +9,12 @@
 #
 
 
-from jx_base.expressions import LengthOp as LengthOp_
+from jx_base.expressions import LengthOp as _LengthOp
 from jx_base.expressions.python_script import PythonScript
 from mo_json import JX_INTEGER
 
 
-class LengthOp(LengthOp_):
+class LengthOp(_LengthOp):
     def to_python(self, loop_depth=0):
         value = self.term.to_python(loop_depth)
         return PythonScript(

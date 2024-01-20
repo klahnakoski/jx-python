@@ -19,7 +19,7 @@ NotOp = expect("NotOp")
 
 
 class ExistsOp(Expression):
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, term):
         Expression.__init__(self, term)
