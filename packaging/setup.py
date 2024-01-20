@@ -8,7 +8,7 @@ setup(
     description='JSON query expressions using Python',
     extras_require={"tests":["mo-testing"]},
     include_package_data=True,
-    install_requires=["mo-collections==5.486.24020","mo-dots==9.476.24007","mo-future==7.476.24007","mo-json==6.486.24020","mo-json-config==4.487.24020","mo-kwargs==7.476.24007","mo-logs==8.477.24007","mo-math==7.476.24007","mo-times==5.481.24007"],
+    install_requires=["mo-collections==5.486.24020","mo-dots==9.476.24007","mo-future==7.476.24007","mo-json==6.486.24020","mo-json-config==4.487.24020","mo-kwargs==7.476.24007","mo-logs==8.477.24007","mo-math==7.476.24007","mo-threads==6.481.24007","mo-times==5.481.24007"],
     license='MPL 2.0',
     long_description='# jx-python\nPython library for JSON Expressions \n',
     long_description_content_type='text/markdown',
