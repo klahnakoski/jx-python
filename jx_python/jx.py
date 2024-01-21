@@ -1096,9 +1096,3 @@ def reverse(vals):
 def countdown(vals):
     remaining = len(vals) - 1
     return [(remaining - i, v) for i, v in enumerate(vals)]
-
-
-from jx_python.lists.aggs import is_aggs, list_aggs
-
-
-export("jx_python.containers.list", "jx")

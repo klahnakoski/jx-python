@@ -156,4 +156,4 @@ _python_operators = {
 }
 
 
-export("jx_base", Python)
+export("jx_base.data_class", Python)

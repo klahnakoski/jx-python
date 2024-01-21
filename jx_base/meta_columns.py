@@ -24,7 +24,7 @@ from mo_dots import (
 )
 from mo_times.dates import Date
 
-from jx_base import DataClass
+from jx_base.data_class import DataClass
 from jx_base.models.schema import Schema
 from jx_base.utils import enlist, delist
 from mo_future import Mapping
@@ -394,4 +394,3 @@ def _merge_python_type(A, B):
 
 
 export("jx_base.expressions.query_op", Column)
-export("jx_base", Column)
