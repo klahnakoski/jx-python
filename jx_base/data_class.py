@@ -226,6 +226,9 @@ class {{class_name}}(Mapping):
             "Null": Null,
             "failure": failure,
             "_constraint": _constraint,
+            "false": False,
+            "true": True,
+            "null": None,
         },
     )
     register_data(output)
