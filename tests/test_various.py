@@ -3,9 +3,8 @@ from unittest import TestCase
 from mo_dots import concat_field
 from mo_times import Date
 
-from jx_base import jx_expression, DataClass
+from jx_base import jx_expression, DataClass, Column
 from jx_base.expressions import GtOp, Variable, Literal
-from jx_python import Column
 from jx_python.expression_compiler import compile_expression
 from mo_json.types import INTEGER, ARRAY
 from mo_logs import Log

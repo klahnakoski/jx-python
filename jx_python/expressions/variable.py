@@ -7,8 +7,8 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base import enlist
 from jx_base.expressions import Variable as _Variable
+from jx_base.expressions._utils import enlist
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions.get_op import get_attr
 from jx_python.utils import merge_locals

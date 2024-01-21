@@ -8,12 +8,12 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from mo_dots import coalesce
-from mo_json import union_type
 
-from jx_base import Python
 from jx_base.expressions import CoalesceOp as _CoalesceOp
 from jx_base.expressions.python_script import PythonScript
+from jx_python.expressions._utils import Python
 from jx_python.utils import merge_locals
+from mo_json import union_type
 
 
 class CoalesceOp(_CoalesceOp):

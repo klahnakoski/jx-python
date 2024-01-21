@@ -290,14 +290,6 @@ class ListContainer(Container, Namespace, Table):
         Log.error("This container only has table by name of {{name}}", name=name)
 
 
-def _exec(code):
-    try:
-        temp = None
-        exec("temp = " + code)
-        return temp
-    except Exception as e:
-        Log.error("Could not execute {{code|quote}}", code=code, cause=e)
-
 
 DUAL = ListContainer(name="dual", data=[{}], schema=Schema(table_name="dual", columns=UniqueIndex(keys=("name",))),)
 
