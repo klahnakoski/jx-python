@@ -147,14 +147,14 @@ class Language(object):
         if not name:
             name = "JX"
             JX = self
-        self.name = name
+        self.lang_name = name
         self.ops = None
         self.id = next_language_id()
 
     def register_ops(self, module_vars):
         global JX
 
-        if self.name != "JX":
+        if self.lang_name != "JX":
             self.ops = copy(JX.ops)  # A COPY, IF ONLY TO KNOW IT WAS REPLACED
 
             double_dispatch_methods = tuple(sorted(set(self.ops[1].lookups.keys())))
@@ -217,7 +217,7 @@ class Language(object):
                             o = getattr(jx_op, n, None)
                             if o is None:
                                 setattr(jx_op, n, v)
-        if self.name == "JX":
+        if self.lang_name == "JX":
             # FINALLY, SWAP OUT THE BASE METHODS
             for dd_method in double_dispatch_methods:
                 existing = getattr(BaseExpression, dd_method, None)
@@ -255,10 +255,10 @@ class Language(object):
         return item
 
     def __str__(self):
-        return self.name
+        return self.lang_name
 
     def __repr__(self):
-        return self.name
+        return self.lang_name
 
 
 def is_op(call, op) -> bool:

@@ -93,10 +93,6 @@ class Expression(BaseExpression):
             Log.warning("programmer error expr = {{value|quote}}", value=expr, cause=cause)
             Log.error("programmer error expr = {{value|quote}}", value=expr, cause=cause)
 
-    @property
-    def name(self):
-        return self.__class__.__name__
-
     def __data__(self):
         raise NotImplementedError
 

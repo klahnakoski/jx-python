@@ -15,20 +15,20 @@ from jx_base.language import is_op
 from mo_json.types import JX_BOOLEAN
 
 
-class SqlEqOp(Expression):
-    _jx_type = JX_BOOLEAN
+class SqlIsNullOp(Expression):
+    _data_type = JX_BOOLEAN
 
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        self.lhs, self.rhs = terms
+    def __init__(self, term):
+        Expression.__init__(self, term)
+        self.term = term
 
     def __data__(self):
-        return {"sql.eq": [self.lhs.__data__(), self.rhs.__data__()]}
+        return {"sql.is_null": self.term.__data__()}
 
     def missing(self, lang):
         return FALSE
 
     def __eq__(self, other):
-        if not is_op(other, SqlEqOp):
+        if not is_op(other, SqlIsNullOp):
             return False
-        return self.lhs == other.lhs and self.rhs == other.rhs
+        return self.term == other.term

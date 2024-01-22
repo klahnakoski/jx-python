@@ -29,10 +29,6 @@ class BaseBinaryOp(Expression):
         Expression.__init__(self, lhs, rhs)
         self.lhs, self.rhs = lhs, rhs
 
-    @property
-    def name(self):
-        return self.op
-
     def __call__(self, row, rownum=None, rows=None):
         lhs = self.lhs(row, rownum, rows)
         rhs = self.rhs(row, rownum, rows)
