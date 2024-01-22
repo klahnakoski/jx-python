@@ -394,3 +394,5 @@ def _merge_python_type(A, B):
 
 
 export("jx_base.expressions.query_op", Column)
+export("jx_python.containers.list", Column)
+export("jx_python.containers.list", get_schema_from_list)

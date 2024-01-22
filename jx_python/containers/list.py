@@ -11,6 +11,16 @@
 
 import itertools
 
+from jx_base.expressions import TRUE
+from jx_base.language import is_expression
+from jx_base.models.container import Container
+from jx_base.models.namespace import Namespace
+from jx_base.models.schema import Schema
+from jx_base.models.table import Table
+from jx_base.utils import delist, enlist
+from jx_python.convert import list2cube, list2table
+from jx_python.expressions import jx_expression_to_function
+from jx_python.lists.aggs import is_aggs, list_aggs
 from mo_collections import UniqueIndex
 from mo_dots import (
     Data,
@@ -22,26 +32,13 @@ from mo_dots import (
     coalesce,
     dict_to_data,
 )
-from mo_threads import Lock
-
-from jx_base.expressions import TRUE
-from jx_base.language import is_expression
-from jx_base.meta_columns import get_schema_from_list
-from jx_base.models.container import Container
-from jx_base.models.namespace import Namespace
-from jx_base.models.schema import Schema
-from jx_base.models.table import Table
-from jx_base.utils import delist, enlist
-from jx_python.convert import list2cube, list2table
-from jx_python.expressions import jx_expression_to_function
-from jx_python.lists.aggs import is_aggs, list_aggs
 from mo_future import first, sort_using_key
-from mo_imports import export, expect, delay_import
+from mo_imports import export, expect
 from mo_json import ARRAY
 from mo_logs import Log
+from mo_threads import Lock
 
-jx = expect("jx")
-Column = delay_import("jx_base.Column")
+jx, get_schema_from_list, Column = expect("jx", "get_schema_from_list", "Column")
 
 
 class ListContainer(Container, Namespace, Table):
