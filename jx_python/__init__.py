@@ -11,7 +11,7 @@
 from jx_python import jx
 from jx_python.containers.cube import Cube
 from jx_python.containers.list import ListContainer
-from jx_python.expressions import Python
+from jx_python.expressions._utils import Python
 from jx_python.streams import stream
 from mo_threads import stop_main_thread
 

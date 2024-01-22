@@ -23,6 +23,25 @@ from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_base.utils import enlist
+from jx_python.expressions._utils import Python
 from jx_base.meta_columns import Column
 
-__all__ = ["Container", "Schema", "Column", "DataClass", "Facts", "Namespace", "NestedPath", "Relation", "Snowflake", "Table", "jx_expression", "JX", "FALSE", "WhenOp", "is_op", "enlist"]
+__all__ = [
+    "Container",
+    "Schema",
+    "Column",
+    "DataClass",
+    "enlist",
+    "Facts",
+    "FALSE",
+    "is_op",
+    "jx_expression",
+    "JX",
+    "Namespace",
+    "NestedPath",
+    "Python",
+    "Relation",
+    "Snowflake",
+    "Table",
+    "WhenOp",
+]
