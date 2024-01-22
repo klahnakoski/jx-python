@@ -103,7 +103,12 @@ from jx_base.expressions.script_op import ScriptOp
 from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.split_op import SplitOp
+from jx_base.expressions.sql_and_op import SqlAndOp
+from jx_base.expressions.sql_or_op import SqlOrOp
 from jx_base.expressions.sql_eq_op import SqlEqOp
+from jx_base.expressions.sql_alias_op import SqlAliasOp
+from jx_base.expressions.sql_inner_join_op import SqlInnerJoinOp
+from jx_base.expressions.sql_is_null_op import SqlIsNullOp
 from jx_base.expressions.sql_group_by_op import SqlGroupByOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
