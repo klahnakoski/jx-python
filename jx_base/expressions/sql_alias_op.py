@@ -9,10 +9,9 @@
 #
 from jx_base.expressions import Expression, Literal
 from jx_base.language import is_op
-from mo_sql import SQL
 
 
-class SqlAliasOp(Expression, SQL):
+class SqlAliasOp(Expression):
 
     def __init__(self, name, value):
         Expression.__init__(self, Literal(name), value)
