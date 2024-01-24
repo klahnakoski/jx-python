@@ -7,7 +7,6 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-import json
 from typing import Tuple, Iterable, Dict
 
 from jx_base.expressions._utils import TYPE_CHECK, simplified
@@ -24,9 +23,9 @@ from jx_base.models.container import Container
 from jx_base.utils import is_variable_name
 from mo_dots import *
 from mo_future import is_text, text
-from mo_json.types import JxType
 from mo_imports import export
 from mo_json import union_type, value2json
+from mo_json.types import JxType
 from mo_logs import Log
 from mo_math import is_number
 
