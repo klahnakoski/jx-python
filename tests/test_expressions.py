@@ -16,9 +16,6 @@ from jx_python.expressions import Python
 
 @add_error_reporting
 class TestOther(FuzzyTestCase):
-    @classmethod
-    def tearDownClass(cls):
-        stop_main_thread()
 
     def test_add(self):
         expr = jx_expression({"add": [1, 2]})

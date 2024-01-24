@@ -13,10 +13,9 @@ from jx_python.containers.cube import Cube
 from jx_python.containers.list import ListContainer
 from jx_python.expressions._utils import Python
 from jx_python.streams import stream
-from mo_threads import stop_main_thread
+from mo_imports import export
+
+export("jx_python.containers.list", jx)
 
 __all__ = ["ListContainer", "Cube", "jx", "stream", "Python"]
 
-
-def __deploy__():
-    stop_main_thread()
