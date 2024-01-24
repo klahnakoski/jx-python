@@ -29,7 +29,6 @@ from mo_dots import *
 from mo_future import is_text
 from mo_imports import expect
 from mo_imports import export
-from mo_json.typed_encoder import untype_path
 from mo_logs import Log
 from mo_math import AND, UNION
 

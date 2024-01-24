@@ -11,7 +11,6 @@ from jx_base.expressions.expression import Expression, Literal
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
-from mo_dots import join_field
 from jx_base.utils import get_property_name
 from mo_dots import is_sequence, split_field, startswith_field, concat_field
 from mo_dots.lists import last
