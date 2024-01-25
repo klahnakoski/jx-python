@@ -8,7 +8,6 @@
 from jx_python.expression_compiler import compile_expression
 
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
-from mo_threads import stop_main_thread
 
 from jx_base import jx_expression
 from jx_python.expressions import Python
