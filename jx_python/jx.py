@@ -32,9 +32,6 @@ from mo_dots import (
 )
 from mo_dots import _getdefault
 from mo_dots.objects import DataObject
-from mo_future import is_text, sort_using_cmp
-from mo_imports import export
-from mo_logs import Log
 from mo_math import MIN, UNION
 
 from jx_base.expressions import FALSE, TRUE
@@ -53,6 +50,8 @@ from jx_python.expressions import jx_expression_to_function as get
 from jx_python.flat_list import PartFlatList
 from jx_python.streams.expression_compiler import compile_expression
 from jx_python.utils import wrap_function as _wrap_function
+from mo_future import is_text, sort_using_cmp
+from mo_logs import Log
 
 # A COLLECTION OF DATABASE OPERATORS (RELATIONAL ALGEBRA OPERATORS)
 # JSON QUERY EXPRESSION DOCUMENTATION: https://github.com/klahnakoski/jx/tree/master/docs
