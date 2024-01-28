@@ -322,18 +322,9 @@ export("jx_base.expressions.variable", SelectOp)
 
 
 def _normalize_selects(frum, selects, format) -> SelectOp:
-    if frum == None or is_text(frum) or is_many(frum):
-        if is_many(selects):
-            if len(selects) == 0:
-                return SelectOp(frum)
-            else:
-                terms = [t for s in selects for t in normalize_one(frum, s, format).terms]
-        else:
-            return SelectOp(frum, normalize_one(frum, select, format))
-    elif is_many(selects):
-        terms = [ss for s in selects for ss in normalize_one(frum, s, format).terms]
-    else:
-        Log.error("should not happen")
+    if len(selects) == 0:
+        return SelectOp(frum)
+    terms = [ss for s in selects for ss in normalize_one(frum, s, format).terms]
 
     # ENSURE NAMES ARE UNIQUE
     exists = set()

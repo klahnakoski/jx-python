@@ -12,7 +12,6 @@
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.variable import IDENTITY, Variable
-from mo_future import PY2
 from mo_json import OBJECT
 
 default_select = ({"name": ".", "value": IDENTITY},)
@@ -55,7 +54,3 @@ class ESSelectOp(Expression):
 
     def __bool__(self):
         return True if self.source_path or self.fields or self.scripts else False
-
-
-if PY2:
-    ESSelectOp.__nonzero__ = ESSelectOp.__bool__
