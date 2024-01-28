@@ -16,8 +16,8 @@
     "include_package_data": true,
     "install_requires": [
         "mo-collections==5.508.24028",        "mo-dots==9.508.24028",
-             "mo-future==7.507.24028",        "mo-json==6.508.24028",
-        "mo-json-config==4.509.24028",      "mo-kwargs==7.508.24028",
+             "mo-future==7.507.24028",        "mo-json==6.511.24028",
+        "mo-json-config==4.511.24028",      "mo-kwargs==7.508.24028",
                "mo-logs==8.508.24028",        "mo-math==7.508.24028",
             "mo-threads==6.508.24028",       "mo-times==5.508.24028"
     ],
@@ -39,5 +39,5 @@
             "jx_python.streams"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.510.24028"
+    "version": "4.511.24028"
 }
