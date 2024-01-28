@@ -150,9 +150,8 @@ class QueryOp(Expression):
 
         frum = query["from"]
         # FIND THE TABLE IN from CLAUSE
-        base_name, query_path = tail_field(frum)
-        snowflake = container.namespace.get_snowflake(base_name)
-        frum = snowflake.get_table(query_path)
+        base_name, _ = tail_field(frum)
+        frum = container.get_table(frum)
         schema = frum.schema
 
         output = QueryOp(frum=frum, format=query.format, chunk_size=query.chunk_size, destination=query.destination,)
@@ -166,46 +165,36 @@ class QueryOp(Expression):
         select = from_data(query).get("select")
         if query.groupby and query.edges:
             raise Log.error("You can not use both the `groupby` and `edges` clauses in the same query!")
-        elif query.edges:
-            if select is None:
-                select = [{"aggregate": "count"}]
-            elif is_many(query.select):
-                pass
-            else:
-                select = [query.select]
 
-            output.edges = _normalize_edges(query.edges, limit=output.limit, schema=schema)
-            output.groupby = Null
-        elif query.groupby:
-            if select is None:
-                select = [{"aggregate": "count"}]
-            elif is_many(query.select):
-                pass
-            else:
-                select = [query.select]
+        output.edges = output.groupby = Null  # Default assignment
 
-            output.edges = Null
-            output.groupby = _normalize_groupby(query.groupby, limit=output.limit, schema=schema)
+        is_value = not is_data(select) and not is_many(select)
+        if is_data(select):
+            output.select = _normalize_selects(Null, [select], query.format)
+        elif not is_many(select):
+            output.select = _normalize_selects(Null, [select or {"aggregate": "count"}], query.format)
         else:
-            output.edges = Null
-            output.groupby = Null
-
-        if is_many(select):
             output.select = _normalize_selects(Null, select, query.format)
-        elif select or is_data(select):
+
+        if query.edges or query.groupby:
+            if query.groupby and query.format in ["list", "table", None]:
+                # EXCLUDE NULLS
+                output.groupby = _normalize_groupby(query.groupby, limit=output.limit, schema=schema)
+            else:
+                clause = query.edges if query.edges else query.groupby
+                output.edges = _normalize_edges(clause, limit=output.limit, schema=schema)
+        elif query.format == "list" and (select or is_data(select)) and not is_many(select):
             output.select = normalize_one(Null, select, query.format)
-            if query.format == "list":
-                output.select.terms = (output.select.terms[0].set_name("."),)
-        elif query.edges or query.groupby:
-            output.select = DEFAULT_SELECT
-        else:
-            output.select = SelectOp(Null, SelectOne(".", Variable(".")))
+            output.select.terms = (output.select.terms[0].set_name("."),)
+        elif is_value:
+            output.select = _normalize_selects(Null, [select or "."], query.format)
 
         output.where = _normalize_where(query.where, lang)
         output.window = [_normalize_window(w) for w in enlist(query.window)]
         output.sort = _normalize_sort(query.sort)
 
         return output
+
 
     def __data__(self):
         return {

@@ -32,6 +32,11 @@ class FindOp(Expression):
         if self.start is NULL:
             self.start = ZERO
 
+    def __eq__(self, other):
+        if not isinstance(other, FindOp):
+            return False
+        return self.value == other.value and self.find == other.find and self.start == other.start
+
     def __data__(self):
         if is_variable(self.value) and is_literal(self.find):
             output = {

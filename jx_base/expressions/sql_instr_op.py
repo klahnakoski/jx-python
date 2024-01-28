@@ -21,6 +21,11 @@ class SqlInstrOp(Expression):
         Expression.__init__(self, value, find)
         self.value, self.find = value, find
 
+    def __eq__(self, other):
+        if not isinstance(other, SqlInstrOp):
+            return False
+        return self.value == other.value and self.find == other.find
+
     def __data__(self):
         return {"sql.instr": [self.value.__data__(), self.find.__data__()]}
 
