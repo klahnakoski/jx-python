@@ -8,12 +8,12 @@ setup(
     description='JSON query expressions using Python',
     extras_require={"tests":["mo-testing"]},
     include_package_data=True,
-    install_requires=["mo-collections==5.508.24028","mo-dots==9.508.24028","mo-future==7.507.24028","mo-json==6.508.24028","mo-json-config==4.509.24028","mo-kwargs==7.508.24028","mo-logs==8.508.24028","mo-math==7.508.24028","mo-threads==6.508.24028","mo-times==5.508.24028"],
+    install_requires=["mo-collections==5.508.24028","mo-dots==9.508.24028","mo-future==7.507.24028","mo-json==6.511.24028","mo-json-config==4.511.24028","mo-kwargs==7.508.24028","mo-logs==8.508.24028","mo-math==7.508.24028","mo-threads==6.508.24028","mo-times==5.508.24028"],
     license='MPL 2.0',
     long_description='# jx-python\nPython library for JSON Expressions \n',
     long_description_content_type='text/markdown',
     name='jx-python',
     packages=["jx_base","jx_base.expressions","jx_base.models","jx_python.expressions","jx_python.containers","jx_python.cubes","jx_python.lists","jx_python.namespace","jx_python","jx_python.streams"],
     url='https://github.com/klahnakoski/jx-python',
-    version='4.510.24028'
+    version='4.511.24028'
 )
