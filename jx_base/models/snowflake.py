@@ -7,16 +7,24 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.models.schema import Schema
+
+from mo_dots import startswith_field
 
 
-class Snowflake(object):
+class Snowflake:
     """
     REPRESENT ONE ALIAS, AND ITS NESTED ARRAYS
     """
+    def __init__(self, namespace, query_paths, columns):
+        self.namespace = namespace
+        self.query_paths = query_paths
+        self.columns = columns
 
     def get_schema(self, query_path):
-        raise NotImplemented()
+        nested_path = []
+        for step in self.query_paths:
+            if startswith_field(query_path, step):
+                nested_path.append(step)
 
-    @property
-    def columns(self):
-        raise NotImplemented()
+        return Schema(nested_path, self)

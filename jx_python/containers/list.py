@@ -16,6 +16,7 @@ from jx_base.language import is_expression
 from jx_base.models.container import Container
 from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
+from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_base.utils import delist, enlist
 from jx_python.convert import list2cube, list2table
@@ -287,8 +288,10 @@ class ListContainer(Container, Namespace, Table):
         Log.error("This container only has table by name of {{name}}", name=name)
 
 
-
-DUAL = ListContainer(name="dual", data=[{}], schema=Schema(table_name="dual", columns=UniqueIndex(keys=("name",))),)
+DUAL = ListContainer(
+    name="dual", data=[{}],
+    schema=Schema(["dual"], Snowflake(None, ["dual"], columns=UniqueIndex(keys=("name",))))
+)
 
 
 export("jx_base.models.container", ListContainer)

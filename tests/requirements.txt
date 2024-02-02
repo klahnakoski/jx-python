@@ -1,1 +1,1 @@
-mo-testing
+mo-testing>=7.523.24033

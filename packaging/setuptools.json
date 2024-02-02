@@ -12,7 +12,7 @@
         "Programming Language :: Python :: 3.12"
     ],
     "description": "JSON query expressions using Python",
-    "extras_require": {"tests": ["mo-testing"]},
+    "extras_require": {"tests": ["mo-testing>=7.523.24033"]},
     "include_package_data": true,
     "install_requires": [
         "mo-collections==5.522.24033",        "mo-dots==9.520.24032",
@@ -39,5 +39,5 @@
             "jx_python.streams"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.522.24033"
+    "version": "4.525.24033"
 }
