@@ -3,7 +3,7 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 hjson==3.1.0
 idna==3.6
-jx-python==4.525.24033
+jx-python @ file:///C:/users/kyle/code/jx-python
 mo-collections==5.522.24033
 mo-dots==9.520.24032
 mo-files==6.522.24033
