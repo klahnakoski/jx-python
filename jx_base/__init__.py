@@ -11,9 +11,11 @@ from jx_base.data_class import DataClass
 from jx_base.expressions import jx_expression
 from jx_base.expressions._utils import JX
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.null_op import NULL
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
+from jx_base.meta_columns import Column
 from jx_base.models.container import Container
 from jx_base.models.facts import Facts
 from jx_base.models.namespace import Namespace
@@ -24,7 +26,6 @@ from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_base.utils import enlist
 from jx_python.expressions._utils import Python
-from jx_base.meta_columns import Column
 
 __all__ = [
     "Container",
@@ -39,6 +40,7 @@ __all__ = [
     "JX",
     "Namespace",
     "NestedPath",
+    "NULL",
     "Python",
     "Relation",
     "Snowflake",
