@@ -1,21 +1,20 @@
-# Tests pass with these versions 2024-02-02
+# Tests pass with these versions 2024-02-04
 certifi==2024.2.2
 charset-normalizer==3.3.2
 hjson==3.1.0
 idna==3.6
-jx-python @ file:///C:/users/kyle/code/jx-python
-mo-collections==5.522.24033
-mo-dots==9.520.24032
-mo-files==6.522.24033
+mo-collections==5.527.24034
+mo-dots==9.527.24034
+mo-files==6.527.24034
 mo-future==7.520.24032
-mo-imports==5.520.24032
-mo-json==6.522.24033
-mo-json-config==4.522.24033
-mo-kwargs==7.520.24032
-mo-logs==8.522.24033
-mo-math==7.521.24032
+mo-imports==7.527.24034
+mo-json==6.527.24034
+mo-json-config==4.528.24034
+mo-kwargs==7.527.24034
+mo-logs==8.527.24034
+mo-math==7.527.24034
 mo-testing==7.523.24033
-mo-threads==6.522.24033
-mo-times==5.522.24033
+mo-threads==6.527.24034
+mo-times==5.527.24034
 requests==2.31.0
 urllib3==2.2.0
