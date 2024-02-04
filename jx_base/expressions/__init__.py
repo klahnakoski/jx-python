@@ -132,6 +132,11 @@ from jx_base.expressions.unix_op import UnixOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.expressions.when_op import WhenOp
 
+from jx_base.expressions.sql_order_by_op import SqlOrderByOp
+from jx_base.expressions.sql_group_by_op import SqlGroupByOp
+from jx_base.expressions.sql_limit_op import SqlLimitOp
+
+
 set_default(
     operators,
     {
@@ -218,6 +223,16 @@ set_default(
         "script": ScriptOp,
         "select": SelectOp,
         "split": SplitOp,
+        "sql.and": SqlAndOp,
+        "sql.alias": SqlAliasOp,
+        "sql.eq": SqlEqOp,
+        "sql.group_by": SqlGroupByOp,
+        "sql.inner_join": SqlInnerJoinOp,
+        "sql.is_null": SqlIsNullOp,
+        "sql.left_joins": SqlLeftJoinsOp,
+        "sql.limit": SqlLimitOp,
+        "sql.order_by": SqlOrderByOp,
+        "sql.or": SqlOrOp,
         "to_array": ToArrayOp,
         "product": ProductOp,
         "to_text": ToTextOp,

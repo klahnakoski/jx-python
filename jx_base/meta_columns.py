@@ -88,7 +88,7 @@ Column = DataClass(
         {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
         {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
         {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
-        {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},
+        {"not": {"prefix": [{"first": "nested_path"}, {"literal": "testdata"}]}},  # USED BY THE TEST GENERATOR.  IF THIS EXISTS IN A CONTAINER THEN IT FAILED
         {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
         {
             "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
