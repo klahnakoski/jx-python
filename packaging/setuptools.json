@@ -19,7 +19,7 @@
              "mo-future==7.531.24035",        "mo-json==6.531.24035",
         "mo-json-config==4.531.24035",      "mo-kwargs==7.531.24035",
                "mo-logs==8.531.24035",        "mo-math==7.531.24035",
-            "mo-threads==6.531.24035",       "mo-times==5.531.24035"
+            "mo-threads==6.537.24036",       "mo-times==5.531.24035"
     ],
     "license": "MPL 2.0",
     "long_description": {
@@ -39,5 +39,5 @@
             "jx_python.streams"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.532.24035"
+    "version": "4.537.24036"
 }
