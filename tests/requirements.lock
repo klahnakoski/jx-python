@@ -1,4 +1,4 @@
-# Tests pass with these versions 2024-02-04
+# Tests pass with these versions 2024-02-05
 certifi==2024.2.2
 charset-normalizer==3.3.2
 hjson==3.1.0
@@ -14,7 +14,7 @@ mo-kwargs==7.531.24035
 mo-logs==8.531.24035
 mo-math==7.531.24035
 mo-testing==7.523.24033
-mo-threads==6.531.24035
+mo-threads==6.537.24036
 mo-times==5.531.24035
 requests==2.31.0
 urllib3==2.2.0
