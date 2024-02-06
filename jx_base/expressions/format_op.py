@@ -68,7 +68,7 @@ class FormatOp(Expression):
 
         # DID NOT THINK THIS FAR YET
         if format == "container":
-            output = QueryTable(new_table, container=container)
+            output = Facts(new_table, container=container)
         elif format == "cube" or (not format and normalized_query.edges):
             column_names = [None] * (max(c.push_column_index for c in index_to_columns.values()) + 1)
             for c in index_to_columns.values():

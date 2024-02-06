@@ -24,7 +24,7 @@ from mo_future import is_text
 from mo_imports import expect
 from mo_logs import Log
 
-ListContainer, Cube = expect("ListContainer", "Cube")
+ListContainer, Cube, QueryOp = expect("ListContainer", "Cube", "QueryOp")
 
 type2container = Data()
 config = Data()  # config.default IS EXPECTED TO BE SET BEFORE CALLS ARE MADE
@@ -74,46 +74,3 @@ class Container(object):
         else:
             Log.error("Do not know how to handle {{type}}", type=frum.__class__.__name__)
 
-    @property
-    def language(self):
-        raise NotImplementedError()
-
-    def get_table(self, name):
-        raise NotImplementedError()
-
-    def query(self, query):
-        if query.frum != self:
-            Log.error("not expected")
-        raise NotImplementedError()
-
-    def filter(self, where):
-        return self.where(where)
-
-    def where(self, where):
-        _ = where
-        raise NotImplementedError()
-
-    def sort(self, sort):
-        _ = sort
-        raise NotImplementedError()
-
-    def select(self, select):
-        _ = select
-        raise NotImplementedError()
-
-    def window(self, window):
-        raise NotImplementedError()
-
-    def format(self, format):
-        _ = format
-        raise NotImplementedError()
-
-    def get_columns(self, table_name):
-        """
-        USE THE frum TO DETERMINE THE COLUMNS
-        """
-        raise NotImplementedError()
-
-    @property
-    def schema(self):
-        raise NotImplementedError()
