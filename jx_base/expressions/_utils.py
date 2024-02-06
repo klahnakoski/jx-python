@@ -13,7 +13,7 @@ import operator
 
 from mo_dots import is_sequence, is_missing, is_data
 from mo_future import get_function_name, is_text, text, utf8_json_encoder
-from mo_imports import expect
+from mo_imports import expect, export
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
@@ -174,3 +174,6 @@ precedence = [
     "from",
     "value",
 ]
+
+
+export("jx_base.domains", jx_expression)

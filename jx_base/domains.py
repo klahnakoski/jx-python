@@ -26,13 +26,14 @@ from mo_dots import (
     from_data,
     is_many,
 )
+from mo_imports import expect
 from mo_kwargs import override
 from mo_logs import Log
 from mo_math import MAX, MIN
 from mo_times.dates import Date
 from mo_times.durations import Duration
 
-from jx_base.expressions import jx_expression, NULL, Expression
+# from jx_base.expressions import jx_expression, NULL, Expression
 from jx_base.utils import enlist
 from mo_json.types import (
     JxType,
@@ -43,6 +44,9 @@ from mo_json.types import (
     JX_INTERVAL,
     python_type_to_jx_type,
 )
+
+jx_expression = expect("jx_expression")
+
 
 # DOMAINS THAT HAVE ALGEBRAIC OPERATIONS DEFINED
 ALGEBRAIC = {
@@ -103,13 +107,12 @@ class Domain(object):
         is_facet=False,
         where=None,
         primitive=None,
-        limit=NULL,
+        limit=None,
         desc=None,
     ):
         self._set_slots(self.__class__, desc)
         self.name = coalesce(name, type)
-        if not isinstance(limit, Expression):
-            self.limit = jx_expression(limit)
+        self.limit = jx_expression(limit)
         self.dimension = Null
 
     def _set_slots(self, cls, data):
