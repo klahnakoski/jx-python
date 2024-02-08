@@ -23,8 +23,8 @@ class Schema(object):
 
     def __init__(self, nested_path, snowflake):
         """
-        :param table_name: A FULL NAME FOR THIS TABLE (NOT USED)
-        :param columns: ALL COLUMNS IN SNOWFLAKE
+        :param nested_path: STACK OF TABLES TO GET HERE, ROOT LAST
+        :param snowflake: WHERE THIS SCHEMA BELONGS
         """
         self.nested_path = nested_path
         self.snowflake = snowflake
@@ -38,7 +38,7 @@ class Schema(object):
 
     @property
     def columns(self):
-        return copy(self.snowflake.columns)
+        return [c for c in self.snowflake.columns if c.nested_path==self.nested_path]
 
     def __getitem__(self, column_name):
         cs = self.lookup.get(column_name)
@@ -59,7 +59,7 @@ class Schema(object):
         :param column:
         :return: NAME OF column
         """
-        return relative_field(column.name, nested_path[0])
+        return relative_field(column.name, column.nested_path[0])
 
     def values(self, name):
         """
