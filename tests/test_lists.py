@@ -81,7 +81,7 @@ class TestLists(FuzzyTestCase):
         self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
 
     def test_use_to_object_array(self):
-        data = [{"a": 1, "b":  [{"c": 5}, {"c": 6}]}, {"a": 4, "b": {"c": 2}}]
+        data = [{"a": 1, "b": [{"c": 5}, {"c": 6}]}, {"a": 4, "b": {"c": 2}}]
         con = ListContainer("test", data)
         columns = con.get_schema().columns
         self.assertEqual(len(columns), 1)
@@ -89,3 +89,4 @@ class TestLists(FuzzyTestCase):
 
         deep_columns = con.get_schema("test.b").columns
         self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
+
