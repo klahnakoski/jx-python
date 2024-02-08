@@ -67,14 +67,15 @@ class ListContainer(Container, Namespace, Table):
     def get_schema(self, query_path=None):
         if query_path is None:
             return self.schema
-        if query_path not in self.schema.snowflake.query_paths:
-            Log.error("This container only has tables with names {names}", names=query_path)
+        snowflake = self.schema.snowflake
+        if query_path not in snowflake.query_paths:
+            Log.error("This container only has tables with names {names}", names=self.schema.snowflake.query_paths)
 
         nested_path = []
-        for path in self.schema.snowflake.query_paths:
+        for path in snowflake.query_paths:
             if startswith_field(query_path, path):
                 nested_path.append(path)
-        return Schema(list(reversed(nested_path)), self)
+        return Schema(list(reversed(nested_path)), snowflake)
 
     def get_snowflake(self, fact_name):
         return Snowflake(fact_name, self)

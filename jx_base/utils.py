@@ -12,12 +12,13 @@ import re
 from mo_dots import is_list, is_many, is_data
 from mo_json.typed_object import TypedObject
 
-from mo_future import is_text
 from mo_logs import Log
 
 from mo_json import ARRAY_KEY
 
 keyword_pattern = re.compile(r"(\w|[\\.])(\w|[\\.$-])*(?:\.(\w|[\\.$-])+)*")
+UID = "__id__"
+GUID = "_id"
 
 
 def is_variable_name(value):
@@ -25,7 +26,7 @@ def is_variable_name(value):
         Log.warning("not expected")
         return True
 
-    if not value or not is_text(value):
+    if not value or not str(value):
         return False  # _a._b
     value = value.lstrip(".")
     if not value:

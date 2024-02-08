@@ -120,7 +120,6 @@ def DataClass(name, columns, constraint=None):
 meta = None
 types_ = {{types}}
 defaults_ = {{defaults}}
-opener = "{"+"{"
 
 class {{class_name}}(Mapping):
     __slots__ = {{slots}}
@@ -229,6 +228,7 @@ class {{class_name}}(Mapping):
             "false": False,
             "true": True,
             "null": None,
+            "opener": "{{"
         },
     )
     register_data(output)

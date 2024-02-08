@@ -150,15 +150,15 @@ def _get_schema_from_list(
         else:
             es_type = row.__class__.__name__
 
-        row_type = native_type_to_json_type(es_type)
+        json_type = native_type_to_json_type(es_type)
 
-        if row_type == ARRAY:
-            full_name = concat_field(nested_path[0], prefix, ARRAY_KEY)
+        if json_type == ARRAY:
+            full_name = concat_field(nested_path[0], prefix)
             np = [full_name, *nested_path]
             if full_name not in snowflake.query_paths:
                 snowflake.query_paths.append(full_name)
-            _get_schema_from_list(value, full_name, np, snowflake, native_type_to_json_type)
-        elif row_type == OBJECT:
+            _get_schema_from_list(row, ".", np, snowflake, native_type_to_json_type)
+        elif json_type == OBJECT:
             for name, value in row.items():
                 _get_schema_from_list(
                     [value], concat_field(prefix, name), nested_path, snowflake, native_type_to_json_type,
@@ -173,7 +173,7 @@ def _get_schema_from_list(
                     es_column=full_name,
                     es_index=nested_path[0],
                     es_type=es_type,
-                    json_type=row_type,
+                    json_type=json_type,
                     last_updated=Date.now(),
                     nested_path=nested_path,
                     multi=1,
