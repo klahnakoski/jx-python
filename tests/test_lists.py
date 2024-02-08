@@ -7,7 +7,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_python import ListContainer
-from mo_json import JX_INTEGER, INTEGER, STRING, NUMBER
+from mo_json import INTEGER, STRING, NUMBER
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 
 
@@ -59,3 +59,33 @@ class TestLists(FuzzyTestCase):
                 {"name": "d", "nested_path": ["test.b", "test"], "json_type": INTEGER},
             ],
         )
+
+    def test_expand_to_value_array(self):
+        data = [{"a": 1, "b": 2}, {"a": 4, "b": [5, 6]}]
+        con = ListContainer("test", data)
+        columns = con.get_schema().columns
+        self.assertEqual(len(columns), 1)
+        self.assertEqual(columns, [{"name": "a", "json_type": INTEGER}])
+
+        deep_columns = con.get_schema("test.b").columns
+        self.assertEqual(deep_columns, [{"name": ".", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
+
+    def test_expand_to_object_array(self):
+        data = [{"a": 1, "b": {"c": 2}}, {"a": 4, "b": [{"c": 5}, {"c": 6}]}]
+        con = ListContainer("test", data)
+        columns = con.get_schema().columns
+        self.assertEqual(len(columns), 1)
+        self.assertEqual(columns, [{"name": "a", "json_type": INTEGER}])
+
+        deep_columns = con.get_schema("test.b").columns
+        self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
+
+    def test_use_to_object_array(self):
+        data = [{"a": 1, "b":  [{"c": 5}, {"c": 6}]}, {"a": 4, "b": {"c": 2}}]
+        con = ListContainer("test", data)
+        columns = con.get_schema().columns
+        self.assertEqual(len(columns), 1)
+        self.assertEqual(columns, [{"name": "a", "json_type": INTEGER}])
+
+        deep_columns = con.get_schema("test.b").columns
+        self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])

@@ -19,7 +19,7 @@ from mo_dots import (
     concat_field,
     to_data,
     is_many,
-    is_missing,
+    is_missing, relative_field,
 )
 from mo_times.dates import Date
 
@@ -141,7 +141,11 @@ def _get_schema_from_list(
         if is_missing(row):
             continue
 
-        if is_many(row):  # GET TYPE OF MULTIVALUE
+        full_name = concat_field(nested_path[0], prefix)
+        if prefix!="." and full_name in snowflake.query_paths and not is_many(row):
+            row = [row]
+            es_type = list.__name__
+        elif is_many(row):  # GET TYPE OF MULTIVALUE
             v = list(row)
             if len(v) == 1:
                 es_type = v[0].__class__.__name__
@@ -153,10 +157,15 @@ def _get_schema_from_list(
         json_type = native_type_to_json_type(es_type)
 
         if json_type == ARRAY:
-            full_name = concat_field(nested_path[0], prefix)
             np = [full_name, *nested_path]
             if full_name not in snowflake.query_paths:
+                # find any not-nested columns, and make them nested
                 snowflake.query_paths.append(full_name)
+                for c in snowflake.columns:
+                    if c.es_column.startswith(full_name):
+                        c.name = relative_field(c.es_column, full_name)
+                        c.nested_path = [full_name, *nested_path]
+
             _get_schema_from_list(row, ".", np, snowflake, native_type_to_json_type)
         elif json_type == OBJECT:
             for name, value in row.items():
@@ -165,7 +174,6 @@ def _get_schema_from_list(
                 )
         else:
             # EXPECTING PRIMITIVE VALUE
-            full_name = concat_field(nested_path[0], prefix)
             column = snowflake.columns[full_name]
             if not column:
                 column = Column(
