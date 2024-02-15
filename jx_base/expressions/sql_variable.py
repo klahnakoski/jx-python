@@ -9,14 +9,14 @@
 #
 from mo_dots import concat_field
 from jx_base.expressions.variable import Variable
+from mo_json import JX_ANY, quote
 
 
 class SqlVariable(Variable):
     simplified = True
 
-    def __init__(self, es_index, es_column, *, jx_type=None):
-        self.es_index = es_index
-        self.es_column = es_column
+    def __init__(self, *es_path, jx_type=JX_ANY):
+        self.es_path = es_path
         self._jx_type = jx_type
 
     def __data__(self):
@@ -29,7 +29,7 @@ class SqlVariable(Variable):
         replacement = map_.get(self.var)
         if replacement is None:
             return self
-        if is_text(replacement):
+        if isinstance(replacement, str):
             return Variable(replacement)
         else:
             return replacement
