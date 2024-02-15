@@ -9,7 +9,6 @@
 #
 from jx_base.expressions import Expression, Literal
 from jx_base.language import is_op
-from mo_sql import SQL
 
 
 class SqlAliasOp(Expression):
@@ -17,8 +16,8 @@ class SqlAliasOp(Expression):
     MUCH LIKE NameOp, BUT FOR SQL
     """
 
-    def __init__(self, value: SQL, name:str):
-        if not isinstance(value, SQL):
+    def __init__(self, value, name: str):
+        if "SQL" not in get_class_names(value.__class__):
             raise ValueError(f"Expected SQL, but got {value}")
         Expression.__init__(self, value, Literal(name))
         self.value = value
@@ -38,3 +37,9 @@ class SqlAliasOp(Expression):
 
     def __repr__(self):
         return f"SqlAliasOp({self.name}={self.value})"
+
+
+def get_class_names(cls):
+    yield cls.__name__
+    for base_class in cls.__bases__:
+        yield from get_class_names(base_class)
