@@ -12,11 +12,17 @@ from jx_base.language import is_op
 
 
 class SqlAliasOp(Expression):
+    """
+    MUCH LIKE NameOp, BUT FOR SQL
+    """
 
-    def __init__(self, name, value):
-        Expression.__init__(self, Literal(name), value)
-        self.name = name
+    def __init__(self, value, name: str):
+        if "SQL" not in get_class_names(value.__class__):
+            raise ValueError(f"Expected SQL, but got {value}")
+        Expression.__init__(self, value, Literal(name))
         self.value = value
+        self.name = name
+        self._jx_type = self.name + self.value.jx_type
 
     def __data__(self):
         return {self.name: self.value.__data__()}
@@ -31,3 +37,9 @@ class SqlAliasOp(Expression):
 
     def __repr__(self):
         return f"SqlAliasOp({self.name}={self.value})"
+
+
+def get_class_names(cls):
+    yield cls.__name__
+    for base_class in cls.__bases__:
+        yield from get_class_names(base_class)

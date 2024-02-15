@@ -27,6 +27,9 @@ from mo_json.types import JX_BOOLEAN
 
 
 class NestedOp(Expression):
+    """
+    QUERY FOR EACH COORDINATE IN MULTI-DIMENSIONAL DOMAIN (FOR EACH GROUP)
+    """
     _jx_type = JX_BOOLEAN
     has_simple_form = False
 

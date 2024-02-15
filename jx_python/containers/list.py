@@ -12,6 +12,7 @@
 import itertools
 
 from jx_base.expressions import TRUE
+from jx_base.expressions.variable import is_variable
 from jx_base.language import is_expression
 from jx_base.models.container import Container
 from jx_base.models.namespace import Namespace
@@ -31,7 +32,7 @@ from mo_dots import (
     from_data,
     to_data,
     coalesce,
-    dict_to_data,
+    dict_to_data, last, startswith_field,
 )
 from mo_future import first, sort_using_key
 from mo_imports import export, expect
@@ -45,27 +46,49 @@ jx, get_schema_from_list, Column = expect("jx", "get_schema_from_list", "Column"
 class ListContainer(Container, Namespace, Table):
     """
     A CONTAINER WITH ONLY ONE TABLE
+    A PYTHON LIST PAIRED WITH SCHEMA SO QUERY EXPRESSIONS CAN BE TRANSPILED
     """
 
     def __init__(self, name, data, schema=None):
         # TODO: STORE THIS LIKE A CUBE FOR FASTER ACCESS AND TRANSFORMATION
-        data = list(from_data(data))
         Container.__init__(self)
-        if schema == None:
-            self._schema = get_schema_from_list(name, data)
-        else:
-            self._schema = schema
-        self.name = coalesce(name, ".")
-        self.data = data
+        self.name = name = coalesce(name, ".")
+        self.data = data = list(from_data(data))
+        self.schema = schema or get_schema_from_list(name, data)
         self.locker = Lock()  # JUST IN CASE YOU WANT TO DO MORE THAN ONE THING
 
     @property
-    def query_path(self):
-        return None
+    def nested_path(self):
+        return [self.name]
 
-    @property
-    def schema(self):
-        return self._schema
+    def get_facts(self, fact_name):
+        return self
+
+    def get_schema(self, query_path=None):
+        if query_path is None:
+            return self.schema
+        snowflake = self.schema.snowflake
+        if query_path not in snowflake.query_paths:
+            Log.error("This container only has tables with names {names}", names=self.schema.snowflake.query_paths)
+
+        nested_path = []
+        for path in snowflake.query_paths:
+            if startswith_field(query_path, path):
+                nested_path.append(path)
+        return Schema(list(reversed(nested_path)), snowflake)
+
+    def get_snowflake(self, fact_name):
+        return Snowflake(fact_name, self)
+
+    def get_relations(self):
+        return self.relations[:]
+
+    def get_columns(self, table_name):
+        return self.columns.find_columns(table_name)
+
+    def get_tables(self):
+        return list(sorted(self.columns.data.keys()))
+
 
     @property
     def namespace(self):
@@ -75,10 +98,7 @@ class ListContainer(Container, Namespace, Table):
         """
         :return:  Last element in the list, or Null
         """
-        if self.data:
-            return self.data[-1]
-        else:
-            return Null
+        last(self.data)
 
     def query(self, q):
         q = to_data(q)
@@ -141,18 +161,15 @@ class ListContainer(Container, Namespace, Table):
                 for k, v in command_set:
                     c[k] = v
 
-    def filter(self, where):
-        return self.where(where)
-
     def where(self, where):
-        if is_data(where):
-            temp = jx_expression_to_function(where)
-        elif is_expression(where):
+        if is_data(where) or is_expression(where):
             temp = jx_expression_to_function(where)
         else:
             temp = where
 
         return ListContainer("from " + self.name, filter(temp, self.data), self.schema)
+
+    filter = where
 
     def sort(self, sort):
         return ListContainer("sorted " + self.name, jx.sort(self.data, sort, already_normalized=True), self.schema,)
@@ -277,11 +294,6 @@ class ListContainer(Container, Namespace, Table):
             Log.error("This container only has table by name of {{name}}", name=name)
         return self
 
-    def get_schema(self, name):
-        if self.name != name:
-            Log.error("This container only has table by name of {{name}}", name=name)
-        return self.schema
-
     def get_table(self, name):
         if self is name or self.name == name:
             return self
@@ -289,8 +301,7 @@ class ListContainer(Container, Namespace, Table):
 
 
 DUAL = ListContainer(
-    name="dual", data=[{}],
-    schema=Schema(["dual"], Snowflake(None, ["dual"], columns=UniqueIndex(keys=("name",))))
+    name="dual", data=[{}], schema=Schema(["dual"], Snowflake(None, ["dual"], columns=UniqueIndex(keys=("name",))))
 )
 
 

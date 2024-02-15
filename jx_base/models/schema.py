@@ -8,11 +8,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from copy import copy
-
 from mo_dots import Null, relative_field, set_default, startswith_field, dict_to_data
+
+from jx_base.utils import GUID, enlist, UID
 from mo_json import EXISTS, ARRAY, OBJECT, INTERNAL
-from mo_json.typed_encoder import unnest_path, untype_path
+from mo_json.typed_encoder import untype_path
 from mo_logs import Log
 
 
@@ -23,13 +23,13 @@ class Schema(object):
 
     def __init__(self, nested_path, snowflake):
         """
-        :param table_name: A FULL NAME FOR THIS TABLE (NOT USED)
-        :param columns: ALL COLUMNS IN SNOWFLAKE
+        :param nested_path: STACK OF TABLES TO GET HERE, ROOT LAST
+        :param snowflake: WHERE THIS SCHEMA BELONGS
         """
         self.nested_path = nested_path
         self.snowflake = snowflake
         self.lookup, self.lookup_leaves, self.lookup_variables = _indexer(
-            snowflake.columns, relative_field(self.nested_path[0], self.snowflake.query_paths[0])
+            snowflake.columns, self.snowflake.query_paths[0]
         )
 
     @property
@@ -38,7 +38,7 @@ class Schema(object):
 
     @property
     def columns(self):
-        return copy(self.snowflake.columns)
+        return [c for c in self.snowflake.columns if c.nested_path==self.nested_path]
 
     def __getitem__(self, column_name):
         cs = self.lookup.get(column_name)
@@ -59,7 +59,7 @@ class Schema(object):
         :param column:
         :return: NAME OF column
         """
-        return relative_field(column.name, nested_path[0])
+        return relative_field(column.name, column.nested_path[0])
 
     def values(self, name):
         """
@@ -67,7 +67,7 @@ class Schema(object):
         :param name:
         :return:
         """
-        return list(self.lookup_variables.get(unnest_path(name), Null))
+        return list(self.lookup_variables.get(untype_path(name), Null))
 
     def leaves(self, name):
         """
@@ -78,7 +78,7 @@ class Schema(object):
         pull the head of any tree by name
         :param name:
         """
-        return self.lookup_leaves.get(unnest_path(name), Null)
+        return self.lookup_leaves.get(untype_path(name), Null)
 
     def map_to_es(self):
         """
@@ -103,18 +103,19 @@ class Schema(object):
         )
 
 
-def _indexer(columns, rel_query_path):
-    all_names = set(unnest_path(c.name) for c in columns) | {"."}
+def _indexer(columns, nested_path):
+    nested_path = enlist(nested_path)
+    all_names = set(untype_path(c.es_column) for c in columns)
 
     lookup_leaves = {}  # ALL LEAF VARIABLES
     for full_name in all_names:
         for c in columns:
-            cname = relative_field(c.name, rel_query_path)
-            nfp = unnest_path(cname)
+            cname = c.es_column
+            nfp = untype_path(cname)
             if (
                 startswith_field(nfp, full_name)
-                and c.es_type not in [EXISTS, OBJECT, ARRAY]
-                and (c.es_column != "_id" or full_name == "_id")
+                and c.json_type not in [EXISTS, OBJECT, ARRAY]
+                and (c.es_column != GUID or full_name == GUID)
             ):
                 cs = lookup_leaves.setdefault(full_name, set())
                 cs.add((relative_field(full_name, cname), c))
@@ -124,13 +125,13 @@ def _indexer(columns, rel_query_path):
     lookup_variables = {}  # ALL NOT-NESTED VARIABLES
     for full_name in all_names:
         for c in columns:
-            cname = relative_field(c.name, rel_query_path)
-            nfp = unnest_path(cname)
+            cname = c.es_column
+            nfp = untype_path(cname)
             if (
                 startswith_field(nfp, full_name)
                 and c.es_type not in [EXISTS, OBJECT]
-                and (c.es_column != "_id" or full_name == "_id")
-                and startswith_field(c.nested_path[0], rel_query_path)
+                and (c.es_column != UID or full_name == UID)
+                and startswith_field(c.nested_path[0], nested_path[0])
             ):
                 cs = lookup_variables.setdefault(full_name, set())
                 cs.add(c)
@@ -140,7 +141,7 @@ def _indexer(columns, rel_query_path):
     relative_lookup = {}
     for c in columns:
         try:
-            cname = relative_field(c.name, rel_query_path)
+            cname = c.es_column
             cs = relative_lookup.setdefault(cname, set())
             cs.add(c)
 
@@ -150,9 +151,9 @@ def _indexer(columns, rel_query_path):
         except Exception as e:
             Log.error("Should not happen", cause=e)
 
-    if rel_query_path != ".":
+    if len(nested_path) > 1:
         # ADD ABSOLUTE NAMES TO THE NAMESAPCE
-        absolute_lookup, more_leaves, more_variables = _indexer(columns, "..")
+        absolute_lookup, more_leaves, more_variables = _indexer(columns, nested_path[1:])
         for k, cs in absolute_lookup.items():
             if k not in relative_lookup:
                 relative_lookup[k] = cs

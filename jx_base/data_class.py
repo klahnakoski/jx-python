@@ -120,7 +120,6 @@ def DataClass(name, columns, constraint=None):
 meta = None
 types_ = {{types}}
 defaults_ = {{defaults}}
-opener = "{"+"{"
 
 class {{class_name}}(Mapping):
     __slots__ = {{slots}}
@@ -229,6 +228,7 @@ class {{class_name}}(Mapping):
             "false": False,
             "true": True,
             "null": None,
+            "opener": "{{"
         },
     )
     register_data(output)
@@ -252,7 +252,7 @@ def failure(row, rownum, rows, constraint):
         does_pass = False
 
     if not does_pass:
-        raise logger.error("{{row}} fails to pass {{req}}", row=row, req=expr.__data__())
+        raise logger.error("{row} fails to pass {req}", row=row, req=expr.__data__())
 
 
 def _exec(code, name, defines={}):
@@ -263,4 +263,4 @@ def _exec(code, name, defines={}):
         temp = locals[name]
         return temp
     except Exception as cause:
-        logger.error("Can not make class\n{{code}}", code=code, cause=cause)
+        logger.error("Can not make class\n{code}", code=code, cause=cause)

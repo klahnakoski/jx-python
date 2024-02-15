@@ -33,7 +33,8 @@ class InOp(Expression):
 
     def __init__(self, value, superset):
         Expression.__init__(self, value, superset)
-        self.value, self.superset = value, superset
+        self.value = value
+        self.superset = superset
 
     def __data__(self):
         if (is_variable(self.value) or is_op(self.value, GetOp)) and is_literal(self.superset):

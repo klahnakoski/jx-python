@@ -29,6 +29,4 @@ class SqlIsNullOp(Expression):
         return FALSE
 
     def __eq__(self, other):
-        if not is_op(other, SqlIsNullOp):
-            return False
-        return self.term == other.term
+        return is_op(other, SqlIsNullOp) and self.term == other.term

@@ -1,20 +1,20 @@
-# Tests pass with these versions 2024-02-07
+# Tests pass with these versions 2024-02-15
 certifi==2024.2.2
 charset-normalizer==3.3.2
 hjson==3.1.0
 idna==3.6
-mo-collections==5.541.24038
-mo-dots==9.541.24038
-mo-files==6.542.24038
+mo-collections==5.543.24046
+mo-dots==9.543.24046
+mo-files==6.543.24046
 mo-future==7.541.24038
 mo-imports==7.541.24038
-mo-json==6.541.24038
-mo-json-config==4.542.24038
-mo-kwargs==7.541.24038
-mo-logs==8.541.24038
-mo-math==7.541.24038
+mo-json==6.543.24046
+mo-json-config==4.543.24046
+mo-kwargs==7.543.24046
+mo-logs==8.543.24046
+mo-math==7.543.24046
 mo-testing==7.523.24033
-mo-threads==6.542.24038
-mo-times==5.541.24038
+mo-threads==6.543.24046
+mo-times==5.543.24046
 requests==2.31.0
 urllib3==2.2.0
