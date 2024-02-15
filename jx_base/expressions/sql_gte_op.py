@@ -7,10 +7,10 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.expressions.base_binary_op import BaseBinaryOp
+
+from mo_json import JX_BOOLEAN
 
 
-from jx_base.expressions.base_inequality_op import BaseInequalityOp
-
-
-class SqlGteOp(BaseInequalityOp):
-    pass
+class SqlGteOp(BaseBinaryOp):
+    _jx_type = JX_BOOLEAN
