@@ -11,6 +11,10 @@
 
 import datetime
 
+from jx_base import Namespace
+from jx_base.data_class import DataClass
+from jx_base.models.schema import Schema
+from jx_base.models.snowflake import Snowflake
 from mo_collections import UniqueIndex
 from mo_dots import (
     Data,
@@ -21,12 +25,6 @@ from mo_dots import (
     is_many,
     is_missing, relative_field,
 )
-from mo_times.dates import Date
-
-from jx_base import Namespace
-from jx_base.data_class import DataClass
-from jx_base.models.schema import Schema
-from jx_base.models.snowflake import Snowflake
 from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, text
 from mo_imports import export
@@ -37,12 +35,10 @@ from mo_json import (
     OBJECT,
     true,
     EXISTS,
-    ARRAY,
-    value_to_json_type,
-    python_type_to_json_type,
-    ARRAY_KEY,
+    ARRAY, python_type_to_json_type,
 )
 from mo_json.typed_encoder import EXISTS_KEY
+from mo_times.dates import Date
 
 DEBUG = False
 META_TABLES_NAME = "meta.tables"

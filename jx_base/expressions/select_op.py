@@ -124,6 +124,7 @@ class SelectOp(Expression):
             not all(isinstance(term, SelectOne) for term in terms) or any(term.name is None for term in terms)
         ):
             Log.error("expecting list of SelectOne")
+
         Expression.__init__(self, frum, *[t.value for t in terms], *kwargs.values())
         self.frum = frum
         self.terms = terms + tuple(*(SelectOne(k, v) for k, v in kwargs.items()))
@@ -298,7 +299,7 @@ def normalize_one(frum, select, format):
             canonical = SelectOne(coalesce(name, value.lstrip("."), aggregate), jx_expression(value))
 
     elif is_number(value):
-        canonical = SelectOne(coalesce(name, text(value)), jx_expression(value))
+        canonical = SelectOne(coalesce(name, str(value)), jx_expression(value))
     else:
         canonical = SelectOne(coalesce(name, value, aggregate), jx_expression(value))
 

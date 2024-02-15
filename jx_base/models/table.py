@@ -9,7 +9,7 @@
 #
 
 
-class Table:
+class Table():
     """
     POINT TO A SPECIFIC TABLE IN A CONTAINER
     """

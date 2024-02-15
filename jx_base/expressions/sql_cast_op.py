@@ -9,32 +9,27 @@
 #
 from jx_base.expressions import Expression, Literal
 from jx_base.language import is_op
-from mo_sql import SQL
 
 
-class SqlAliasOp(Expression):
+class SqlCastOp(Expression):
     """
     MUCH LIKE NameOp, BUT FOR SQL
     """
 
-    def __init__(self, value: SQL, name:str):
-        if not isinstance(value, SQL):
-            raise ValueError(f"Expected SQL, but got {value}")
-        Expression.__init__(self, value, Literal(name))
+    def __init__(self, value, es_type):
+        Expression.__init__(self, value)
         self.value = value
-        self.name = name
-        self._jx_type = self.name + self.value.jx_type
+        self.es_type = es_type
+        self._jx_type = to_jx_type(es_type)
 
     def __data__(self):
-        return {self.name: self.value.__data__()}
+        return {"sql.cast": self.value.__data__()}
 
     def missing(self, lang):
         return self.value.missing(lang)
 
     def __eq__(self, other):
-        if not is_op(other, SqlAliasOp):
-            return False
-        return self.name == other.name and self.value == other.value
+        return is_op(other, SqlCastOp) and self.value == other.value and self.es_type == other.es_type
 
     def __repr__(self):
-        return f"SqlAliasOp({self.name}={self.value})"
+        return f"SqlCastOp({self.value}, {self.es_type})"
