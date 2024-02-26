@@ -9,7 +9,7 @@
 #
 from jx_base.data_class import DataClass
 from jx_base.expressions import jx_expression
-from jx_base.expressions._utils import JX
+from jx_base.expressions._utils import JX, simplified, builtin_ops
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.true_op import TRUE
@@ -28,8 +28,8 @@ from jx_python.expressions._utils import Python
 
 
 __all__ = [
+    "builtin_ops",
     "Container",
-    "Schema",
     "Column",
     "DataClass",
     "enlist",
@@ -43,9 +43,11 @@ __all__ = [
     "NULL",
     "Python",
     "Relation",
+    "Schema",
     "Snowflake",
     "Table",
     "WhenOp",
+    "simplified",
 ]
 
 # must be last

@@ -53,13 +53,13 @@ class ToTextOp(Expression):
         if is_op(term, ToTextOp):
             return term.term.partial_eval(lang)
         elif is_op(term, CoalesceOp):
-            return CoalesceOp(*((ToTextOp(t)).partial_eval(lang) for t in term.terms))
+            return lang.CoalesceOp(*(ToTextOp(t).partial_eval(lang) for t in term.terms))
         elif is_literal(term):
             if term.jx_type == JX_TEXT:
                 return term
             else:
                 return Literal(mo_json.value2json(term.value))
-        return self
+        return lang.ToTextOp(term)
 
     def __eq__(self, other):
         if not is_op(other, ToTextOp):

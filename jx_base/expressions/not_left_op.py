@@ -10,6 +10,7 @@
 
 
 from jx_base.expressions.basic_substring_op import BasicSubstringOp
+from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.length_op import LengthOp
 from jx_base.expressions.literal import ZERO
@@ -46,15 +47,15 @@ class NotLeftOp(Expression):
         return OrOp(self.value.missing(lang), self.length.missing(lang))
 
     def partial_eval(self, lang):
-        value = (self.value).partial_eval(lang)
+        value = self.value.partial_eval(lang)
         length = self.length.partial_eval(lang)
 
         if length is ZERO:
             return value
 
-        max_length = LengthOp(value)
+        max_length = CoalesceOp(LengthOp(value), ZERO)
         output = WhenOp(
             self.missing(lang),
-            **{"else": BasicSubstringOp(value, MaxOp(ZERO, MinOp(length, max_length)), max_length,)}
+            **{"else": BasicSubstringOp(value, MaxOp(ZERO, MinOp(length, max_length)), max_length)}
         ).partial_eval(lang)
         return output

@@ -8,10 +8,10 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
+from jx_base.expressions.to_integer_op import ToIntegerOp
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.integer_op import ToIntegerOp
 from jx_base.expressions.literal import ZERO
 from jx_base.expressions.max_op import MaxOp
 from jx_base.expressions.to_text_op import ToTextOp

@@ -57,7 +57,6 @@ from jx_base.expressions.gt_op import GtOp
 from jx_base.expressions.gte_op import GteOp
 from jx_base.expressions.in_op import InOp
 from jx_base.expressions.inner_join_op import InnerJoinOp
-from jx_base.expressions.integer_op import ToIntegerOp
 from jx_base.expressions.is_boolean_op import IsBooleanOp
 from jx_base.expressions.is_integer_op import IsIntegerOp
 from jx_base.expressions.is_number_op import IsNumberOp
@@ -130,6 +129,7 @@ from jx_base.expressions.sum_op import SumOp
 from jx_base.expressions.tally_op import TallyOp
 from jx_base.expressions.to_array_op import ToArrayOp
 from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_base.expressions.to_integer_op import ToIntegerOp
 from jx_base.expressions.to_number_op import ToNumberOp
 from jx_base.expressions.to_text_op import ToTextOp
 from jx_base.expressions.to_value_op import ToValueOp

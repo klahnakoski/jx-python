@@ -8,9 +8,9 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-
-from jx_base.expressions import LeastOp as _LeastOp, AndOp
-from jx_base.expressions.python_script import PythonScript
+from jx_base.expressions import LeastOp as _LeastOp
+from jx_python.expressions.and_op import AndOp
+from jx_python.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import union_type

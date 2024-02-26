@@ -7,8 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions import Expression, Literal
+from jx_base.expressions import Expression
 from jx_base.language import is_op
+from mo_json import to_jx_type
 
 
 class SqlCastOp(Expression):

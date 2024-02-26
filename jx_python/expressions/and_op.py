@@ -9,7 +9,8 @@
 #
 
 
-from jx_base.expressions import AndOp as _AndOp, FALSE, PythonScript, ToBooleanOp
+from jx_base.expressions import AndOp as _AndOp, FALSE, PythonScript
+from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 

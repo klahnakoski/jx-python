@@ -23,12 +23,12 @@ from mo_future import (
     long,
     none_type,
     text,
-    transpose,
     function_type,
     get_function_arguments,
+    first,
 )
 from mo_imports import delay_import
-from mo_logs import Log
+from mo_logs import logger
 from mo_times import Date
 
 is_literal = delay_import("jx_base.expressions.literal.is_literal")
@@ -115,7 +115,7 @@ def partial_eval(self, lang):
         output = func(self, lang)
         if output.lang is not lang and not is_literal(output) and func is not self.lookups["partial_eval"][JX.id]:
             func(self, lang)
-            Log.error(f"expecting {lang}")
+            logger.error(f"expecting {lang}")
         output.simplified = True
         return output
     except Exception as cause:
@@ -123,7 +123,7 @@ def partial_eval(self, lang):
             func(self, lang)
         except Exception as e:
             pass
-        Log.error("Not expected", cause=cause)
+        logger.error("Not expected", cause=cause)
 
 
 def get_dispatcher_for(name):
@@ -133,7 +133,7 @@ def get_dispatcher_for(name):
             output = func(self, lang)
             return output
         except Exception as cause:
-            Log.error("problem", cause=cause)
+            logger.error("problem", cause=cause)
 
     return dispatcher
 
@@ -178,45 +178,48 @@ class Language(object):
             double_dispatch_methods = tuple(sorted(double_dispatch_methods))
 
         for _, new_op in list(module_vars.items()):
-            if is_Expression(new_op):
-                op_id = new_op.get_id()
-                jx_op = JX.ops[op_id]
-                # LET EACH LANGUAGE POINT TO OP CLASS
-                self.ops[op_id] = new_op
-                new_op.lang = self
-                try:
-                    _get(new_op, "op")
-                except AttributeError as _:
+            if not is_Expression(new_op):
+                continue
+            op_id = new_op.get_id()
+            jx_op = JX.ops[op_id]
+            # LET EACH LANGUAGE POINT TO OP CLASS
+            self.ops[op_id] = new_op
+            new_op.lang = self
+            try:
+                _get(new_op, "op")
+            except AttributeError as _:
+                if new_op.__name__.endswith("Op"):
                     new_op.op = new_op.__name__[:-2].lower()
-
-                # ENSURE THE partial_eval IS REGISTERED
-                if jx_op is None:
-                    for dd_method in double_dispatch_methods:
-                        member = _extract_method(new_op, dd_method)
-                        args = get_function_arguments(member)
-                        if args[:2] != ("self", "lang"):
-                            Log.error(
-                                "{{module}}.{{clazz}}.{{name}} is expecting (self, lang) parameters, minimum",
-                                module=new_op.__module__,
-                                clazz=new_op.__name__,
-                                name=dd_method,
-                            )
-                        new_op.lookups[dd_method] = [member]
-                elif jx_op.__name__ != new_op.__name__:
-                    Log.error("Logic error")
                 else:
-                    new_op.lookups = jx_op.lookups
-                    for dd_method in double_dispatch_methods:
-                        member = _extract_method(new_op, dd_method)
-                        jx_op.lookups[dd_method] += [member]
+                    new_op.op = new_op.__name__
 
-                    # COPY OTHER DEFINED METHODS
-                    others = list(vars(new_op).items())
-                    for n, v in others:
-                        if v is not None:
-                            o = getattr(jx_op, n, None)
-                            if o is None:
-                                setattr(jx_op, n, v)
+            # ENSURE THE partial_eval IS REGISTERED
+            if jx_op is None:
+                for dd_method in double_dispatch_methods:
+                    member = _extract_method(new_op, dd_method)
+                    args = get_function_arguments(member)
+                    if args[:2] != ("self", "lang"):
+                        logger.error(
+                            "{{module}}.{{clazz}}.{{name}} is expecting (self, lang) parameters, minimum",
+                            module=new_op.__module__,
+                            clazz=new_op.__name__,
+                            name=dd_method,
+                        )
+                    new_op.lookups[dd_method] = [member]
+            elif jx_op.__name__ != new_op.__name__:
+                logger.error("Logic error")
+            else:
+                new_op.lookups = jx_op.lookups
+                for dd_method in double_dispatch_methods:
+                    set_at(jx_op.lookups[dd_method], self.id, _extract_method(new_op, dd_method))
+
+                # COPY OTHER DEFINED METHODS
+                others = list(vars(new_op).items())
+                for n, v in others:
+                    if v is not None:
+                        o = getattr(jx_op, n, None)
+                        if o is None:
+                            setattr(jx_op, n, v)
         if self.lang_name == "JX":
             # FINALLY, SWAP OUT THE BASE METHODS
             for dd_method in double_dispatch_methods:
@@ -230,27 +233,31 @@ class Language(object):
 
         else:
             # ENSURE THE ALL OPS ARE DEFINED ON THE NEW LANGUAGE
-            for base_op, new_op in transpose(JX.ops, self.ops):
-                if base_op and new_op is base_op:
-                    # MISSED DEFINITION, ADD ONE
-                    new_op = type(base_op.__name__, (base_op,), {})
-                    new_op.lang = self
-                    self.ops[new_op.get_id()] = new_op
-                    setattr(new_op, "lookups", base_op.lookups)
-                    for n, v in base_op.lookups.items():
-                        v += v[-1:]
+            for new_op, jx_op in zip(self.ops, JX.ops):
+                if not jx_op or new_op is not jx_op:
+                    continue  # ALREADY DEFINED
+                base_op = first(b for b in get_basis(new_op) if isinstance(b, LanguageElement))
+                if not base_op:
+                    logger.error("Expecting operator to inherit from LanguageElement")
+                new_op = type(base_op.__name__, (base_op,), {})
+                new_op.lang = self
+                self.ops[new_op.get_id()] = new_op
+                setattr(new_op, "lookups", base_op.lookups)
+
+                for n, v in jx_op.lookups.items():
+                    set_at(v, self.id, v[base_op.lang.id])
 
         # ENSURE THIS LANGUAGE INSTANCE POINTS TO ALL THE OPS BY NAME
         for o in self.ops[1:]:
             setattr(self, o.__name__, o)
 
     def __getitem__(self, item):
-        Log.error("Stop using")
+        logger.error("Stop using")
         if item == None:
-            Log.error("expecting operator")
+            logger.error("expecting operator")
         class_ = self.ops[item.get_id()]
         if class_.__name__ != item.__class__.__name__:
-            Log.error("programming error")
+            logger.error("programming error")
         item.__class__ = class_
         return item
 
@@ -259,6 +266,25 @@ class Language(object):
 
     def __repr__(self):
         return self.lang_name
+
+
+def set_at(list, index, value):
+    """
+    Ensure the list is extended to accommodate the specified index if needed,
+    and set the value at that index.
+    """
+    if index >= len(list):
+        list.extend([None] * (index - len(list) + 1))
+    list[index] = value
+
+
+def get_basis(cls):
+    """
+    RETURN ALL BASE CLASSES, UP THE FAMILY TREE, object LAST
+    """
+    yield cls
+    for base_class in cls.__bases__:
+        yield from get_basis(base_class)
 
 
 def is_op(call, op) -> bool:
@@ -281,7 +307,7 @@ def is_expression(call):
     except Exception:
         output = False
     # if output != isinstance(call, Expression):
-    #     Log.error("programmer error")
+    #     logger.error("programmer error")
     return output
 
 
@@ -358,7 +384,7 @@ def value_compare(left, right, ordering=1):
         else:
             return 0
     except Exception as e:
-        Log.error(
+        logger.error(
             "Can not compare values {{left}} to {{right}}", left=left, right=right, cause=e,
         )
 
@@ -369,7 +395,7 @@ def type_order(dtype, ordering):
         if dtype in null_types:
             return ordering * 10
         else:
-            Log.warning("type will be treated as its own type while sorting")
+            logger.warning("type will be treated as its own type while sorting")
             TYPE_ORDER[dtype] = 6
             return 6
     return o

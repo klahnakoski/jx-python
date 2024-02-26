@@ -9,13 +9,12 @@
 #
 
 
-from mo_imports import export
-from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
+from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.first_op import FirstOp
-from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
+from mo_imports import export
 from mo_json import union_type
 
 
@@ -55,7 +54,7 @@ class CoalesceOp(Expression):
             simple = FirstOp(t).partial_eval(lang)
             if simple is NULL:
                 pass
-            elif is_literal(simple):
+            elif simple.missing(lang) is FALSE:
                 terms.append(simple)
                 break
             else:
@@ -66,7 +65,7 @@ class CoalesceOp(Expression):
         elif len(terms) == 1:
             return terms[0]
         else:
-            return CoalesceOp(*terms)
+            return lang.CoalesceOp(*terms)
 
 
 export("jx_base.expressions.base_multi_op", CoalesceOp)

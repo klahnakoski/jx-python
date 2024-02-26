@@ -77,11 +77,7 @@ class EqOp(BaseInequalityOp):
         if is_literal(lhs) and is_literal(rhs):
             return FALSE if value_compare(lhs.value, rhs.value) else TRUE
         else:
-            return CaseOp(
-                WhenOp(lhs.missing(lang), then=rhs.missing(lang)),
-                WhenOp(rhs.missing(lang), then=FALSE),
-                BasicEqOp(lhs, rhs),
-            ).partial_eval(lang)
+            return lang.EqOp(lhs, rhs)
 
 
 export("jx_base.expressions.basic_in_op", EqOp)

@@ -53,11 +53,11 @@ class LeastOp(BaseMultiOp):
             if minimum == None:
                 return NULL
             else:
-                return Literal(minimum)
+                return lang.Literal(minimum)
         else:
             if minimum == None:
-                output = LeastOp(*terms, nulls=self.decisive)
+                output = lang.LeastOp(*terms, nulls=self.decisive)
             else:
-                output = LeastOp(Literal(minimum), *terms, nulls=self.decisive)
+                output = lang.LeastOp(lang.Literal(minimum), *terms, nulls=self.decisive)
 
         return output

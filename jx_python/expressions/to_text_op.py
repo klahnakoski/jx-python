@@ -18,4 +18,11 @@ class ToTextOp(_ToTextOp):
     def to_python(self, loop_depth=0):
         missing = self.term.missing(Python).to_python(loop_depth)
         value = self.term.to_python(loop_depth)
-        return PythonScript(value.locals, loop_depth, JX_TEXT, value.source, self, missing)
+        return PythonScript(
+            locals=value.locals,
+            loop_depth=loop_depth,
+            type=JX_TEXT,
+            source=value.source,
+            frum=self,
+            miss=missing
+        )

@@ -7,9 +7,9 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from mo_dots import concat_field
 from jx_base.expressions.variable import Variable
-from mo_json import JX_ANY, quote
+from mo_dots import concat_field, join_field
+from mo_json import JX_ANY, quote, to_jx_type
 
 
 class SqlVariable(Variable):
@@ -17,10 +17,18 @@ class SqlVariable(Variable):
 
     def __init__(self, *es_path, jx_type=JX_ANY):
         self.es_path = es_path
+        if not es_path:
+            raise ValueError("es_path cannot be empty")
+        if jx_type != to_jx_type(jx_type):
+            raise ValueError("jx_type must must be a valid type, not "+str(jx_type))
         self._jx_type = jx_type
 
     def __data__(self):
         return quote(str(self))
+
+    @property
+    def var(self):
+        return join_field(self.es_path)
 
     def vars(self):
         return {self}
@@ -38,10 +46,10 @@ class SqlVariable(Variable):
         return (self.es_index, self.es_column).__hash__()
 
     def __eq__(self, other):
-        return isinstance(other, SqlVariable) and self.es_index == other.es_index and self.es_column == other.es_column
+        return isinstance(other, SqlVariable) and self.es_path == other.es_path
 
     def __str__(self):
-        params = [p for p in [self.es_index, self.es_column] if p is not None]
+        params = [p for p in self.es_path if p is not None]
         return concat_field(*params)
 
     def partial_eval(self, lang):
