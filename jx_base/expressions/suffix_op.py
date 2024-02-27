@@ -95,11 +95,4 @@ class SuffixOp(Expression):
     def partial_eval(self, lang):
         if self.expr is None:
             return TRUE
-        if not is_literal(self.suffix) and self.suffix.jx_type == STRING:
-            Log.error("can only hanlde literal suffix ")
-
-        return CaseOp(
-            WhenOp(self.expr.missing(lang), then=FALSE),
-            WhenOp(self.suffix.missing(lang), then=TRUE),
-            RegExpOp(self.expr, Literal(".*" + re.escape(coalesce(self.suffix.value, ""))),),
-        ).partial_eval(lang)
+        return lang.SuffixOp(self.expr.partial_eval(lang), self.suffix.partial_eval(lang))

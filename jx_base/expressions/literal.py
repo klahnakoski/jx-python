@@ -119,6 +119,8 @@ ZERO = object.__new__(Literal)
 Literal.__init__(ZERO, 0)
 ONE = object.__new__(Literal)
 Literal.__init__(ONE, 1)
+NEG_ONE = object.__new__(Literal)
+Literal.__init__(NEG_ONE, -1)
 EMPTY_ARRAY = object.__new__(Literal)
 Literal.__init__(EMPTY_ARRAY, [])
 

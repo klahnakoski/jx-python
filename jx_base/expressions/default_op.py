@@ -65,4 +65,4 @@ class DefaultOp(Expression):
         fall_miss = default.missing(lang)
         if fall_miss is TRUE:
             return frum
-        return DefaultOp(self.frum.partial_eval(lang), self.default.partial_eval(lang))
+        return lang.DefaultOp(self.frum.partial_eval(lang), self.default.partial_eval(lang))

@@ -15,6 +15,13 @@ from mo_json import JX_INTEGER
 
 
 class SqlInstrOp(Expression):
+    """
+    CONSERVATIVE indexOf OPERATION (null PARAMETERS RETURN null)
+    RETURN POSITION OF find IN value
+    RETURN INDEX OF find IN value (FIRST CHARACTER IS 1)
+    RETURN 0 IF NOT FOUND
+    """
+
     _jx_type = JX_INTEGER
 
     def __init__(self, value, find):

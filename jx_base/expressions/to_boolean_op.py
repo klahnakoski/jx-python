@@ -7,15 +7,10 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.expressions.and_op import AndOp
 
-from jx_base.expressions.basic_eq_op import BasicEqOp
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.not_op import NotOp
-from jx_base.expressions.null_op import NULL
 from mo_imports import export
-from mo_json.types import JX_BOOLEAN
+from mo_json import JX_BOOLEAN
 
 
 class ToBooleanOp(Expression):
@@ -46,15 +41,11 @@ class ToBooleanOp(Expression):
 
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
-        if term is NULL:
-            return FALSE
-        elif term.jx_type == JX_BOOLEAN:
+        if term.jx_type == JX_BOOLEAN:
             return term
         elif term is self.term:
             return self
         return ToBooleanOp(term)
-        # exists = AndOp(NotOp(term.missing(lang)), NotOp(BasicEqOp(term, FALSE))).partial_eval(lang)
-        # return exists
 
 
 export("jx_base.expressions.and_op", ToBooleanOp)

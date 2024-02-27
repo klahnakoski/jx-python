@@ -9,12 +9,9 @@
 #
 
 
-from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import NULL
-from jx_base.expressions.not_op import NotOp
-from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.to_boolean_op import ToBooleanOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
@@ -27,7 +24,7 @@ WhenOp = expect("WhenOp")
 
 
 class CaseOp(Expression):
-    def __init__(self, *terms, **clauses):
+    def __init__(self, *terms):
         if not is_sequence(terms):
             Log.error("case expression requires a list of `when` sub-clauses")
         Expression.__init__(self, *terms)
@@ -97,16 +94,16 @@ class CaseOp(Expression):
             elif when is FALSE or when is NULL:
                 pass
             else:
-                whens.append(WhenOp(when, then=w.then.partial_eval(lang)))
+                whens.append(lang.WhenOp(when, then=w.then.partial_eval(lang)))
 
         _else = self._else.partial_eval(lang)
 
         if len(whens) == 0:
             return self._else.partial_eval(lang)
         elif len(whens) == 1:
-            return WhenOp(whens[0].when, then=whens[0].then, **{"else": _else})
+            return lang.WhenOp(whens[0].when, then=whens[0].then, **{"else": _else})
         else:
-            return CaseOp(*whens, _else)
+            return lang.CaseOp(*whens, _else)
 
     @property
     def jx_type(self):

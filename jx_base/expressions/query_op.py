@@ -704,3 +704,4 @@ sort_direction = {
 
 
 export("jx_base.expressions.variable", QueryOp)
+export("jx_base.models.container", QueryOp)

@@ -10,7 +10,8 @@
 from mo_dots import is_missing
 from mo_json.typed_object import TypedObject
 
-from jx_base.expressions import MissingOp as _MissingOp, PythonScript, FALSE
+from jx_base.expressions import MissingOp as _MissingOp, FALSE
+from jx_python.expressions.python_script import PythonScript
 from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 

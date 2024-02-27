@@ -51,8 +51,8 @@ class LengthOp(Expression):
         term = self.term.partial_eval(lang)
         if is_literal(term):
             if is_text(term.value):
-                return Literal(len(term.value))
+                return lang.Literal(len(term.value))
             else:
                 return NULL
         else:
-            return LengthOp(term)
+            return lang.LengthOp(term)
