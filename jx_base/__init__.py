@@ -46,6 +46,7 @@ __all__ = [
     "Schema",
     "Snowflake",
     "Table",
+    "TRUE",
     "WhenOp",
     "simplified",
 ]

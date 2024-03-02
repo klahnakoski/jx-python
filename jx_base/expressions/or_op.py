@@ -12,6 +12,7 @@
 from jx_base.expressions.and_op import AndOp
 from jx_base.expressions.base_multi_op import BaseMultiOp
 from jx_base.expressions.false_op import FALSE
+from jx_base.expressions.null_op import NULL
 from jx_base.expressions.true_op import TRUE
 from jx_base.language import is_op
 from mo_imports import export
@@ -42,7 +43,7 @@ class OrOp(BaseMultiOp):
             simple = lang.ToBooleanOp(t).partial_eval(lang)
             if simple is TRUE:
                 return TRUE
-            elif simple is FALSE:
+            elif simple is FALSE or simple is NULL:
                 continue
             elif is_op(simple, OrOp):
                 terms.extend([tt for tt in simple.terms if tt not in terms])

@@ -15,17 +15,24 @@
     "extras_require": {"tests": ["mo-testing>=7.523.24033"]},
     "include_package_data": true,
     "install_requires": [
-        "mo-collections==5.547.24058",        "mo-dots==9.547.24058",
-             "mo-future==7.546.24057",        "mo-json==6.547.24058",
-        "mo-json-config==4.547.24058",      "mo-kwargs==7.547.24058",
-               "mo-logs==8.547.24058",        "mo-math==7.547.24058",
-            "mo-threads==6.547.24058",       "mo-times==5.547.24058"
+        "mo-collections==5.553.24062",        "mo-dots==9.549.24062",
+             "mo-future==7.546.24057",        "mo-json==6.552.24062",
+        "mo-json-config==4.553.24062",      "mo-kwargs==7.551.24062",
+               "mo-logs==8.551.24062",        "mo-math==7.552.24062",
+            "mo-threads==6.552.24062",       "mo-times==5.552.24062"
     ],
     "license": "MPL 2.0",
     "long_description": {
         "$concat": [
             "# jx-python",
+            "",
             "Python library for JSON Expressions ",
+            "",
+            "[![PyPI Latest Release](https://img.shields.io/pypi/v/jx-python.svg)](https://pypi.org/project/jx-python/)",
+            "[![Build Status](https://github.com/klahnakoski/jx-python/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/klahnakoski/jx-python/actions/workflows/build.yml)",
+            "[![Coverage Status](https://coveralls.io/repos/github/klahnakoski/jx-python/badge.svg?branch=dev)](https://coveralls.io/github/klahnakoski/jx-python?branch=dev)",
+            "[![Downloads](https://pepy.tech/badge/jx-python/month)](https://pepy.tech/project/jx-python)",
+            "",
             ""
         ],
         "separator": "\n"
@@ -39,5 +46,5 @@
             "jx_python.streams"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.547.24058"
+    "version": "4.554.24062"
 }
