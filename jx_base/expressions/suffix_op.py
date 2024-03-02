@@ -9,22 +9,15 @@
 #
 
 
-import re
-
-from mo_dots import coalesce
-from mo_dots import is_data, is_missing
-
 from jx_base.expressions._utils import TYPE_CHECK, jx_expression
-from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import Literal, is_literal
-from jx_base.expressions.reg_exp_op import RegExpOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.variable import Variable, is_variable
-from jx_base.expressions.when_op import WhenOp
+from mo_dots import is_data, is_missing
 from mo_future import first
-from mo_json.types import JX_BOOLEAN, STRING
+from mo_json.types import JX_BOOLEAN
 from mo_logs import Log
 
 
@@ -72,6 +65,9 @@ class SuffixOp(Expression):
         if is_missing(suffix):
             return None
         return expr.endswith(suffix)
+
+    def __eq__(self, other):
+        return isinstance(other, SuffixOp) and self.expr == other.expr and self.suffix == other.suffix
 
     def missing(self, lang):
         """

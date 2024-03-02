@@ -8,7 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from jx_base.expressions.expression import Expression
+from jx_base.expressions.expression import Expression, TRUE
 from mo_imports import export
 from mo_json import JX_BOOLEAN
 
@@ -41,7 +41,7 @@ class ToBooleanOp(Expression):
 
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
-        if term.jx_type == JX_BOOLEAN:
+        if term.jx_type == JX_BOOLEAN or term.missing(lang) is TRUE:
             return term
         elif term is self.term:
             return self

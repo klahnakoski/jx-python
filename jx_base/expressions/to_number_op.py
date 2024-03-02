@@ -60,7 +60,10 @@ class ToNumberOp(Expression):
 
             v = term.value
             if isinstance(v, (str, Date)):
-                return Literal(float(v))
+                try:
+                    return Literal(float(v))
+                except Exception:
+                    return NULL
             elif isinstance(v, (int, float)):
                 return term
             else:

@@ -94,12 +94,22 @@ class CaseOp(Expression):
             elif when is FALSE or when is NULL:
                 pass
             else:
-                whens.append(lang.WhenOp(when, then=w.then.partial_eval(lang)))
+                then = w.then.partial_eval(lang)
+                if is_op(then, CaseOp):
+                    for ww in then.whens:
+                        whens.append(lang.WhenOp(AndOp(when, ww.when).partial_eval(lang), then=ww.then))
+                        if then.els_ is not NULL:
+                            whens.append(lang.WhenOp(when, then.els_))
+                elif is_op(then, WhenOp):
+                    whens.append(lang.WhenOp(AndOp(when, then.when).partial_eval(lang), then=then.then))
+                    whens.append(lang.WhenOp(when, then.els_))
+                else:
+                    whens.append(lang.WhenOp(when, then=then))
 
         _else = self._else.partial_eval(lang)
 
         if len(whens) == 0:
-            return self._else.partial_eval(lang)
+            return _else
         elif len(whens) == 1:
             return lang.WhenOp(whens[0].when, then=whens[0].then, **{"else": _else})
         else:
