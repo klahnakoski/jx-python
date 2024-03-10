@@ -102,6 +102,7 @@ from jx_base.expressions.split_op import SplitOp
 from jx_base.expressions.sql_alias_op import SqlAliasOp
 from jx_base.expressions.sql_and_op import SqlAndOp
 from jx_base.expressions.sql_cast_op import SqlCastOp
+from jx_base.expressions.sql_concat_op import SqlConcatOp
 from jx_base.expressions.sql_eq_op import SqlEqOp
 from jx_base.expressions.sql_group_by_op import SqlGroupByOp
 from jx_base.expressions.sql_gt_op import SqlGtOp
@@ -229,6 +230,7 @@ set_default(
         "split": SplitOp,
         "sql.and": SqlAndOp,
         "sql.alias": SqlAliasOp,
+        "sql.concat": SqlConcatOp,
         "sql.eq": SqlEqOp,
         "sql.group_by": SqlGroupByOp,
         "sql.inner_join": SqlInnerJoinOp,

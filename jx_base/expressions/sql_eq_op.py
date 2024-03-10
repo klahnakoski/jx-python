@@ -12,6 +12,8 @@
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import ZERO, ONE, is_literal
+from jx_base.expressions.null_op import NULL
+from jx_base.expressions.sql_is_null_op import SqlIsNullOp
 from jx_base.language import is_op, value_compare
 from mo_json.types import JX_BOOLEAN
 
@@ -38,5 +40,9 @@ class SqlEqOp(Expression):
 
         if is_literal(lhs) and is_literal(rhs):
             return ZERO if value_compare(lhs.value, rhs.value) else ONE
+        elif lhs is NULL:
+            return SqlIsNullOp(self.rhs)
+        elif rhs is NULL:
+            return SqlIsNullOp(self.lhs)
         else:
             return lang.SqlEqOp(lhs, rhs)

@@ -54,6 +54,8 @@ class ToTextOp(Expression):
             return term.term.partial_eval(lang)
         elif is_op(term, CoalesceOp):
             return lang.CoalesceOp(*(ToTextOp(t).partial_eval(lang) for t in term.terms))
+        elif term.jx_type == JX_TEXT:
+            return term
         elif is_literal(term):
             if term.jx_type == JX_TEXT:
                 return term

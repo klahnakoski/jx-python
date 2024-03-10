@@ -38,7 +38,7 @@ class CaseOp(Expression):
 
         for w in self._whens:
             if not is_op(w, WhenOp) or w.els_ is not NULL:
-                Log.error("case expression does not allow `else` clause in `when` sub-clause")
+                Log.error("case expression does not allow `else` clause in `when` sub-clause {case}", case=self.__data__())
 
     @property
     def whens(self):

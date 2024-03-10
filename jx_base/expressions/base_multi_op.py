@@ -66,7 +66,7 @@ class BaseMultiOp(Expression):
         literal_acc = None
         terms = []
         for t in self.terms:
-            simple = ToNumberOp(t).partial_eval(lang)
+            simple = t.partial_eval(lang)
             if simple is NULL:
                 if self.decisive:
                     pass
