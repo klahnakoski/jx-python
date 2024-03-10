@@ -22,7 +22,7 @@ class SqlOrOp(Expression):
     """
     A CONSERVATIVE OR OPERATION
     """
-    _data_type = JX_BOOLEAN
+    _jx_type = JX_BOOLEAN
 
     def __init__(self, *terms):
         Expression.__init__(self, *terms)

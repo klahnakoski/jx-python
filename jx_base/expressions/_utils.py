@@ -152,6 +152,7 @@ builtin_ops = {
     "min": lambda *v: min(*v),
     "most": lambda *v: max(*v),
     "least": lambda *v: min(*v),
+    "sql.concat": lambda *v: "".join(*v)
 }
 
 operators = {}
