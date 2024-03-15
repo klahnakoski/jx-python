@@ -37,6 +37,13 @@ class RightOp(Expression):
         else:
             return {"right": [self.value.__data__(), self.length.__data__()]}
 
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.value(row, rownum, rows)
+        length = self.length(row, rownum, rows)
+        if value is None or length is None or length <= 0:
+            return None
+        return value[-length:]
+
     def vars(self):
         return self.value.vars() | self.length.vars()
 

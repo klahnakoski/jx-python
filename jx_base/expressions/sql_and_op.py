@@ -18,9 +18,6 @@ from mo_json.types import JX_BOOLEAN
 class SqlAndOp(BaseMultiOp):
     _jx_type = JX_BOOLEAN
 
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def __data__(self):
         return {"sql.and": [t.__data__() for t in self.terms]}
 
