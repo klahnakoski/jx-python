@@ -29,13 +29,9 @@ class Streams:
 
     def __getattr__(self, item):
         if isinstance(item, str):
-            return self.map(ExpressionFactory(
-                GetOp(self.factory.expr, Literal(item)), self.factory.domain
-            ))
+            return self.map(ExpressionFactory(GetOp(self.factory.expr, Literal(item)), self.factory.domain))
         if isinstance(item, ExpressionFactory):
-            return self.map(ExpressionFactory(
-                GetOp(self.factory.expr, item.expr), self.factory.domain
-            ))
+            return self.map(ExpressionFactory(GetOp(self.factory.expr, item.expr), self.factory.domain))
 
     def map(self, accessor):
         fact = factory(accessor, self.factory.domain)
@@ -51,6 +47,4 @@ class Streams:
 
 
 def stream(values):
-    return Streams(
-        values, ExpressionFactory(Variable("."), Typer(example=values)), JX_IS_NULL
-    )
+    return Streams(values, ExpressionFactory(Variable("."), Typer(example=values)), JX_IS_NULL)

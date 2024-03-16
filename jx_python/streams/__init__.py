@@ -17,7 +17,8 @@ from jx_base.expressions import (
     SelectOp,
     ArrayOfOp,
     LimitOp,
-    GroupOp, ToArrayOp,
+    GroupOp,
+    ToArrayOp,
 )
 from jx_base.expressions.select_op import SelectOne
 from jx_base.language import value_compare
@@ -68,8 +69,7 @@ class Stream:
     def map(self, accessor):
         if isinstance(accessor, dict):
             fact = ExpressionFactory(SelectOp(
-                self.factory.expr,
-                *(SelectOne(n, factory(v).expr) for n, v in to_data(accessor).leaves())
+                self.factory.expr, *(SelectOne(n, factory(v).expr) for n, v in to_data(accessor).leaves())
             ))
         else:
             accessor = factory(accessor)

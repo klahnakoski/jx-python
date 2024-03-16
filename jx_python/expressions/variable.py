@@ -24,7 +24,11 @@ class Variable(_Variable):
             if loop_depth == 0:
                 # WE ASSUME THIS IS NAIVE PYTHON EXPRESSION BUILD
                 return PythonScript(
-                    merge_locals(get_attr=get_attr, enlist=enlist), loop_depth, JX_ANY, f"get_attr(enlist(row{loop_depth}), {quote(self.var)})", self
+                    merge_locals(get_attr=get_attr, enlist=enlist),
+                    loop_depth,
+                    JX_ANY,
+                    f"get_attr(enlist(row{loop_depth}), {quote(self.var)})",
+                    self,
                 )
 
             logger.error("not expected")

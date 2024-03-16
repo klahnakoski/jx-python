@@ -112,7 +112,7 @@ def multiop_to_python(self, loop_depth):
         loop_depth,
         JX_NUMBER,
         sign.join(f"coalesce({t.source}, {zero})" for t in self.terms),
-        self
+        self,
     )
 
 

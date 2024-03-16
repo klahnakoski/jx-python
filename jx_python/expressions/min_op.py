@@ -16,12 +16,6 @@ from jx_python.expressions import Python
 
 class MinOp(_MinOp):
     def to_python(self, loop_depth=0):
-        frum = self.frum.partial_eval(Python).to_python(loop_depth+1)
+        frum = self.frum.partial_eval(Python).to_python(loop_depth + 1)
         source, locals = frum.source, frum.locals
-        return PythonScript(
-            locals,
-            loop_depth,
-            frum.jx_type,
-            f"min({source})",
-            self
-        )
+        return PythonScript(locals, loop_depth, frum.jx_type, f"min({source})", self)

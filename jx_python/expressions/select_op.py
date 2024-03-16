@@ -24,9 +24,7 @@ class SelectOp(_SelectOp):
     def to_python(self, loop_depth=0):
         frum = ToArrayOp(self.frum).partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
-        selects = tuple(
-            SelectOne(t.name, t.expr.partial_eval(Python).to_python(loop_depth)) for t in self.terms
-        )
+        selects = tuple(SelectOne(t.name, t.expr.partial_eval(Python).to_python(loop_depth)) for t in self.terms)
 
         if len(self.terms) == 1 and self.terms[0].name == ".":
             # value selection
