@@ -24,4 +24,3 @@ class ToArrayOp(_ToArrayOp):
             f"enlist({term.source})",
             self,
         )
-

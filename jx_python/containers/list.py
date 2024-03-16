@@ -32,7 +32,9 @@ from mo_dots import (
     from_data,
     to_data,
     coalesce,
-    dict_to_data, last, startswith_field,
+    dict_to_data,
+    last,
+    startswith_field,
 )
 from mo_future import first, sort_using_key
 from mo_imports import export, expect
@@ -88,7 +90,6 @@ class ListContainer(Container, Namespace, Table):
 
     def get_tables(self):
         return list(sorted(self.columns.data.keys()))
-
 
     @property
     def namespace(self):

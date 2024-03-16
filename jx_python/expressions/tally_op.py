@@ -26,7 +26,7 @@ class TallyOp(_TallyOp):
             loop_depth,
             JX_INTEGER,
             f"tally({','.join(t.source for t in terms)})",
-            self
+            self,
         )
 
 

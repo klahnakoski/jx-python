@@ -12,9 +12,7 @@ class ExpressionFactory:
         self.domain: Typer = domain or LazyTyper()
 
     def build(self):
-        return compile_expression(
-            self.expr.partial_eval(Python).to_python(), "some_function"
-        )
+        return compile_expression(self.expr.partial_eval(Python).to_python(), "some_function")
 
     def __getattr__(self, item):
         item_type = getattr(self.domain, item)
@@ -52,9 +50,7 @@ class TopExpressionFactory(ExpressionFactory):
         if isinstance(value, ExpressionFactory):
             logger.error("don't do this")
 
-        return ExpressionFactory(
-            Literal("."), Typer(python_type=type(value)), f"{value}"
-        )
+        return ExpressionFactory(Literal("."), Typer(python_type=type(value)), f"{value}")
 
     def __str__(self):
         return "it"

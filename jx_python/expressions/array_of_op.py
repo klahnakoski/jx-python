@@ -22,10 +22,4 @@ class ArrayOfOp(_ToArrayOp):
         if type == ARRAY:
             return PythonScript(merge_locals(term.locals), loop_depth, type, term.source, self)
 
-        return PythonScript(
-            term.locals,
-            loop_depth,
-            array_of(term.jx_type),
-            f"[{term.source}]",
-            self,
-        )
+        return PythonScript(term.locals, loop_depth, array_of(term.jx_type), f"[{term.source}]", self,)

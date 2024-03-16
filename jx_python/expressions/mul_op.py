@@ -17,4 +17,5 @@ class MulOp(_MulOp):
     """
     CONSERVATIVE MULTIPLICATION (SEE ProductOp FOR DECISIVE MULTIPLICATION)
     """
+
     to_python = multiop_to_python

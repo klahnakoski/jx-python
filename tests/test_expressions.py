@@ -15,7 +15,6 @@ from jx_python.expressions import Python
 
 @add_error_reporting
 class TestOther(FuzzyTestCase):
-
     def test_add(self):
         expr = jx_expression({"add": [1, 2]})
 

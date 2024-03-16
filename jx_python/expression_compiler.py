@@ -56,21 +56,21 @@ def compile_expression(source, function_name="output"):
     locals = {}
     try:
         exec(
-            (
-                strings.outdent(f"""
+            (strings.outdent(
+                f"""
                 def {function_name}(row0, rownum0=None, rows0=None):
                     _source = {strings.quote(source)}
                     try:
                         return {source}
                     except Exception as e:
                         Log.error('Problem with dynamic function {{func|quote}}', func=_source, cause=e)
-                """)
-            ),
+                """
+            )),
             {**GLOBALS, **source.locals},
-            locals
+            locals,
         )
         func = locals[function_name]
         setattr(func, "_source", source)
         return func
     except Exception as e:
-        raise Log.error(u"Bad source: {{source}}", source=source, cause=e)
+        raise Log.error("Bad source: {{source}}", source=source, cause=e)

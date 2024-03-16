@@ -21,6 +21,5 @@ class IsTextOp(_IsTextOp):
             JX_TEXT,
             f"[v if isinstance(v, str) else None for v in [{term.source}]][0]",
             self,
-            ToBooleanOp(self)
+            ToBooleanOp(self),
         )
-

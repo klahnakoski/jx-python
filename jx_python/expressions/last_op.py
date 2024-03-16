@@ -19,11 +19,7 @@ class LastOp(_LastOp):
     def to_python(self, loop_depth=0):
         term = ToArrayOp(self.term).partial_eval(Python).to_python(loop_depth)
         return PythonScript(
-            merge_locals(term.locals, last=last),
-            loop_depth,
-            member_type(term.jx_type),
-            f"last({term.source})",
-            self,
+            merge_locals(term.locals, last=last), loop_depth, member_type(term.jx_type), f"last({term.source})", self,
         )
 
 

@@ -56,7 +56,7 @@ class TestVarious(TestCase):
                 {"name": "partitions", "nulls": True},
                 "last_updated",
             ],
-            json
+            json,
         )
         with self.assertRaises(Exception):
             AnotherColumn(
@@ -94,7 +94,7 @@ class TestVarious(TestCase):
             json_type=ARRAY,
             cardinality=1,
             multi=2,
-            nested_path="a",
+            nested_path=("a",),
             last_updated=Date.now(),
         )
 
@@ -106,7 +106,7 @@ class TestVarious(TestCase):
                 es_type="es_type",
                 json_type=INTEGER,
                 multi=1,
-                nested_path="a",
+                nested_path=("a",),
                 last_updated=Date.now(),
             )
 
@@ -118,7 +118,7 @@ class TestVarious(TestCase):
                 es_type="es_type",
                 json_type=INTEGER,
                 multi=0,
-                nested_path="a",
+                nested_path=("a",),
                 last_updated=Date.now(),
             )
 
@@ -129,7 +129,7 @@ class TestVarious(TestCase):
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,
-                nested_path="a",
+                nested_path=("a",),
                 last_updated=Date.now(),
             )
 

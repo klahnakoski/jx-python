@@ -90,4 +90,3 @@ class TestLists(FuzzyTestCase):
 
         deep_columns = con.get_schema("test.b").columns
         self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
-

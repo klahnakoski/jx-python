@@ -43,7 +43,3 @@ class EqOp(_EqOp):
                 WhenOp(rhs.missing(lang), then=FALSE),
                 BasicEqOp(lhs, rhs),
             ).partial_eval(lang)
-
-
-
-
