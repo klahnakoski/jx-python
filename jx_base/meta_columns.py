@@ -13,6 +13,8 @@ import datetime
 from dataclasses import dataclass
 from typing import List, Optional
 
+from mo_dots.datas import register_data
+
 from jx_base.expressions._utils import JX, _jx_expression as jx_expression
 from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
@@ -111,7 +113,7 @@ column_constraint = {"and": [
 
 
 @dataclass
-class Column:
+class Column(Mapping):
     _slots = ["name", "es_column", "es_index", "es_type", "json_type", "nested_path", "count", "cardinality", "multi", "last_updated", "partitions"]
 
     name: str  # ABS NAME OF COLUMN
@@ -171,6 +173,8 @@ class Column:
     def __getitem__(self, item):
         return _get(self, item)
 
+    get = __getitem__
+
     def __setattr__(self, key, value):
         if key in Column._slots:
             _set(self, key, value)
@@ -184,6 +188,26 @@ class Column:
 
     def __hash__(self):
         return hash((self.name, self.es_column, self.es_index, self.es_type, self.json_type, tuple(self.nested_path), self.multi, self.last_updated, self.partitions))
+
+    def __len__(self):
+        return len(Column._slots)
+
+    def keys(self):
+        return Column._slots
+
+    def items(self):
+        return ((k, _get(self, k)) for k in Column._slots)
+
+    def values(self):
+        return (_get(self, k) for k in Column._slots)
+
+    def __iter__(self):
+        return iter(Column._slots)
+
+    def __bool__(self):
+        return True
+
+register_data(Column)
 
 
 def get_schema_from_list(table_name, frum, native_type_to_json_type=python_type_to_json_type):
@@ -249,22 +273,22 @@ def _get_schema_from_list(
         else:
             # EXPECTING PRIMITIVE VALUE
             column = snowflake.columns[full_name]
-            if not column:
-                column = Column(
-                    name=prefix,
-                    es_column=full_name,
-                    es_index=nested_path[0],
-                    es_type=es_type,
-                    json_type=json_type,
-                    last_updated=Date.now(),
-                    nested_path=nested_path,
-                    multi=1,
-                )
-                snowflake.columns.add(column)
-            else:
+            if column:
                 column.es_type = _merge_python_type(column.es_type, row.__class__)
                 column.json_type = native_type_to_json_type(column.es_type)
+                continue
 
+            column = Column(
+                name=prefix,
+                es_column=full_name,
+                es_index=nested_path[0],
+                es_type=es_type,
+                json_type=json_type,
+                last_updated=Date.now(),
+                nested_path=nested_path,
+                multi=1,
+            )
+            snowflake.columns.add(column)
 
 def get_id(column):
     """
