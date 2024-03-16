@@ -7,7 +7,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_python import ListContainer
-from mo_json import INTEGER, STRING, NUMBER
+from mo_json import INTEGER, STRING, NUMBER, value2json
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 
 
@@ -64,6 +64,7 @@ class TestLists(FuzzyTestCase):
         data = [{"a": 1, "b": 2}, {"a": 4, "b": [5, 6]}]
         con = ListContainer("test", data)
         columns = con.get_schema().columns
+        print(value2json(columns))
         self.assertEqual(len(columns), 1)
         self.assertEqual(columns, [{"name": "a", "json_type": INTEGER}])
 
