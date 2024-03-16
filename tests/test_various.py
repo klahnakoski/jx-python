@@ -61,7 +61,7 @@ class TestVarious(TestCase):
         with self.assertRaises(Exception):
             AnotherColumn(
                 name="name",
-                es_column="es_column.~N~",
+                es_column="es_column.~a~",
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,
@@ -88,7 +88,7 @@ class TestVarious(TestCase):
     def test_column_constraints(self):
         multi = Column(
             name="name",
-            es_column="es_column.~N~",
+            es_column="es_column.~a~",
             es_index="es_index",
             es_type="nested",
             json_type=ARRAY,
@@ -101,7 +101,7 @@ class TestVarious(TestCase):
         with self.assertRaises(Exception):
             Column(
                 name="name",
-                es_column="es_column.~N~",
+                es_column="es_column.~a~",
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,
@@ -113,7 +113,7 @@ class TestVarious(TestCase):
         with self.assertRaises(Exception):
             Column(
                 name="name",
-                es_column="es_column.~N~",
+                es_column="es_column.~a~",
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,
@@ -125,7 +125,7 @@ class TestVarious(TestCase):
         with self.assertRaises(Exception):
             Column(
                 name="name",
-                es_column="es_column.~N~",
+                es_column="es_column.~a~",
                 es_index="es_index",
                 es_type="es_type",
                 json_type=INTEGER,

@@ -10,9 +10,13 @@
 
 
 import datetime
+from dataclasses import dataclass
+from typing import List, Optional
 
-from jx_base import Namespace
-from jx_base.data_class import DataClass
+from mo_dots.datas import register_data
+
+from jx_base.expressions._utils import JX, _jx_expression as jx_expression
+from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from mo_collections import UniqueIndex
@@ -23,7 +27,7 @@ from mo_dots import (
     concat_field,
     to_data,
     is_many,
-    is_missing, relative_field,
+    is_missing, relative_field, last,
 )
 from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, text
@@ -33,12 +37,15 @@ from mo_json import (
     NUMBER,
     STRING,
     OBJECT,
-    true,
     EXISTS,
-    ARRAY, python_type_to_json_type,
+    ARRAY, python_type_to_json_type, ARRAY_KEY,
 )
 from mo_json.typed_encoder import EXISTS_KEY
+from mo_logs import logger
 from mo_times.dates import Date
+
+_get = object.__getattribute__
+_set = object.__setattr__
 
 DEBUG = False
 META_TABLES_NAME = "meta.tables"
@@ -48,64 +55,146 @@ ROOT_PATH = [META_COLUMNS_NAME]
 singlton = None
 
 
-TableDesc = DataClass(
-    "Table",
-    ["name", {"name": "url", "nulls": true}, "query_path", {"name": "last_updated", "nulls": False}, "columns"],
-    constraint={"and": [{"ne": [{"last": "query_path"}, {"literal": "."}]}]},
-)
+@dataclass
+class TableDesc:
+    name: str
+    url: Optional[str]
+    query_path: List[str]
+    last_updated: Date
+    columns: List[Data]
 
-Column = DataClass(
-    "Column",
-    [
-        "name",  # ABS NAME OF COLUMN
-        "es_column",
-        "es_index",
-        "es_type",
-        "json_type",
-        "nested_path",  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
-        {"name": "count", "nulls": True},
-        {"name": "cardinality", "nulls": True},
-        {"name": "multi", "nulls": False},
-        {"name": "partitions", "nulls": True},
-        "last_updated",
-    ],
-    constraint={"and": [
-        {
-            "when": {"ne": {"name": "."}},
-            "then": {"or": [
-                {"and": [{"eq": {"json_type": OBJECT}}, {"eq": {"multi": 1}}]},
-                {"ne": ["name", {"first": "nested_path"}]},
-            ]},
-            "else": True,
-        },
-        {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT]}}, "else": True},
-        {"not": {"find": {"es_column": "null"}}},
-        {"not": {"eq": {"es_column": "string"}}},
-        {"not": {"eq": {"es_type": "object", "json_type": EXISTS}}},
-        {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"eq": {"json_type": EXISTS}}, "else": True},
-        {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
-        {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
-        {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
-        {"not": {"prefix": [
-            {"first": "nested_path"},
-            {"literal": "testdata"},
-        ]}},  # USED BY THE TEST GENERATOR.  IF THIS EXISTS IN A CONTAINER THEN IT FAILED
-        {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
-        {
-            "when": {"eq": [{"literal": ".~N~"}, {"right": {"es_column": 4}}]},
-            "then": {"or": [
-                {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": ARRAY}}, {"eq": {"es_type": "nested"}}]},
-                {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": OBJECT}}, {"eq": {"es_type": "object"}}]},
-            ]},
-            "else": True,
-        },
-        {
-            "when": {"gte": [{"count": "nested_path"}, 2]},
-            "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
-            "else": True,
-        },
-    ]},
-)
+    def __init__(self, name, url, query_path, last_updated, columns):
+        self.name = name
+        self.url = url
+        self.query_path = query_path
+        self.last_updated = last_updated
+        self.columns = columns
+
+        if last(query_path)==".":
+            logger.error(f"query_path cannot end with a period: {query_path}")
+
+
+column_constraint = {"and": [
+    {
+        "when": {"ne": {"name": "."}},
+        "then": {"or": [
+            {"and": [{"eq": {"json_type": OBJECT}}, {"eq": {"multi": 1}}]},
+            {"ne": ["name", {"first": "nested_path"}]},
+        ]},
+        "else": True,
+    },
+    {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT]}}, "else": True},
+    {"not": {"find": {"es_column": "null"}}},
+    {"not": {"eq": {"es_column": "string"}}},
+    {"not": {"eq": {"es_type": "object", "json_type": EXISTS}}},
+    {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"eq": {"json_type": EXISTS}}, "else": True},
+    {"when": {"suffix": {"es_column": "." + EXISTS_KEY}}, "then": {"exists": "cardinality"}, "else": True},
+    {"when": {"eq": {"json_type": OBJECT}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
+    {"when": {"eq": {"json_type": ARRAY}}, "then": {"in": {"cardinality": [0, 1]}}, "else": True},
+    {"not": {"prefix": [
+        {"first": "nested_path"},
+        {"literal": "testdata"},
+    ]}},  # USED BY THE TEST GENERATOR.  IF THIS EXISTS IN A CONTAINER THEN IT FAILED
+    {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
+    {
+        "when": {"eq": [{"literal": f".{ARRAY_KEY}"}, {"right": {"es_column": 4}}]},
+        "then": {"or": [
+            {"and": [{"gt": {"multi": 1}}, {"eq": {"json_type": ARRAY}}, {"eq": {"es_type": "nested"}}]},
+            {"and": [{"eq": {"multi": 1}}, {"eq": {"json_type": OBJECT}}, {"eq": {"es_type": "object"}}]},
+        ]},
+        "else": True,
+    },
+    {
+        "when": {"gte": [{"count": "nested_path"}, 2]},
+        "then": {"ne": [{"first": {"right": {"nested_path": 2}}}, {"literal": "."}]},  # SECOND-LAST ELEMENT
+        "else": True,
+    },
+]}
+
+
+class Column(Mapping):
+    _slots = ["name", "es_column", "es_index", "es_type", "json_type", "nested_path", "count", "cardinality", "multi", "last_updated", "partitions"]
+
+    def __init__(
+        self,
+        *,
+        name,  # ABS NAME OF COLUMN
+        es_column: str,
+        es_index: str,
+        es_type: str,
+        json_type: str,
+        nested_path: List[str],  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
+        multi: int,
+        last_updated,
+        partitions: int=None,
+        count: Optional[int]=None,
+        cardinality: Optional[int]=None,
+    ):
+        _set(self, "_checking", True)
+        self.name = name
+        self.es_column = es_column
+        self.es_index = es_index
+        self.es_type = es_type
+        self.json_type = json_type
+        self.nested_path = nested_path
+        self.multi = multi
+        self.last_updated = last_updated
+        self.count = count
+        self.cardinality = cardinality
+        self.partitions = partitions
+        _set(self, "_checking", False)
+        self.check()
+
+    def check(self):
+        _set(self, "_checking", True)
+        try:
+            if jx_expression(column_constraint, JX)(self):
+                return
+
+            for c in column_constraint["and"]:
+                if not jx_expression(c, JX)(self):
+                    raise ValueError(f"Constraint {c} failed for {self}")
+        finally:
+            _set(self, "_checking", False)
+
+    def __getitem__(self, item):
+        return _get(self, item)
+
+    get = __getitem__
+
+    def __setattr__(self, key, value):
+        if key in Column._slots:
+            _set(self, key, value)
+            if not _get(self, "_checking"):
+                self.check()
+        else:
+            logger.error(f"Cannot set {key} on {self}")
+
+    def __setitem__(self, key, value):
+        _set(self, key, value)
+
+    def __hash__(self):
+        return hash((self.name, self.es_column, self.es_index, self.es_type, self.json_type, tuple(self.nested_path), self.multi, self.last_updated, self.partitions))
+
+    def __len__(self):
+        return len(Column._slots)
+
+    def keys(self):
+        return Column._slots
+
+    def items(self):
+        return ((k, _get(self, k)) for k in Column._slots)
+
+    def values(self):
+        return (_get(self, k) for k in Column._slots)
+
+    def __iter__(self):
+        return iter(Column._slots)
+
+    def __bool__(self):
+        return True
+
+register_data(Column)
 
 
 def get_schema_from_list(table_name, frum, native_type_to_json_type=python_type_to_json_type):
@@ -171,22 +260,22 @@ def _get_schema_from_list(
         else:
             # EXPECTING PRIMITIVE VALUE
             column = snowflake.columns[full_name]
-            if not column:
-                column = Column(
-                    name=prefix,
-                    es_column=full_name,
-                    es_index=nested_path[0],
-                    es_type=es_type,
-                    json_type=json_type,
-                    last_updated=Date.now(),
-                    nested_path=nested_path,
-                    multi=1,
-                )
-                snowflake.columns.add(column)
-            else:
+            if column:
                 column.es_type = _merge_python_type(column.es_type, row.__class__)
                 column.json_type = native_type_to_json_type(column.es_type)
+                continue
 
+            column = Column(
+                name=prefix,
+                es_column=full_name,
+                es_index=nested_path[0],
+                es_type=es_type,
+                json_type=json_type,
+                last_updated=Date.now(),
+                nested_path=nested_path,
+                multi=1,
+            )
+            snowflake.columns.add(column)
 
 def get_id(column):
     """
