@@ -112,31 +112,18 @@ column_constraint = {"and": [
 ]}
 
 
-@dataclass
 class Column(Mapping):
     _slots = ["name", "es_column", "es_index", "es_type", "json_type", "nested_path", "count", "cardinality", "multi", "last_updated", "partitions"]
-
-    name: str  # ABS NAME OF COLUMN
-    es_column: str
-    es_index: str
-    es_type: str
-    json_type: str
-    nested_path: List[str]  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
-    count: Optional[int]
-    cardinality: Optional[int]
-    multi: int
-    partitions: int
-    last_updated: Date
 
     def __init__(
         self,
         *,
-        name,
+        name,  # ABS NAME OF COLUMN
         es_column: str,
         es_index: str,
         es_type: str,
         json_type: str,
-        nested_path: List[str],
+        nested_path: List[str],  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
         multi: int,
         last_updated,
         partitions: int=None,
