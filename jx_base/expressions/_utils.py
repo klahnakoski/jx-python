@@ -11,17 +11,16 @@
 
 import operator
 
+from jx_base.language import is_expression, Language
+from jx_base.utils import enlist
 from mo_dots import is_sequence, is_missing, is_data
-from mo_future import get_function_name, is_text, text, utf8_json_encoder
+from mo_future import get_function_name, is_text, utf8_json_encoder
 from mo_imports import expect, export
+from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
+from mo_json.types import union_type
 from mo_logs import Except, Log
 from mo_math import is_number
 from mo_times import Date
-
-from jx_base.language import is_expression, Language
-from jx_base.utils import enlist
-from mo_json import BOOLEAN, INTEGER, IS_NULL, NUMBER, STRING, scrub
-from mo_json.types import union_type
 
 TYPE_CHECK = True  # A LITTLE FASTER IF False
 ALLOW_SCRIPTING = False
