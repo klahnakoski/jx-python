@@ -201,7 +201,6 @@ def get_schema_from_list(table_name, frum, native_type_to_json_type=python_type_
     """
     SCAN THE LIST FOR COLUMN TYPES
     """
-
     columns = UniqueIndex(keys=("es_column",))
     snowflake = Snowflake(Namespace(), [table_name], columns)
 
