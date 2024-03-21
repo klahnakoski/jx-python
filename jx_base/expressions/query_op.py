@@ -149,8 +149,6 @@ class QueryOp(Expression):
         query = to_data(query)
 
         frum = query["from"]
-        # FIND THE TABLE IN from CLAUSE
-        base_name, _ = tail_field(frum)
         frum = container.container.get_table(frum)
         schema = frum.schema
 
