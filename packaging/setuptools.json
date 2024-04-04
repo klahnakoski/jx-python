@@ -15,11 +15,11 @@
     "extras_require": {"tests": ["mo-testing>=7.562.24075"]},
     "include_package_data": true,
     "install_requires": [
-        "mo-collections==5.582.24095",        "mo-dots==9.582.24095",
-             "mo-future==7.546.24057",        "mo-json==6.582.24095",
-        "mo-json-config==4.582.24095",      "mo-kwargs==7.582.24095",
-               "mo-logs==8.582.24095",        "mo-math==7.582.24095",
-            "mo-threads==6.582.24095",       "mo-times==5.582.24095"
+        "mo-collections==5.584.24095",        "mo-dots==9.584.24095",
+             "mo-future==7.584.24095",        "mo-json==6.584.24095",
+        "mo-json-config==4.586.24095",      "mo-kwargs==7.584.24095",
+               "mo-logs==8.584.24095",        "mo-math==7.584.24095",
+            "mo-threads==6.585.24095",       "mo-times==5.584.24095"
     ],
     "license": "MPL 2.0",
     "long_description": {
@@ -44,5 +44,5 @@
             "jx_python.streams"
     ],
     "url": "https://github.com/klahnakoski/jx-python",
-    "version": "4.583.24095"
+    "version": "4.586.24095"
 }
