@@ -13,6 +13,7 @@ import datetime
 from dataclasses import dataclass
 from typing import List, Optional
 
+from jx_base.expressions.variable import QueryOp
 from mo_dots.datas import register_data
 
 from jx_base.expressions._utils import JX, _jx_expression as jx_expression
@@ -27,9 +28,9 @@ from mo_dots import (
     concat_field,
     to_data,
     is_many,
-    is_missing, relative_field, last,
+    is_missing, relative_field, last, endswith_field, join_field, split_field,
 )
-from mo_future import Mapping
+from mo_future import Mapping, first
 from mo_future import binary_type, items, long, none_type, text
 from mo_imports import export
 from mo_json import (
@@ -38,7 +39,7 @@ from mo_json import (
     STRING,
     OBJECT,
     EXISTS,
-    ARRAY, python_type_to_json_type, ARRAY_KEY,
+    ARRAY, python_type_to_json_type, ARRAY_KEY, jx_type_to_json_type,
 )
 from mo_json.typed_encoder import EXISTS_KEY
 from mo_logs import logger
@@ -197,12 +198,48 @@ class Column(Mapping):
 register_data(Column)
 
 
+def get_schema_from_jx_type(table_name, jx_type):
+    """
+    ASSUME THE VALUES DO NOT HAVE TYPED PROPERTIES
+    :param table_name:
+    :param jx_type:
+    :return:
+    """
+    paths, columns = _get_columns_from_jx_type([table_name], jx_type)
+    schema = Schema([table_name], Snowflake(None, paths, columns))
+    schema.snowflake.namespace = schema.snowflake
+    return schema
+
+def _get_columns_from_jx_type(nested_path, jx_type):
+    paths = [nested_path[0]]
+    columns = []
+    for path, type in jx_type.leaves():
+        if endswith_field(path, ARRAY_KEY):
+            child = concat_field(nested_path[0], join_field(split_field(path)[:-1]))
+            more_paths, more_columns = _get_columns_from_jx_type([child, *nested_path], type)
+            paths = [*paths, *more_paths]
+            columns.extend(more_columns)
+            continue
+        name = concat_field(relative_field(nested_path[0], nested_path[-1]), path)
+        columns.append(Column(
+            name=name,  # ABS NAME OF COLUMN
+            es_column=name,
+            es_index=nested_path[0],
+            es_type=type,
+            json_type=jx_type_to_json_type(type),
+            nested_path=nested_path,
+            multi=1,
+            last_updated=Date.now()
+        ))
+    return paths, columns
+
 def get_schema_from_list(table_name, frum, native_type_to_json_type=python_type_to_json_type):
     """
     SCAN THE LIST FOR COLUMN TYPES
     """
     columns = UniqueIndex(keys=("es_column",))
-    snowflake = Snowflake(Namespace(), [table_name], columns)
+    snowflake = Snowflake(None, [table_name], columns)
+    snowflake.namespace = snowflake
 
     _get_schema_from_list(
         frum,
@@ -461,6 +498,11 @@ def _merge_python_type(A, B):
     else:
         return output.__name__
 
+
+def query_metadata(container, query):
+    container = container.namespace.columns.denormalized()
+    normalized = QueryOp.wrap(query, container, JX)
+    return container.query(normalized)
 
 export("jx_base.expressions.query_op", Column)
 export("jx_python.containers.list", Column)

@@ -57,6 +57,6 @@ class NotOp(Expression):
 
 
 export("jx_base.expressions.and_op", NotOp)
-export("jx_base.expressions.basic_in_op", NotOp)
+export("jx_base.expressions.strict_in_op", NotOp)
 export("jx_base.expressions.exists_op", NotOp)
 export("jx_base.expressions.expression", NotOp)

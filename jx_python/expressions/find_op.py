@@ -16,12 +16,12 @@ from mo_json import JX_INTEGER
 
 class FindOp(_FindOp):
     def partial_eval(self, lang):
-        index = lang.BasicIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
+        index = lang.StrictIndexOfOp(self.value, self.find, self.start).partial_eval(lang)
 
         output = (
             lang
             .WhenOp(
-                lang.OrOp(self.value.missing(Python), self.find.missing(Python), lang.BasicEqOp(index, Literal(-1))),
+                lang.OrOp(self.value.missing(Python), self.find.missing(Python), lang.StrictEqOp(index, Literal(-1))),
                 **{"else": index},
             )
             .partial_eval(lang)
@@ -34,7 +34,7 @@ class FindOp(_FindOp):
             .OrOp(
                 self.value.missing(Python),
                 self.find.missing(Python),
-                lang.EqOp(lang.BasicIndexOfOp(self.value, self.find, self.start), Literal(-1)),
+                lang.EqOp(lang.StrictIndexOfOp(self.value, self.find, self.start), Literal(-1)),
             )
             .partial_eval(lang)
         )

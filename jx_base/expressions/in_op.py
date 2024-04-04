@@ -9,7 +9,6 @@
 #
 
 
-from jx_base.expressions import BasicInOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.get_op import GetOp
@@ -20,6 +19,7 @@ from jx_base.expressions.nested_op import NestedOp
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.or_op import OrOp
+from jx_base.expressions.strict_in_op import StrictInOp
 from jx_base.expressions.variable import is_variable
 from jx_base.language import is_op
 from mo_dots import is_many
@@ -91,7 +91,7 @@ class InOp(Expression):
     def invert(self, lang):
         this = self.partial_eval(lang)
         if is_op(this, InOp):
-            inv = NotOp(BasicInOp(this.value, this.superset))
+            inv = NotOp(StrictInOp(this.value, this.superset))
             inv.simplified = True
             return OrOp(MissingOp(this.value), inv)
         else:

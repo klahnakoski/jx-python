@@ -9,7 +9,7 @@
 #
 from jx_base.expressions.base_inequality_op import BaseInequalityOp
 
-from jx_base.expressions.basic_eq_op import BasicEqOp
+from jx_base.expressions.strict_eq_op import StrictEqOp
 from jx_base.expressions.nested_op import NestedOp
 from jx_base.expressions.not_op import NotOp
 from jx_base.expressions.or_op import OrOp
@@ -27,7 +27,7 @@ class NeOp(BaseInequalityOp):
         return v1 != v2
 
     def invert(self, lang):
-        return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), BasicEqOp(self.lhs, self.rhs),).partial_eval(lang)
+        return OrOp(self.lhs.missing(lang), self.rhs.missing(lang), StrictEqOp(self.lhs, self.rhs),).partial_eval(lang)
 
     def partial_eval(self, lang):
         lhs = self.lhs.partial_eval(lang)
@@ -42,5 +42,5 @@ class NeOp(BaseInequalityOp):
                 limit=lhs.limit.partial_eval(lang),
             ).partial_eval(lang)
 
-        output = lang.AndOp(lhs.exists(), rhs.exists(), NotOp(BasicEqOp(lhs, rhs))).partial_eval(lang)
+        output = lang.AndOp(lhs.exists(), rhs.exists(), NotOp(StrictEqOp(lhs, rhs))).partial_eval(lang)
         return output

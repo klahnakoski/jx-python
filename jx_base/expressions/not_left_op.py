@@ -9,7 +9,7 @@
 #
 
 
-from jx_base.expressions.basic_substring_op import BasicSubstringOp
+from jx_base.expressions.strict_substring_op import StrictSubstringOp
 from jx_base.expressions.coalesce_op import CoalesceOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.length_op import LengthOp
@@ -56,6 +56,6 @@ class NotLeftOp(Expression):
         max_length = CoalesceOp(LengthOp(value), ZERO)
         output = WhenOp(
             self.missing(lang),
-            **{"else": BasicSubstringOp(value, MaxOp(ZERO, MinOp(length, max_length)), max_length)}
+            **{"else": StrictSubstringOp(value, MaxOp(ZERO, MinOp(length, max_length)), max_length)}
         ).partial_eval(lang)
         return output

@@ -126,4 +126,4 @@ class NestedOp(Expression):
         ).partial_eval(lang)
 
 
-export("jx_base.expressions.basic_in_op", NestedOp)
+export("jx_base.expressions.strict_in_op", NestedOp)
