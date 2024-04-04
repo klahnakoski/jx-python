@@ -188,7 +188,7 @@ class QueryOp(Expression):
             output.select = _normalize_selects(Null, [select or "."], query.format)
 
         output.select.frum = frum.schema
-        output.where = _normalize_where(query.where, lang)
+        output.where = _normalize_where(query.where)
         output.window = [_normalize_window(w) for w in enlist(query.window)]
         output.sort = _normalize_sort(query.sort)
 

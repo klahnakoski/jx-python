@@ -1,10 +1,4 @@
-from jx_base.expressions._utils import (
-    jx_expression,
-    merge_types,
-    operators,
-    JX,
-    _jx_expression,
-)
+from jx_base.expressions._utils import jx_expression, merge_types, operators, JX, _jx_expression
 from jx_base.expressions.abs_op import AbsOp
 from jx_base.expressions.add_op import AddOp
 from jx_base.expressions.aggregate_op import AggregateOp
@@ -16,16 +10,6 @@ from jx_base.expressions.avg_op import AvgOp
 from jx_base.expressions.base_binary_op import BaseBinaryOp
 from jx_base.expressions.base_inequality_op import BaseInequalityOp
 from jx_base.expressions.base_multi_op import BaseMultiOp
-from jx_base.expressions.basic_add_op import BasicAddOp
-from jx_base.expressions.basic_boolean_op import BasicBooleanOp
-from jx_base.expressions.basic_eq_op import BasicEqOp
-from jx_base.expressions.basic_in_op import BasicInOp
-from jx_base.expressions.basic_index_of_op import BasicIndexOfOp
-from jx_base.expressions.basic_mul_op import BasicMulOp
-from jx_base.expressions.basic_multi_op import BasicMultiOp
-from jx_base.expressions.basic_not_op import BasicNotOp
-from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
-from jx_base.expressions.basic_substring_op import BasicSubstringOp
 from jx_base.expressions.between_op import BetweenOp
 from jx_base.expressions.call_op import CallOp
 from jx_base.expressions.cardinality_op import CardinalityOp
@@ -124,6 +108,16 @@ from jx_base.expressions.sql_select_all_from_op import SqlSelectAllFromOp
 from jx_base.expressions.sql_select_op import SqlSelectOp
 from jx_base.expressions.sql_substr_op import SqlSubstrOp
 from jx_base.expressions.sql_variable import SqlVariable
+from jx_base.expressions.strict_add_op import StrictAddOp
+from jx_base.expressions.strict_boolean_op import StrictBooleanOp
+from jx_base.expressions.strict_eq_op import StrictEqOp
+from jx_base.expressions.strict_in_op import StrictInOp
+from jx_base.expressions.strict_index_of_op import StrictIndexOfOp
+from jx_base.expressions.strict_mul_op import StrictMulOp
+from jx_base.expressions.strict_multi_op import StrictMultiOp
+from jx_base.expressions.strict_not_op import StrictNotOp
+from jx_base.expressions.strict_starts_with_op import StrictStartsWithOp
+from jx_base.expressions.strict_substring_op import StrictSubstringOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.suffix_op import SuffixOp
 from jx_base.expressions.sum_op import SumOp
@@ -151,9 +145,9 @@ set_default(
         "and": AndOp,
         "array": ArrayOfOp,
         "avg": AvgOp,
-        "basic.add": BasicAddOp,
-        "basic.boolean": BasicBooleanOp,
-        "basic.mul": BasicMulOp,
+        "strict.add": StrictAddOp,
+        "strict.boolean": StrictBooleanOp,
+        "strict.mul": StrictMulOp,
         "between": BetweenOp,
         "cardinality": CardinalityOp,
         "case": CaseOp,

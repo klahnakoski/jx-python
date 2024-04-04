@@ -12,7 +12,7 @@
 from mo_dots import is_data, is_missing
 
 from jx_base.expressions._utils import jx_expression
-from jx_base.expressions.basic_starts_with_op import BasicStartsWithOp
+from jx_base.expressions.strict_starts_with_op import StrictStartsWithOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
@@ -91,7 +91,7 @@ class PrefixOp(Expression):
         return CaseOp(
             WhenOp(prefix.missing(lang), then=TRUE),
             WhenOp(expr.missing(lang), then=FALSE),
-            BasicStartsWithOp(expr, prefix),
+            StrictStartsWithOp(expr, prefix),
         ).partial_eval(lang)
 
     def __eq__(self, other):

@@ -66,4 +66,4 @@ class MissingOp(Expression):
 
 
 export("jx_base.expressions.expression", MissingOp)
-export("jx_base.expressions.basic_in_op", MissingOp)
+export("jx_base.expressions.strict_in_op", MissingOp)

@@ -11,7 +11,7 @@
 
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.add_op import AddOp
-from jx_base.expressions.basic_substring_op import BasicSubstringOp
+from jx_base.expressions.strict_substring_op import StrictSubstringOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.find_op import FindOp
@@ -108,7 +108,7 @@ class BetweenOp(Expression):
         ).partial_eval(lang)
 
         start_index = AddOp(start_index, len_prefix).partial_eval(lang)
-        substring = BasicSubstringOp(value, start_index, end_index).partial_eval(lang)
+        substring = StrictSubstringOp(value, start_index, end_index).partial_eval(lang)
 
         between = WhenOp(end_index.missing(lang), **{"else": substring}).partial_eval(lang)
 

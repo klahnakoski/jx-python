@@ -11,7 +11,7 @@ from jx_base.expressions import EqOp as _EqOp, is_literal, FALSE, TRUE, ToArrayO
 from jx_base.expressions.python_script import PythonScript
 from jx_base.language import value_compare
 from jx_python.expressions import Python
-from jx_python.expressions.basic_eq_op import BasicEqOp
+from jx_python.expressions.strict_eq_op import StrictEqOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.when_op import WhenOp
 from jx_python.utils import merge_locals
@@ -41,5 +41,5 @@ class EqOp(_EqOp):
             return CaseOp(
                 WhenOp(lhs.missing(lang), then=rhs.missing(lang)),
                 WhenOp(rhs.missing(lang), then=FALSE),
-                BasicEqOp(lhs, rhs),
+                StrictEqOp(lhs, rhs),
             ).partial_eval(lang)

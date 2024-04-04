@@ -2,11 +2,6 @@ from jx_python.expressions._utils import jx_expression_to_function, Python
 from jx_python.expressions.add_op import AddOp
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.array_of_op import ArrayOfOp
-from jx_python.expressions.basic_add_op import BasicAddOp
-from jx_python.expressions.basic_eq_op import BasicEqOp
-from jx_python.expressions.basic_index_of_op import BasicIndexOfOp
-from jx_python.expressions.basic_starts_with_op import BasicStartsWithOp
-from jx_python.expressions.basic_substring_op import BasicSubstringOp
 from jx_python.expressions.between_op import BetweenOp
 from jx_python.expressions.call_op import CallOp
 from jx_python.expressions.case_op import CaseOp
@@ -60,6 +55,11 @@ from jx_python.expressions.rows_op import RowsOp
 from jx_python.expressions.script_op import ScriptOp
 from jx_python.expressions.select_op import SelectOp
 from jx_python.expressions.split_op import SplitOp
+from jx_python.expressions.strict_add_op import StrictAddOp
+from jx_python.expressions.strict_eq_op import StrictEqOp
+from jx_python.expressions.strict_index_of_op import StrictIndexOfOp
+from jx_python.expressions.strict_starts_with_op import StrictStartsWithOp
+from jx_python.expressions.strict_substring_op import StrictSubstringOp
 from jx_python.expressions.sub_op import SubOp
 from jx_python.expressions.suffix_op import SuffixOp
 from jx_python.expressions.sum_op import SumOp

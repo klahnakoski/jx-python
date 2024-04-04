@@ -9,7 +9,7 @@
 #
 
 
-from jx_base.expressions.basic_substring_op import BasicSubstringOp
+from jx_base.expressions.strict_substring_op import StrictSubstringOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.length_op import LengthOp
 from jx_base.expressions.literal import ZERO
@@ -59,5 +59,5 @@ class NotRightOp(Expression):
             return value
 
         max_length = LengthOp(value)
-        part = BasicSubstringOp(value, ZERO, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),)
+        part = StrictSubstringOp(value, ZERO, MaxOp(ZERO, MinOp(max_length, SubOp(max_length, length))),)
         return (WhenOp(self.missing(lang), **{"else": part})).partial_eval(lang)

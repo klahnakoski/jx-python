@@ -12,6 +12,7 @@
 import itertools
 
 from jx_base.domains import DefaultDomain, SimpleSetDomain
+from jx_base.expressions.literal import NULL
 from jx_python import windows
 from jx_python.expressions import jx_expression_to_function
 from mo_collections.matrix import Matrix
@@ -25,7 +26,7 @@ _ = Date
 
 
 def is_aggs(query):
-    if query.edges or query.groupby or any(a != None and a != "none" for a in enlist(query.select).aggregate):
+    if query.edges or query.groupby or any(s.aggregate is not NULL for s in query.select.terms):
         return True
     return False
 

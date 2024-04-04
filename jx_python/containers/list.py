@@ -11,9 +11,12 @@
 
 import itertools
 
+from jx_base.expressions._utils import jx_expression
+
 from jx_base.expressions import TRUE
 from jx_base.expressions.variable import is_variable
 from jx_base.language import is_expression
+from jx_base.meta_columns import get_schema_from_jx_type
 from jx_base.models.container import Container
 from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
@@ -22,6 +25,7 @@ from jx_base.models.table import Table
 from jx_base.utils import delist, enlist
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
+from jx_python.expressions._utils import compile_expression, JXExpression
 from jx_python.lists.aggs import is_aggs, list_aggs
 from mo_collections import UniqueIndex
 from mo_dots import (
@@ -38,7 +42,7 @@ from mo_dots import (
 )
 from mo_future import first, sort_using_key
 from mo_imports import export, expect
-from mo_json import ARRAY
+from mo_json import ARRAY, JX_IS_NULL, value_to_json_type, value_to_jx_type
 from mo_logs import Log
 from mo_threads import Lock
 
@@ -56,6 +60,7 @@ class ListContainer(Container, Namespace, Table):
         Container.__init__(self)
         self.name = name = coalesce(name, ".")
         self.data = data = list(from_data(data))
+        self.container = self
         self.schema = schema or get_schema_from_list(name, data)
         self.locker = Lock()  # JUST IN CASE YOU WANT TO DO MORE THAN ONE THING
 
@@ -101,34 +106,34 @@ class ListContainer(Container, Namespace, Table):
         """
         last(self.data)
 
-    def query(self, q):
-        q = to_data(q)
+    def query(self, query: "QueryOp"):
+        query = to_data(query)
         output = self
-        if is_aggs(q):
-            output = list_aggs(output.data, q)
+        if is_aggs(query):
+            output = list_aggs(output.data, query)
         else:
-            if q.where is not TRUE:
-                output = output.where(q.where)
+            if query.where is not TRUE:
+                output = output.where(query.where)
 
-            if q.sort:
-                output = output.sort(q.sort)
+            if query.sort:
+                output = output.sort(query.sort)
 
-            if q.select:
-                output = output.select(q.select)
+            if query.select:
+                output = output.select(query.select)
 
         # TODO: ADD EXTRA COLUMN DESCRIPTIONS TO RESULTING SCHEMA
-        for param in q.window:
+        for param in query.window:
             output.window(param)
 
-        if q.format:
-            if q.format == "list":
+        if query.format:
+            if query.format == "list":
                 return Data(data=output.data, meta={"format": "list"})
-            elif q.format == "table":
-                head = [c.name for c in output.schema.columns]
+            elif query.format == "table":
+                head = [c.name for c in output.schema.snowflake.columns]
                 data = [[r if h == "." else r[h] for h in head] for r in output.data]
                 return Data(header=head, data=data, meta={"format": "table"})
-            elif q.format == "cube":
-                head = [c.name for c in output.schema.columns]
+            elif query.format == "cube":
+                head = [c.name for c in output.schema.snowflake.columns]
                 rows = [[r[h] for h in head] for r in output.data]
                 data = {h: c for h, c in zip(head, zip(*rows))}
                 return Data(
@@ -140,7 +145,7 @@ class ListContainer(Container, Namespace, Table):
                     }],
                 )
             else:
-                Log.error("unknown format {{format}}", format=q.format)
+                Log.error("unknown format {{format}}", format=query.format)
         else:
             return output
 
@@ -186,44 +191,24 @@ class ListContainer(Container, Namespace, Table):
             return [d[select] for d in self.data]
 
     def select(self, select):
-        selects = enlist(select)
+        selects= select.terms
+        if len(selects) == 1 and is_variable(selects[0].value) and selects[0].value.var == "." and selects[0].name == ".":
+            return self
 
-        if len(selects) == 1 and is_variable(selects[0].value) and selects[0].value.var == ".":
-            new_schema = self.schema
-            if selects[0].name == ".":
-                return self
-        else:
-            new_schema = None
+        exprs = [jx_expression(s.value) for s in selects]
+        jx_type = JX_IS_NULL
+        new_data = []
+        for row in self.data:
+            result = Data()
+            for s, e in zip(selects, exprs):
+                value = e(row)
+                result[s.name] = e(row)
+                jx_type = jx_type | s.name+value_to_jx_type(value)
+            new_data.append(from_data(result))
 
-        if is_list(select):
-            if all(is_variable(s.value) and s.name == s.value.var for s in select):
-                names = set(s.value.var for s in select)
-                new_schema = Schema(".", [c for c in self.schema.columns if c.name in names])
-
-            push_and_pull = [(s.name, jx_expression_to_function(s.value)) for s in selects]
-
-            def selector(d):
-                output = Data()
-                for n, p in push_and_pull:
-                    output[n] = delist(p(to_data(d)))
-                return from_data(output)
-
-            new_data = list(map(selector, self.data))
-        else:
-            select_value = jx_expression_to_function(select.value)
-            new_data = list(map(select_value, self.data))
-            if is_variable(select.value):
-                column = dict(**first(c for c in self.schema.columns if c.name == select.value.var))
-                column.update({
-                    "name": ".",
-                    "json_type": ARRAY,
-                    "es_type": "nested",
-                    "multi": 1001,
-                    "cardinality": 1,
-                })
-                new_schema = Schema("from " + self.name, [Column(**column)])
-
-        return ListContainer("from " + self.name, data=new_data, schema=new_schema)
+        new_name = f"from {self.name}"
+        new_schema = get_schema_from_jx_type(new_name, jx_type)
+        return ListContainer(new_name, data=new_data, schema=new_schema)
 
     def window(self, window):
         # _ = window
