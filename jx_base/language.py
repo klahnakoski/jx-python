@@ -16,7 +16,7 @@ from decimal import Decimal
 from math import isnan
 
 from jx_base.utils import enlist
-from mo_dots import Data, data_types, startswith_field, null_types
+from mo_dots import Data, startswith_field, null_types
 from mo_dots.lists import list_types, is_many
 from mo_future import (
     boolean_type,
@@ -369,7 +369,7 @@ def value_compare(left, right, ordering=1):
                 if c != 0:
                     return c * ordering
             return 0
-        elif ltype in data_types:
+        elif is_data(ltype):
             for k in sorted(set(left.keys()) | set(right.keys())):
                 c = value_compare(left.get(k), right.get(k)) * ordering
                 if c != 0:
