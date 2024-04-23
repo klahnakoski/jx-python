@@ -41,7 +41,8 @@ class GroupOp(_GroupOp):
 
 def groupby(values, func):
     output = []
-    cmp = lambda a, b: value_compare(detype(func(a)), detype(func(b)))
+    def cmp(a, b):
+        return value_compare(detype(func(a)), detype(func(b)))
     for g, rows in itertools.groupby(sort_using_cmp(values, cmp=cmp), func):
         row = list(rows)
         if is_data(g):
