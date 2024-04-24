@@ -30,7 +30,7 @@ def jx_expression_to_function(expr):
     """
     RETURN FUNCTION THAT REQUIRES PARAMETERS (row, rownum=None, rows=None):
     """
-    if expr == None:
+    if is_null(expr):
         return Null
 
     if is_expression(expr):
