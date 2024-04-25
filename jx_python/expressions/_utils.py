@@ -10,7 +10,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from mo_dots import is_data, is_list, Null, coalesce
+from mo_dots import is_data, is_list, Null, coalesce, is_null
 from mo_future import is_text, extend
 from mo_imports import expect, export
 from mo_logs import strings
