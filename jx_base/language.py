@@ -16,7 +16,7 @@ from decimal import Decimal
 from math import isnan
 
 import mo_dots
-from mo_dots import Data, startswith_field, null_types, is_data
+from mo_dots import Data, startswith_field, null_types, is_data, datas
 from mo_dots.lists import list_types, is_many
 from mo_times import Date
 
@@ -371,7 +371,7 @@ def value_compare(left, right, ordering=1):
                 if c != 0:
                     return c * ordering
             return 0
-        elif ltype in mo_dots.data_types:
+        elif ltype in datas._data_types:
             for k in sorted(set(left.keys()) | set(right.keys())):
                 c = value_compare(left.get(k), right.get(k)) * ordering
                 if c != 0:
