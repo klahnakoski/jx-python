@@ -6,6 +6,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.language import value_compare
 from jx_python import ListContainer
 from mo_json import INTEGER, STRING, NUMBER, value2json
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
@@ -90,3 +91,8 @@ class TestLists(FuzzyTestCase):
 
         deep_columns = con.get_schema("test.b").columns
         self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
+
+    def test_value_compare_two_lists(self):
+        a = [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}]
+        b = [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}]
+        self.assertEqual(value_compare(a, b), 0)
