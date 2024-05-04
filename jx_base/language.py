@@ -15,7 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
-from mo_dots import Data, startswith_field, null_types, datas, is_many, is_list
+from mo_dots import Data, startswith_field, null_types, datas, is_many, is_list, utils
 from mo_times import Date
 
 from jx_base.utils import enlist
@@ -327,7 +327,7 @@ def value_compare(left, right, ordering=1):
         ltype = left.__class__
         rtype = right.__class__
 
-        if is_list(ltype) or is_list(rtype):
+        if ltype in utils.list_types or rtype in utils.list_types:
             if left == None:
                 return ordering
             elif right == None:
