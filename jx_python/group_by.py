@@ -11,8 +11,7 @@
 
 import math
 
-from mo_dots import FlatList, Null, dict_to_data
-from mo_dots.lists import list_types
+from mo_dots import FlatList, Null, dict_to_data, is_list
 from mo_future import binary_type, text
 from mo_logs import Log
 from mo_logs.exceptions import Except
@@ -118,7 +117,7 @@ def chunk(data, size=0):
     if not size:
         return [data]
 
-    if data.__class__ in list_types + (tuple, bytearray, text, binary_type):
+    if is_list(data) or isinstance(data, (bytearray, text, binary_type)):
         # USE SLICING
         def _iter():
             num = int(math.ceil(len(data) / size))
