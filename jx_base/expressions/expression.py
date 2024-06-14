@@ -16,7 +16,7 @@ from jx_base.expressions._utils import (
 )
 from jx_base.language import BaseExpression, ID, is_expression
 from jx_base.models.container import Container
-from mo_dots import is_data, is_container
+from mo_dots import is_data, is_container, is_not_null
 from mo_future import items as items_
 from mo_imports import expect
 from mo_json import BOOLEAN, value2json, JX_IS_NULL, JxType
@@ -30,13 +30,15 @@ TRUE, FALSE, Literal, is_literal, MissingOp, NotOp, NULL, Variable, AndOp = expe
 class Expression(BaseExpression):
     _jx_type: JxType = JX_IS_NULL
     has_simple_form = False
+    precedence = 0
 
     def __init__(self, *args):
         self.simplified = False
         # SOME BASIC VERIFICATION THAT THESE ARE REASONABLE PARAMETERS
-        bad = [t for t in args if t != None and not is_expression(t)]
+        bad = [t for t in args if is_not_null(t) and not is_expression(t)]
         if bad:
-            Log.error("Expecting an expression, not {{bad}}", bad=bad)
+            [t for t in args if is_not_null(t) and not is_expression(t)]
+            Log.error("Expecting an expression, not {bad}", bad=bad)
 
     @classmethod
     def get_id(cls):

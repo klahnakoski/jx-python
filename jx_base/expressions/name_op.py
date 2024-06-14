@@ -8,11 +8,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 
-from mo_logs import logger
-
+from jx_base.expressions._utils import _jx_expression, symbiotic
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.literal import is_literal
+from jx_base.expressions.literal import is_literal, Literal
 from mo_json import JxType
+from mo_logs import logger
 
 
 class NameOp(Expression):
@@ -27,8 +27,17 @@ class NameOp(Expression):
         self.frum = frum
         self._name = name
 
+    @classmethod
+    def define(cls, expr):
+        frum, name = expr['name']
+        if isinstance(name, str):
+            name = Literal(name)
+        else:
+            name = _jx_expression(name)
+        return NameOp(_jx_expression(frum, cls.lang), name)
+
     def __data__(self):
-        return {"name": [self.frum.__data__(), self._name.__data__()]}
+        return symbiotic(NameOp, self.frum, self._name.__data__())
 
     def vars(self):
         return self.frum.vars() | self._name.vars()

@@ -9,7 +9,7 @@
 #
 
 
-from jx_base.expressions._utils import _jx_expression
+from jx_base.expressions._utils import _jx_expression, symbiotic
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal
 from jx_base.models.container import Container
@@ -39,7 +39,7 @@ class CommentOp(Expression):
         return result
 
     def __data__(self):
-        return {"comment": [self.frum.__data__(), self.comment.__data__()]}
+        symbiotic(CommentOp, self.frum, self.comment.__data__())
 
     def vars(self):
         return self.frum.vars() | self.comment.vars()

@@ -9,7 +9,7 @@
 #
 from typing import Tuple, Iterable, Dict
 
-from jx_base.expressions._utils import TYPE_CHECK, simplified
+from jx_base.expressions._utils import TYPE_CHECK, simplified, symbiotic
 from jx_base.expressions.aggregate_op import canonical_aggregates
 from jx_base.expressions.default_op import DefaultOp
 from jx_base.expressions.expression import jx_expression, Expression, _jx_expression
@@ -236,7 +236,7 @@ class SelectOp(Expression):
             yield term.name, term.value
 
     def __data__(self):
-        return {"select": [self.frum.__data__()] + [term.__data__() for term in self.terms]}
+        return symbiotic(SelectOp, self.frum, *(term.__data__() for term in self.terms))
 
     def vars(self):
         return set(v for term in self.terms for v in term.value.vars())
