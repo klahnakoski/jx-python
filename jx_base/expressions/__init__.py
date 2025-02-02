@@ -95,7 +95,6 @@ from jx_base.expressions.sql_inner_join_op import SqlInnerJoinOp
 from jx_base.expressions.sql_inner_join_op import SqlInnerJoinOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
 from jx_base.expressions.sql_is_null_op import SqlIsNullOp
-from jx_base.expressions.sql_left_join_op import SqlLeftJoinOp
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
 from jx_base.expressions.sql_limit_op import SqlLimitOp
 from jx_base.expressions.sql_literal import SqlLiteral

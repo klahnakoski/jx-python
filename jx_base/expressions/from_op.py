@@ -3,7 +3,7 @@
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
-# You can obtain one at http:# mozilla.org/MPL/2.0/.
+# You can obtain one at https://www.mozilla.org/en-US/MPL/2.0/.
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
@@ -11,7 +11,7 @@
 
 from jx_base.expressions.expression import Expression, _jx_expression
 from jx_base.expressions.sql_inner_join_op import SqlJoinOne
-from jx_base.expressions.sql_left_join_op import SqlLeftJoinOp
+from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
 from jx_base.language import is_op
 from jx_base.models.container import Container
 from mo_dots import is_many, coalesce, is_data
@@ -46,7 +46,7 @@ class FromOp(Expression):
                 _jx_expression(coalesce(join.get('on'), True), cls.lang)
             ))
 
-        return SqlLeftJoinOp(_jx_expression(root, cls.lang), *joins)
+        return SqlLeftJoinsOp(_jx_expression(root, cls.lang), *joins)
 
 
     def apply(self, container: Container):
