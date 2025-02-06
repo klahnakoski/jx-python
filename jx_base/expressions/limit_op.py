@@ -3,10 +3,11 @@
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
-# You can obtain one at http:# mozilla.org/MPL/2.0/.
+# You can obtain one at https://www.mozilla.org/en-US/MPL/2.0/.
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base.expressions._utils import symbiotic
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.expression import Expression
@@ -27,7 +28,7 @@ class LimitOp(Expression):
         self._jx_type = self.frum.jx_type
 
     def __data__(self):
-        return {"limit": [self.frum.__data__(), self.amount.__data__()]}
+        return symbiotic(LimitOp, self.frum, self.amount.__data__())
 
     def __call__(self, row, rownum=None, rows=None):
         amount = self.amount(row, rownum, rows)

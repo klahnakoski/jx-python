@@ -10,25 +10,26 @@
 
 
 from jx_base.expressions.expression import Expression
-from mo_json.types import JX_NUMBER
+from mo_json import JX_ANY
 
 
-class FromUnixOp(Expression):
+class ValueOp(Expression):
     """
-    FOR USING ON DATABASES WHICH HAVE A DATE COLUMNS: CONVERT TO UNIX
+    A NO-OP FOR SYMBIOTIC FUNCTIONS
     """
 
-    _jx_type = JX_NUMBER
+    has_simple_form = True
+    _jx_type = JX_ANY
 
-    def __init__(self, *term):
-        Expression.__init__(self, *term)
-        self.value = term
+    def __init__(self, value):
+        Expression.__init__(self, value)
+        self.value = value
 
     def vars(self):
         return self.value.vars()
 
     def map(self, map_):
-        return FromUnixOp(self.value.map(map_))
+        return ValueOp(self.value.map(map_))
 
     def missing(self, lang):
         return self.value.missing(lang)

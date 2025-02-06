@@ -3,7 +3,7 @@
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
-# You can obtain one at http:# mozilla.org/MPL/2.0/.
+# You can obtain one at https://www.mozilla.org/en-US/MPL/2.0/.
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
@@ -188,4 +188,3 @@ export("jx_base.expressions.base_binary_op", Variable)
 export("jx_base.expressions.base_binary_op", is_variable)
 export("jx_base.expressions.strict_in_op", Variable)
 export("jx_base.expressions.strict_in_op", is_variable)
-export("jx_base.expressions.from_op", Variable)

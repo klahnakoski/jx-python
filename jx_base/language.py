@@ -3,7 +3,7 @@
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
-# You can obtain one at http://mozilla.org/MPL/2.0/.
+# You can obtain one at https://www.mozilla.org/en-US/MPL/2.0/.
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
@@ -15,7 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from math import isnan
 
-from mo_dots import Data, startswith_field, null_types, datas, is_many, is_list, utils
+from mo_dots import Data, startswith_field, null_types, is_many, utils
 from mo_times import Date
 
 from jx_base.utils import enlist
@@ -369,7 +369,7 @@ def value_compare(left, right, ordering=1):
                 if c != 0:
                     return c * ordering
             return 0
-        elif ltype in datas._data_types:
+        elif ltype in utils._data_types:
             for k in sorted(set(left.keys()) | set(right.keys())):
                 c = value_compare(left.get(k), right.get(k)) * ordering
                 if c != 0:

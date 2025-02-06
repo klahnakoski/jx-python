@@ -1,4 +1,4 @@
-from jx_base.expressions._utils import jx_expression, merge_types, operators, JX, _jx_expression
+from jx_base.expressions._utils import jx_expression, merge_types, operators, JX, _jx_expression, precedence
 from jx_base.expressions.abs_op import AbsOp
 from jx_base.expressions.add_op import AddOp
 from jx_base.expressions.aggregate_op import AggregateOp
@@ -40,7 +40,6 @@ from jx_base.expressions.group_op import GroupOp
 from jx_base.expressions.gt_op import GtOp
 from jx_base.expressions.gte_op import GteOp
 from jx_base.expressions.in_op import InOp
-from jx_base.expressions.inner_join_op import InnerJoinOp
 from jx_base.expressions.is_boolean_op import IsBooleanOp
 from jx_base.expressions.is_integer_op import IsIntegerOp
 from jx_base.expressions.is_number_op import IsNumberOp
@@ -93,6 +92,7 @@ from jx_base.expressions.sql_gt_op import SqlGtOp
 from jx_base.expressions.sql_gte_op import SqlGteOp
 from jx_base.expressions.sql_in_op import SqlInOp
 from jx_base.expressions.sql_inner_join_op import SqlInnerJoinOp
+from jx_base.expressions.sql_inner_join_op import SqlInnerJoinOp
 from jx_base.expressions.sql_instr_op import SqlInstrOp
 from jx_base.expressions.sql_is_null_op import SqlIsNullOp
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
@@ -132,6 +132,7 @@ from jx_base.expressions.true_op import TrueOp, TRUE
 from jx_base.expressions.tuple_op import TupleOp
 from jx_base.expressions.union_op import UnionOp
 from jx_base.expressions.unix_op import UnixOp
+from jx_base.expressions.value_op import ValueOp
 from jx_base.expressions.variable import Variable, IDENTITY
 from jx_base.expressions.when_op import WhenOp
 from mo_dots import set_default
@@ -247,6 +248,7 @@ set_default(
         "tuple": TupleOp,
         "union": UnionOp,
         "unix": UnixOp,
+        "value": ValueOp,
         "when": WhenOp,
         "where": FilterOp,
     },
@@ -264,3 +266,6 @@ register_literal(Literal)
 for op, v in operators.items():
     if v.lang == None:
         logger.warning(f"Operator {op} has no language defined")
+
+for i, op in enumerate(precedence):
+    operators[op].precedence = i
