@@ -9,8 +9,7 @@
 #
 
 from jx_base.expressions.literal import Literal
-from mo_sql import SQL
 
 
-class SqlLiteral(Literal, SQL):
+class SqlLiteral(Literal):
     pass
