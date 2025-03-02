@@ -19,6 +19,7 @@ class SqlConcatOp(Expression):
     """
     conservative string concatenation
     """
+
     op = "sql.concat"
     _jx_type = JX_TEXT
 
@@ -37,7 +38,7 @@ class SqlConcatOp(Expression):
             return False
         if len(self.terms) != len(other.terms):
             return False
-        return all(t==o for t, o in zip(self.terms, other.terms))
+        return all(t == o for t, o in zip(self.terms, other.terms))
 
     def partial_eval(self, lang):
         if not self.terms:

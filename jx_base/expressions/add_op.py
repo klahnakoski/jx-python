@@ -16,6 +16,7 @@ class AddOp(BaseMultiOp):
     """
     CONSERVATIVE ADDITION (SEE SumOp FOR DECISIVE ADDITION)
     """
+
     def __call__(self, row=None, rownum=None, rows=None):
         output = 0
         for t in self.terms:

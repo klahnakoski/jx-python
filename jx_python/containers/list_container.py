@@ -11,22 +11,20 @@
 
 import itertools
 
-from jx_base.expressions._utils import jx_expression
-
 from jx_base.expressions import TRUE
+from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.variable import is_variable
-from jx_base.language import is_expression
-from jx_base.meta_columns import get_schema_from_jx_type
+from jx_base.language import is_expression, ID
+from jx_base.meta_columns import get_schema_from_jx_type, get_schema_from_list
 from jx_base.models.container import Container
 from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_base.utils import delist, enlist
+from jx_python.containers.lists.aggs import is_aggs, list_aggs
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
-from jx_python.expressions._utils import compile_expression, JXExpression
-from jx_python.lists.aggs import is_aggs, list_aggs
 from mo_collections import UniqueIndex
 from mo_dots import (
     Data,
@@ -35,18 +33,17 @@ from mo_dots import (
     is_list,
     from_data,
     to_data,
-    coalesce,
     dict_to_data,
     last,
-    startswith_field,
+    startswith_field, coalesce, register_many,
 )
 from mo_future import first, sort_using_key
 from mo_imports import export, expect
-from mo_json import ARRAY, JX_IS_NULL, value_to_json_type, value_to_jx_type
-from mo_logs import Log
+from mo_json import JX_IS_NULL, value_to_jx_type, JxType, to_jx_type, union_type, array_of
+from mo_logs import logger
 from mo_threads import Lock
 
-jx, get_schema_from_list, Column = expect("jx", "get_schema_from_list", "Column")
+jx = expect("jx")
 
 
 class ListContainer(Container, Namespace, Table):
@@ -63,10 +60,21 @@ class ListContainer(Container, Namespace, Table):
         self.container = self
         self.schema = schema or get_schema_from_list(name, data)
         self.locker = Lock()  # JUST IN CASE YOU WANT TO DO MORE THAN ONE THING
+        setattr(self, ID, -1)
 
     @property
     def nested_path(self):
         return [self.name]
+
+    @property
+    def jx_type(self):
+        return self.name + array_of(union_type(*(
+            col.name + to_jx_type(col.json_type)
+            for col in self.schema.columns
+        )))
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        return self
 
     def get_facts(self, fact_name):
         return self
@@ -76,7 +84,7 @@ class ListContainer(Container, Namespace, Table):
             return self.schema
         snowflake = self.schema.snowflake
         if query_path not in snowflake.query_paths:
-            Log.error("This container only has tables with names {names}", names=self.schema.snowflake.query_paths)
+            logger.error("This container only has tables with names {names}", names=self.schema.snowflake.query_paths)
 
         nested_path = []
         for path in snowflake.query_paths:
@@ -145,7 +153,7 @@ class ListContainer(Container, Namespace, Table):
                     }],
                 )
             else:
-                Log.error("unknown format {{format}}", format=query.format)
+                logger.error("unknown format {format}", format=query.format)
         else:
             return output
 
@@ -191,8 +199,13 @@ class ListContainer(Container, Namespace, Table):
             return [d[select] for d in self.data]
 
     def select(self, select):
-        selects= select.terms
-        if len(selects) == 1 and is_variable(selects[0].value) and selects[0].value.var == "." and selects[0].name == ".":
+        selects = select.terms
+        if (
+            len(selects) == 1
+            and is_variable(selects[0].value)
+            and selects[0].value.var == "."
+            and selects[0].name == "."
+        ):
             return self
 
         exprs = [jx_expression(s.value) for s in selects]
@@ -203,7 +216,7 @@ class ListContainer(Container, Namespace, Table):
             for s, e in zip(selects, exprs):
                 value = e(row)
                 result[s.name] = e(row)
-                jx_type = jx_type | s.name+value_to_jx_type(value)
+                jx_type = jx_type | s.name + value_to_jx_type(value)
             new_data.append(from_data(result))
 
         new_name = f"from {self.name}"
@@ -241,7 +254,7 @@ class ListContainer(Container, Namespace, Table):
 
             return _output()
         except Exception as e:
-            Log.error("Problem grouping", e)
+            logger.error("Problem grouping", e)
 
     def insert(self, documents):
         self.data.extend(documents)
@@ -277,18 +290,19 @@ class ListContainer(Container, Namespace, Table):
 
     def get_snowflake(self, name):
         if self.name != name:
-            Log.error("This container only has table by name of {{name}}", name=name)
+            logger.error("This container only has table by name of {name}", name=name)
         return self
 
     def get_table(self, name):
         if self is name or self.name == name:
             return self
-        Log.error("This container only has table by name of {{name}}", name=name)
+        logger.error("This container only has table by name of {name}", name=name)
 
 
 DUAL = ListContainer(
     name="dual", data=[{}], schema=Schema(["dual"], Snowflake(None, ["dual"], columns=UniqueIndex(keys=("name",))))
 )
 
+register_many(ListContainer)
 
 export("jx_base.models.container", ListContainer)

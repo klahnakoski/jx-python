@@ -141,7 +141,7 @@ def get_dispatcher_for(name):
 BaseExpression = LanguageElement(str("BaseExpression"), (object,), {"partial_eval": partial_eval})
 
 
-class Language(object):
+class Language:
     def __init__(self, name):
         global JX
         if not name:
@@ -211,7 +211,9 @@ class Language(object):
             else:
                 new_op.lookups = jx_op.lookups
                 for dd_method in double_dispatch_methods:
-                    set_at(jx_op.lookups[dd_method], self.id, _extract_method(new_op, dd_method))
+                    set_at(
+                        jx_op.lookups[dd_method], self.id, _extract_method(new_op, dd_method)
+                    )
 
                 # COPY OTHER DEFINED METHODS
                 others = list(vars(new_op).items())
@@ -300,15 +302,10 @@ def is_op(call, op) -> bool:
 
 
 def is_expression(call):
-    if is_many(call):
-        return False
     try:
-        output = getattr(call, ID, None) != None
+        return getattr(call, ID, None) != None
     except Exception:
-        output = False
-    # if output != isinstance(call, Expression):
-    #     logger.error("programmer error")
-    return output
+        return False
 
 
 def value_compare(left, right, ordering=1):

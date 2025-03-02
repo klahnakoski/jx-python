@@ -20,6 +20,7 @@ class SumOp(Expression):
     """
     DECISIVE ADDITION
     """
+
     has_simple_form = True
     _jx_type = JX_NUMBER
 

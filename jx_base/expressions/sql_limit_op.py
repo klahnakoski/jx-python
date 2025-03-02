@@ -17,4 +17,3 @@ class SqlLimitOp(Expression):
         Expression.__init__(self, frum, limit)
         self.frum = frum
         self.limit = limit
-

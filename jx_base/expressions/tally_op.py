@@ -14,6 +14,7 @@ class TallyOp(BaseMultiOp):
     """
     CONSERVATIVE COUNT (SEE CountOp FOR DECISIVE COUNT)
     """
+
     has_simple_form = False
 
     def __call__(self, row, rownum, rows):

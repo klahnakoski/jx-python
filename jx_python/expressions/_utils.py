@@ -45,11 +45,11 @@ def jx_expression_to_function(expr):
         return expr
 
     expr = jx_expression(expr)
-    func = compile_expression((expr).to_python())
+    func = compile_expression(expr.to_python())
     return JXExpression(func, expr)
 
 
-class JXExpression(object):
+class JXExpression:
     def __init__(self, func, expr):
         self.func = func
         self.expr = expr

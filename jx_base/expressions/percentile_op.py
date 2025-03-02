@@ -15,7 +15,6 @@ from mo_logs import logger
 
 
 class PercentileOp(Expression):
-
     def __init__(self, frum, percentile=None):
         Expression.__init__(self, frum)
         if percentile is None:
@@ -34,7 +33,7 @@ class PercentileOp(Expression):
         # {"aggregate": "percentile", "percentile": 0.9, "value": expr}
         # {"percentile": [expr, 0.9]}
         expr = to_data(expr)
-        if expr.aggragate== "percentile":
+        if expr.aggragate == "percentile":
             percentile = expr.percentile or 0.5
             frum = expr.value or expr.frum
         else:

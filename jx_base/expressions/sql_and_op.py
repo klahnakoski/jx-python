@@ -30,4 +30,4 @@ class SqlAndOp(BaseMultiOp):
             return False
         if len(self.terms) != len(other.terms):
             return False
-        return all(t==o for t, o in zip(self.terms, other.terms))
+        return all(t == o for t, o in zip(self.terms, other.terms))

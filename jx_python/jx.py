@@ -7,10 +7,25 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-
+from functools import cmp_to_key
 
 import mo_dots
 import mo_math
+from jx_base import jx_expression, Snowflake, Schema, get_schema_from_list
+from jx_base.expressions import FALSE, TRUE
+from jx_base.expressions.query_op import _normalize_sort, Column
+from jx_base.expressions.select_op import _normalize_selects, SelectOne
+from jx_base.expressions.sort_op import SortOne
+from jx_base.language import value_compare
+from jx_base.models.container import Container
+from jx_base.utils import enlist
+from jx_python import expressions as _expressions, flat_list, group_by
+from jx_python.containers.cube import Cube
+from jx_python.containers.list_container import ListContainer
+from jx_python.expressions import jx_expression_to_function as get
+from jx_python.flat_list import PartFlatList
+from jx_python.streams.expression_compiler import compile_expression
+from jx_python.utils import wrap_function as _wrap_function
 from mo_collections.index import Index
 from mo_collections.unique_index import UniqueIndex
 from mo_dots import (
@@ -29,29 +44,16 @@ from mo_dots import (
     dict_to_data,
     list_to_data,
     from_data,
+    concat_field,
 )
 from mo_dots import _getdefault
 from mo_dots.objects import DataObject
-from mo_math import MIN, UNION
-
-from jx_base.expressions import FALSE, TRUE
-from jx_base.expressions import QueryOp
-from jx_base.expressions.query_op import _normalize_sort
-from jx_base.expressions.select_op import _normalize_selects
-from jx_base.language import is_op, value_compare
-from jx_base.models.container import Container
-from jx_base.utils import enlist
-from jx_python import expressions as _expressions, flat_list, group_by
-from jx_python.containers.cube import Cube
-from jx_python.containers.list import ListContainer
-from jx_python.convert import list2table, list2cube
-from jx_python.cubes.aggs import cube_aggs
-from jx_python.expressions import jx_expression_to_function as get
-from jx_python.flat_list import PartFlatList
-from jx_python.streams.expression_compiler import compile_expression
-from jx_python.utils import wrap_function as _wrap_function
 from mo_future import is_text, sort_using_cmp
+from mo_json import ARRAY, array_of
+from mo_kwargs import override
 from mo_logs import Log
+from mo_math import MIN, UNION
+from mo_times import Date
 
 # A COLLECTION OF DATABASE OPERATORS (RELATIONAL ALGEBRA OPERATORS)
 # JSON QUERY EXPRESSION DOCUMENTATION: https://github.com/klahnakoski/jx/tree/master/docs
@@ -65,66 +67,15 @@ _merge_type = None
 _ = _expressions
 
 
-def run(query, container=Null):
+@override(kwargs="query")
+def run(frum=None, query=None):
     """
     THIS FUNCTION IS SIMPLY SWITCHING BASED ON THE query["from"] CONTAINER,
     BUT IT IS ALSO PROCESSING A list CONTAINER; SEPARATE TO A ListContainer
     """
-    if container == None:
-        container = to_data(query)["from"]
-        query_op = QueryOp.wrap(query, container=container, namespace=container.schema)
-    else:
-        query_op = QueryOp.wrap(query, container=container, namespace=container.namespace)
-
-    if container == None:
-        from jx_python.containers.list import DUAL
-
-        return DUAL.query(query_op)
-    elif isinstance(container, Container):
-        return container.query(query_op)
-    elif is_many(container):
-        container = ListContainer(name=None, data=list(container))
-    elif isinstance(container, Cube):
-        if is_aggs(query_op):
-            return cube_aggs(container, query_op)
-    elif is_op(container, QueryOp):
-        container = run(container)
-    elif is_data(container):
-        query = container
-        container = query["from"]
-        container = run(QueryOp.wrap(query, container, container.namespace), container)
-    else:
-        Log.error("Do not know how to handle {{type}}", type=container.__class__.__name__)
-
-    if is_aggs(query_op):
-        container = list_aggs(container, query_op)
-    else:  # SETOP
-        if query_op.where is not TRUE:
-            container = filter(container, query_op.where)
-
-        if query_op.sort:
-            container = sort(container, query_op.sort, already_normalized=True)
-
-        if query_op.select:
-            container = select(container, query_op.select)
-
-    if query_op.window:
-        if isinstance(container, Cube):
-            container = list(container.values())
-
-        for param in query_op.window:
-            window(container, param)
-
-    # AT THIS POINT frum IS IN LIST FORMAT, NOW PACKAGE RESULT
-    if query_op.format == "cube":
-        container = list2cube(container)
-    elif query_op.format == "table":
-        container = list2table(container)
-        container.meta.format = "table"
-    else:
-        container = dict_to_data({"meta": {"format": "list"}, "data": container})
-
-    return container
+    del query["query"]
+    query = jx_expression(query)
+    return query()
 
 
 groupby = group_by.groupby
@@ -289,43 +240,27 @@ def _tuple_deep(v, field, depth, record):
     return 0, None, record + (v.get(f),)
 
 
-def select(data, field_name):
+def select(frum, *selects):
     """
     return list with values from field_name
     """
-    if isinstance(data, Cube):
-        return data._select(_normalize_selects(data, field_name, "list"))
 
-    if isinstance(data, PartFlatList):
-        return data.select(field_name)
+    if not isinstance(frum, Container):
+        frum = Container.create(frum)
+    if not all(isinstance(s, SelectOne) for s in selects):
+        selects = jx_expression({"from": frum, "select": selects}).terms
 
-    if isinstance(data, UniqueIndex):
-        data = data._data.values()  # THE SELECT ROUTINE REQUIRES dicts, NOT Data WHILE ITERATING
+    return _selects(frum, *selects)
 
-    if is_data(field_name):
-        field_name = to_data(field_name)
-        if field_name.value in ["*", "."]:
-            return data
 
-        if field_name.value:
-            # SIMPLIFY {"value":value} AS STRING
-            field_name = field_name.value
-
-    # SIMPLE PYTHON ITERABLE ASSUMED
-    if is_text(field_name):
-        path = split_field(field_name)
-        if len(path) == 1:
-            return FlatList([d[field_name] for d in data])
-        else:
-            output = FlatList()
-            flat_list._select1(data, path, 0, output)
-            return output
-    elif is_list(field_name):
-        keys = [_select_a_field(to_data(f)) for f in field_name]
-        return _select(Data(), from_data(data), keys, 0)
-    else:
-        keys = [_select_a_field(field_name)]
-        return _select(Data(), from_data(data), keys, 0)
+def _select(frum, *selects):
+    output = []
+    for rownum, row in enumerate(frum):
+        record = {}
+        for s in selects:
+            record[s.name] = s.value(row, rownum, frum)
+        output.append(record)
+    return ListContainer(".", data=output, schema=get_schema_from_list(".", output))
 
 
 def _select_a_field(field):
@@ -338,7 +273,7 @@ def _select_a_field(field):
         return dict_to_data({"name": field.name, "value": field.value})
 
 
-def _select(template, data, fields, depth):
+def _select_(template, data, fields, depth):
     output = FlatList()
     deep_path = []
     deep_fields = UniqueIndex(["name"])
@@ -394,7 +329,7 @@ def _select_deep(v, field, depth, record):
         else:
             record[field.name] = v.get(f)
     except Exception as e:
-        Log.error("{{value}} does not have {{field}} property", value=v, field=f, cause=e)
+        Log.error("{value} does not have {field} property", value=v, field=f, cause=e)
     return 0, None
 
 
@@ -518,11 +453,11 @@ def _deeper_iterator(columns, nested_path, path, data):
                 if leaf.startswith(nested_path[0] + ".") or leaf == nested_path[0] or not nested_path[0]:
                     nested_path[0] = leaf
                 else:
-                    Log.error("nested path conflict: {{leaf}} vs {{nested}}", leaf=leaf, nested=nested_path[0])
+                    Log.error("nested path conflict: {leaf} vs {nested}", leaf=leaf, nested=nested_path[0])
 
             if is_list(v) and v:
                 if deep_leaf:
-                    Log.error("nested path conflict: {{leaf}} vs {{nested}}", leaf=leaf, nested=deep_leaf)
+                    Log.error("nested path conflict: {leaf} vs {nested}", leaf=leaf, nested=deep_leaf)
                 deep_leaf = leaf
                 deep_v = v
             elif is_data(v):
@@ -541,46 +476,34 @@ def _deeper_iterator(columns, nested_path, path, data):
 """
 
 
-def sort(data, fieldnames=None, already_normalized=False):
+def sort(frum, *sorts):
     """
-    :param data: THE DATA TO SORT
+    :param frum: THE DATA TO SORT
     :param fieldnames: A FIELDNAME, LIST OF FIELD NAMES
     :param already_normalized: True IF fieldnames IS SORT STRUCTURE:  {"field":field_name, "sort":direction}
     :return: A NEW LIST OF DATA, BUT SORTED
     """
+    if not isinstance(frum, Container):
+        frum = Container.create(frum)
+    if not all(isinstance(s, SortOne) for s in sorts):
+        sorts = jx_expression({"from": frum, "sort": sorts}).sorts
 
-    try:
-        if data == None:
-            return Null
+    funcs = [(f.expr, f.direction) for f in sorts]
 
-        if isinstance(fieldnames, int):
-            funcs = [(lambda t: t[fieldnames], 1)]
-        else:
-            if not fieldnames:
-                return to_data(sort_using_cmp(data, value_compare))
-            formal = fieldnames if already_normalized else _normalize_sort(fieldnames)
-            funcs = [(get(f.value), f.sort) for f in formal]
+    def comparer(left, right):
+        for func, sort_ in funcs:
+            try:
+                result = value_compare(func(left), func(right), sort_)
+                if result != 0:
+                    return result
+            except Exception as cause:
+                Log.error("problem with compare", cause)
+        return 0
 
-        def comparer(left, right):
-            for func, sort_ in funcs:
-                try:
-                    result = value_compare(func(left), func(right), sort_)
-                    if result != 0:
-                        return result
-                except Exception as cause:
-                    Log.error("problem with compare", cause)
-            return 0
-
-        if is_text(data):
-            raise Log.error("Do not know how to handle")
-        elif is_many(data):
-            output = list_to_data([d for d in sort_using_cmp((from_data(d) for d in data), cmp=comparer)])
-        else:
-            raise Log.error("Do not know how to handle")
-
-        return output
-    except Exception as e:
-        Log.error("Problem sorting\n{{data}}", data=data, cause=e)
+    sorted_data = list(sorted((from_data(d) for d in frum), key=cmp_to_key(comparer)))
+    return ListContainer(
+        ".", data=sorted_data, schema=frum.schema
+    )
 
 
 def count(values):
@@ -650,7 +573,7 @@ def filter(data, where):
         dd = to_data(data)
         return list_to_data([from_data(d) for i, d in enumerate(data) if temp(to_data(d), i, dd)])
     else:
-        Log.error("Do not know how to handle type {{type}}", type=data.__class__.__name__)
+        Log.error("Do not know how to handle type {type}", type=data.__class__.__name__)
 
     try:
         return drill_filter(where, data)
@@ -707,7 +630,7 @@ def drill_filter(esfilter, data):
             try:
                 d = d[c]
             except Exception as e:
-                Log.error("{{name}} does not exist", name=fieldname)
+                Log.error("{name} does not exist", name=fieldname)
             if is_list(d) and len(col) > 1:
                 if len(primary_column) <= depth + i:
                     primary_nested.append(True)
@@ -892,7 +815,7 @@ def drill_filter(esfilter, data):
             else:
                 return {"exists": rest}
         else:
-            Log.error("Can not interpret esfilter: {{esfilter}}", {"esfilter": filter})
+            Log.error("Can not interpret esfilter: {esfilter}", {"esfilter": filter})
 
     output = []  # A LIST OF OBJECTS MAKING THROUGH THE FILTER
 
@@ -920,7 +843,7 @@ def drill_filter(esfilter, data):
         if is_data(d):
             main([], esfilter, to_data(d), 0)
         else:
-            Log.error("filter is expecting a dict, not {{type}}", type=d.__class__)
+            Log.error("filter is expecting a dict, not {type}", type=d.__class__)
 
     # AT THIS POINT THE primary_column[] IS DETERMINED
     # USE IT TO EXPAND output TO ALL NESTED OBJECTS
@@ -969,76 +892,94 @@ def wrap_function(func):
     return _wrap_function(func)
 
 
-def window(data, param):
+def group(frum, edges):
+    def func(row, rownum, rows):
+        return to_data({e.name: e.value(row, rownum, rows) for e in edges})
+
+    output = {}
+    for rownum, row in enumerate(frum):
+        key = func(row, rownum, frum)
+        output.setdefault(key, []).append(row)
+
+    group_schema = get_schema_from_list(".", list(output.keys()))
+
+    columns = [
+        *(
+            Column(
+                name=col,
+                es_column=concat_field("group", col.es_column),
+                es_index=col.es_index,
+                es_type=array_of("group" + col.es_type),
+                json_type=ARRAY,
+                last_updated=Date.now(),
+                nested_path=["."],
+                multi=len(output),
+                cardinality=0,
+            )
+            for col in group_schema.columns
+        ),
+        *(
+            Column(
+                name=col,
+                es_column=concat_field("rows", col.es_column),
+                es_index=col.es_index,
+                es_type=array_of("row" + array_of(col.es_type)),
+                json_type=ARRAY,
+                last_updated=Date.now(),
+                nested_path=[concat_field("rows", col.nested_path[0]), *col.nested_path],
+                multi=len(output),
+                cardinality=0,
+            )
+            for col in frum.schema.columns
+        ),
+    ]
+
+    columns = UniqueIndex(keys=("es_column",), data=columns)
+    snowflake = Snowflake(None, ["."], columns)
+    snowflake.namespace = snowflake
+    return ListContainer(
+        ".", [{"group": from_data(k), "rows": v} for k, v in output.items()], schema=Schema(["."], snowflake)
+    )
+
+
+internal_sort = sort
+
+
+@override(kwargs="query")
+def window(
+    frum,
+    *,
+    window=None,
+    name=None,
+    edges=None,
+    where=None,
+    sort=None,
+    value=None,
+    aggregate=None,
+    range=None,
+    query=None
+):
     """
     MAYBE WE CAN DO THIS WITH NUMPY (no, the edges of windows are not graceful with numpy)
     data - list of records
     """
-    name = param.name  # column to assign window function result
-    edges = param.edges  # columns to gourp by
-    where = param.where  # DO NOT CONSIDER THESE VALUES
-    sortColumns = param.sort  # columns to sort by
-    calc_value = get(param.value)  # function that takes a record and returns a value (for aggregation)
-    aggregate = param.aggregate  # WindowFunction to apply
-    _range = param.range  # of form {"min":-10, "max":0} to specify the size and relative position of window
+    if not window:
+        # assemble parameters into window_op
+        window = jx_expression({
+            "from": Container.create(frum),
+            "window": {k: v for k, v in query.items() if k not in ["from", "window", "query"]},
+        }).window
 
-    data = filter(data, where)
+    frum = filter(frum, window.where)
 
-    if not aggregate and not edges:
-        if sortColumns:
-            data = sort(data, sortColumns, already_normalized=True)
-        # SIMPLE CALCULATED VALUE
-        for rownum, r in enumerate(data):
-            try:
-                r[name] = calc_value(r, rownum, data)
-            except Exception as e:
-                raise e
-        return
+    new_rows = []
+    for group_row in group(frum, window.edges):
+        rows = ListContainer(".", group_row.rows, schema=frum.schema)
+        sorted_rows = internal_sort(rows, *window.sort)
+        result = _select(sorted_rows, *window.select)
+        new_rows.extend([{**a, **b} for a, b in zip(sorted_rows, result)])
 
-    try:
-        edge_values = [e.value.var for e in edges]
-    except Exception as e:
-        raise Log.error("can only support simple variable edges", cause=e)
-
-    if not aggregate or aggregate == "none":
-        for _, values in groupby(data, edge_values):
-            if not values:
-                continue  # CAN DO NOTHING WITH THIS ZERO-SAMPLE
-
-            if sortColumns:
-                sequence = sort(values, sortColumns, already_normalized=True)
-            else:
-                sequence = values
-
-            for rownum, r in enumerate(sequence):
-                r[name] = calc_value(r, rownum, sequence)
-        return
-
-    for keys, values in groupby(data, edge_values):
-        if not values:
-            continue  # CAN DO NOTHING WITH THIS ZERO-SAMPLE
-
-        sequence = sort(values, sortColumns)
-
-        for rownum, r in enumerate(sequence):
-            r["__temp__"] = calc_value(r, rownum, sequence)
-
-        head = coalesce(_range.max, _range.stop)
-        tail = coalesce(_range.min, _range.start)
-
-        # PRELOAD total
-        total = aggregate()
-        for i in range(tail, head):
-            total.add(sequence[i].__temp__)
-
-        # WINDOW FUNCTION APPLICATION
-        for i, r in enumerate(sequence):
-            r[name] = total.end()
-            total.add(sequence[i + head].__temp__)
-            total.sub(sequence[i + tail].__temp__)
-
-    for r in data:
-        r["__temp__"] = None  # CLEANUP
+    return ListContainer(".", new_rows)
 
 
 def intervals(_min, _max=None, size=1):

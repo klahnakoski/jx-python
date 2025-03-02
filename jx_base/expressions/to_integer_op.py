@@ -62,7 +62,7 @@ class ToIntegerOp(Expression):
             elif isinstance(v, (int, float)):
                 return term
             else:
-                Log.error("can not convert {{value|json}} to integer", value=term.value)
+                Log.error("can not convert {value|json} to integer", value=term.value)
         elif base_type(term.jx_type) == JX_INTEGER:
             return term
         elif is_op(term, CaseOp):  # REWRITING
@@ -70,7 +70,9 @@ class ToIntegerOp(Expression):
                 *(WhenOp(t.when, then=ToIntegerOp(t.then)) for t in term.whens[:-1]), ToIntegerOp(term.whens[-1])
             ).partial_eval(lang)
         elif is_op(term, WhenOp):  # REWRITING
-            return WhenOp(term.when, then=ToIntegerOp(term.then), **{"else": ToIntegerOp(term.els_)}).partial_eval(lang)
+            return WhenOp(
+                term.when, then=ToIntegerOp(term.then), **{"else": ToIntegerOp(term.els_)}
+            ).partial_eval(lang)
         elif is_op(term, CoalesceOp):
             return CoalesceOp(*(ToIntegerOp(t) for t in term.terms))
         elif is_op(term, SelectOp):

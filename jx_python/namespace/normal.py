@@ -130,7 +130,7 @@ class Normal(Namespace):
                 Log.error("Must give name to each column in select clause")
 
             if not output.name:
-                Log.error("expecting select to have a name: {{select}}", select=select)
+                Log.error("expecting select to have a name: {select}", select=select)
 
             output.aggregate = coalesce(canonical_aggregates.get(select.aggregate), select.aggregate, "none")
             return output
@@ -141,7 +141,7 @@ class Normal(Namespace):
         else:
             edge = to_data(edge)
             if not edge.name and not is_text(edge.value):
-                Log.error("You must name compound edges: {{edge}}", edge=edge)
+                Log.error("You must name compound edges: {edge}", edge=edge)
 
             if edge.value.__class__ in (Data, dict, list, FlatList) and not edge.domain:
                 # COMPLEX EDGE IS SHORT HAND
@@ -168,7 +168,7 @@ class Normal(Namespace):
                 Log.error("groupby does not accept complicated domains")
 
             if not column.name and not is_text(column.value):
-                Log.error("You must name compound edges: {{edge}}", edge=column)
+                Log.error("You must name compound edges: {edge}", edge=column)
 
             return dict_to_data({
                 "name": coalesce(column.name, column.value),

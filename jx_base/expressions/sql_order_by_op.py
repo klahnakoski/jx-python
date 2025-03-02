@@ -28,5 +28,3 @@ class SqlOrderByOp(Expression):
         Expression.__init__(self, frum, *(o.expr for o in order))
         self.frum = frum
         self.order = order
-
-

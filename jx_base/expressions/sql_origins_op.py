@@ -7,6 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_logs import logger
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp, Source

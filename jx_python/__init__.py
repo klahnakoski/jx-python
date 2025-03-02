@@ -10,11 +10,12 @@
 
 from jx_python import jx
 from jx_python.containers.cube import Cube
-from jx_python.containers.list import ListContainer
+from jx_python.containers.list_container import ListContainer
 from jx_python.expressions._utils import Python
 from jx_python.streams import stream
 from mo_imports import export
 
-export("jx_python.containers.list", jx)
+export("jx_python.containers.list_container", jx)
+export("jx_base.expressions.window_op", jx)
 
 __all__ = ["ListContainer", "Cube", "jx", "stream", "Python"]

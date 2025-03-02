@@ -13,7 +13,7 @@ from jx_base.expressions import QueryOp
 from mo_dots import is_data
 
 
-class Namespace(object):
+class Namespace:
     """
     A CONGLOMERATION OF Snowflake METADATA
     A Namespace HOLDS METADATA FOR A Collection

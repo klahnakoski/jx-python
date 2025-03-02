@@ -71,19 +71,19 @@ class TestVarious(TestCase):
             )
 
     def test_column(self):
+        # using "." for nameless lists
         nested_path = ["."]
-        with self.assertRaises(Exception):
-            Column(
-                name=".",
-                json_type=INTEGER,
-                es_type="nested",
-                es_column=typed_column(concat_field(nested_path[0], "."), "n"),
-                es_index="test",
-                cardinality=0,
-                multi=1,
-                nested_path=nested_path,
-                last_updated=Date.now(),
-            )
+        Column(
+            name=".",
+            json_type=INTEGER,
+            es_type="nested",
+            es_column=typed_column(concat_field(nested_path[0], "."), "n"),
+            es_index="test",
+            cardinality=0,
+            multi=1,
+            nested_path=nested_path,
+            last_updated=Date.now(),
+        )
 
     def test_column_constraints(self):
         multi = Column(

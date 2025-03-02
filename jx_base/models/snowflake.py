@@ -16,6 +16,7 @@ class Snowflake:
     """
     REPRESENT ONE ALIAS, AND ITS NESTED ARRAYS
     """
+
     def __init__(self, namespace, query_paths, columns):
         self.namespace = namespace
         self.query_paths = query_paths

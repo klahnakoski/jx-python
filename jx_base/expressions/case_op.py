@@ -36,7 +36,9 @@ class CaseOp(Expression):
 
         for w in self._whens:
             if not is_op(w, WhenOp) or w.els_ is not NULL:
-                Log.error("case expression does not allow `else` clause in `when` sub-clause {case}", case=self.__data__())
+                Log.error(
+                    "case expression does not allow `else` clause in `when` sub-clause {case}", case=self.__data__()
+                )
 
     @property
     def whens(self):
@@ -69,9 +71,7 @@ class CaseOp(Expression):
         return CaseOp(*whens).partial_eval(lang)
 
     def invert(self, lang):
-        return CaseOp(
-            *(WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens), self._else
-        ).partial_eval(lang)
+        return CaseOp(*(WhenOp(w.when, then=w.then.invert(lang)) for w in self.whens), self._else).partial_eval(lang)
 
     def partial_eval(self, lang):
         if self.jx_type is JX_BOOLEAN:

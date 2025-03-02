@@ -29,7 +29,7 @@ class NameOp(Expression):
 
     @classmethod
     def define(cls, expr):
-        frum, name = expr['name']
+        frum, name = expr["name"]
         if isinstance(name, str):
             name = Literal(name)
         else:

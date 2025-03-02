@@ -16,6 +16,7 @@ from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
 from mo_imports import export
 from mo_json import union_type
+from mo_dots import exists
 
 
 class CoalesceOp(Expression):
@@ -25,6 +26,13 @@ class CoalesceOp(Expression):
         Expression.__init__(self, *terms)
         self.terms = terms
         self._jx_type = union_type(*(t.jx_type for t in terms))
+
+    def __call__(self, row, row_num, rows):
+        for t in self.terms:
+            v = t(row, row_num, rows)
+            if exists(v):
+                return v
+        return None
 
     def __data__(self):
         return {"coalesce": [t.__data__() for t in self.terms]}

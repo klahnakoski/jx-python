@@ -37,7 +37,6 @@ class LeastOp(BaseMultiOp):
                 mini = v
         return mini
 
-
     def partial_eval(self, lang):
         minimum = None
         terms = []

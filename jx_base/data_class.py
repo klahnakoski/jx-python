@@ -79,7 +79,7 @@ def DataClass(name, columns, constraint=None):
 
                 fvalue = func(row0, rownum0, rows0)
                 evalue = expr(row0, rownum0, rows0)
-                logger.error("Can not validate constraint\n{{code}}", code=cond, cause=cause)
+                logger.error("Can not validate constraint\n{code}", code=cond, cause=cause)
 
             if "and" in cond:
                 for i, term in enumerate(cond["and"]):
@@ -100,7 +100,7 @@ def DataClass(name, columns, constraint=None):
 
             fvalue = func(row0, rownum0, rows0)
             evalue = expr(row0, rownum0, rows0)
-            logger.error("Can not validate constraint\n{{code}}", code=cond)
+            logger.error("Can not validate constraint\n{code}", code=cond)
 
         # USE THIS TO DEBUG CONSTRAINTS
         # validate(constraint)
@@ -228,7 +228,7 @@ class {{class_name}}(Mapping):
             "false": False,
             "true": True,
             "null": None,
-            "opener": "{{"
+            "opener": "{{",
         },
     )
     register_data(output)

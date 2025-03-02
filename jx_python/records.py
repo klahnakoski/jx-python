@@ -10,7 +10,7 @@
 from jx_base.utils import enlist
 
 
-class Record(object):
+class Record:
     def __init__(self, coord, cube):
         self.coord = coord
         self.cube = cube

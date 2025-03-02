@@ -10,18 +10,20 @@
 
 
 from jx_base.expressions.expression import Expression
+from jx_base.utils import enlist
 from mo_dots import Null, is_data
 from mo_future import is_text
 from mo_imports import expect, export
 from mo_json import value2json, value_to_jx_type
 
-(DateOp, FALSE, TRUE, NULL) = expect("DateOp", "FALSE", "TRUE", "NULL")
+(DateOp, FALSE, TRUE, NULL, get_schema_from_list) = expect("DateOp", "FALSE", "TRUE", "NULL", "get_schema_from_list")
 
 
 class Literal(Expression):
     """
     A literal JSON document
     """
+
     simplified = True
 
     def __new__(cls, term):
@@ -67,6 +69,10 @@ class Literal(Expression):
 
     def __data__(self):
         return {"literal": self.value}
+
+    @property
+    def schema(self):
+        return get_schema_from_list(".", enlist(self._value))
 
     @property
     def value(self):

@@ -23,7 +23,7 @@ from mo_math.stats import ZeroMoment, ZeroMoment2Stats
 # A VARIETY OF SLIDING WINDOW FUNCTIONS
 
 
-class AggregationFunction(object):
+class AggregationFunction:
     def __init__(self):
         """
         RETURN A ZERO-STATE AGGREGATE

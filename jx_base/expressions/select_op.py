@@ -141,7 +141,7 @@ class SelectOp(Expression):
                 terms.extend(t.terms)
             elif is_text(t):
                 if not is_variable_name(t):
-                    Log.error("expecting {{value}} a simple dot-delimited path name", value=t)
+                    Log.error("expecting {value} a simple dot-delimited path name", value=t)
                 terms.append(SelectOne(t, _jx_expression(t, cls.lang)))
             elif t.aggregate:
                 # AGGREGATES ARE INSERTED INTO THE CALL CHAIN
@@ -154,7 +154,7 @@ class SelectOp(Expression):
                 if t.name == None:
                     if is_text(t.value):
                         if not is_variable_name(t.value):
-                            Log.error("expecting {{value}} a simple dot-delimited path name", value=t.value)
+                            Log.error("expecting {value} a simple dot-delimited path name", value=t.value)
                         else:
                             terms.append(SelectOne(t.value, agg))
                     else:
@@ -245,6 +245,9 @@ class SelectOp(Expression):
         return SelectOp(self.frum, *(SelectOne(name, value.map(map_)) for name, value in self))
 
 
+register_many(SelectOp)
+
+
 def normalize_one(frum, select, format):
     if is_text(select):
         if select == "*":
@@ -332,7 +335,7 @@ def _normalize_selects(frum, selects, format) -> SelectOp:
     for s in terms:
         name = s.name
         if name in exists:
-            Log.error("{{name}} has already been defined", name=name)
+            Log.error("{name} has already been defined", name=name)
         exists.add(name)
 
     return SelectOp(frum, *terms)

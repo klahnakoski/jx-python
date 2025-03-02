@@ -35,7 +35,7 @@ class Expression(BaseExpression):
     def __init__(self, *args):
         self.simplified = False
         # SOME BASIC VERIFICATION THAT THESE ARE REASONABLE PARAMETERS
-        bad = [t for t in args if is_not_null(t) and not is_expression(t)]
+        bad = [t for t in args if is_not_null(t) and not is_expression(t) and not isinstance(t, Container)]
         if bad:
             [t for t in args if is_not_null(t) and not is_expression(t)]
             Log.error("Expecting an expression, not {bad}", bad=bad)
@@ -66,7 +66,7 @@ class Expression(BaseExpression):
             else:
                 if not items:
                     return NULL
-                raise Log.error("{{operator|quote}} is not a known operator", operator=expr)
+                raise Log.error("{operator|quote} is not a known operator", operator=expr)
 
             if term == None:
                 return class_(**clauses)
@@ -83,7 +83,7 @@ class Expression(BaseExpression):
                         k, v = items[0]
                         return class_(Variable(k), Literal(v), **clauses)
                     else:
-                        Log.error("add define method to {{op}}}", op=class_.__name__)
+                        Log.error("add define method to {op}", op=class_.__name__)
                 else:
                     return class_(_jx_expression(term, lang), **clauses)
             else:
@@ -92,17 +92,16 @@ class Expression(BaseExpression):
                 else:
                     return class_(_jx_expression(term, lang), **clauses)
         except Exception as cause:
-            Log.warning("programmer error expr = {{value|quote}}", value=expr, cause=cause)
-            Log.error("programmer error expr = {{value|quote}}", value=expr, cause=cause)
+            Log.error("programmer error expr = {value|quote}", value=expr, cause=cause)
 
     def __data__(self):
         raise NotImplementedError
 
     def vars(self):
-        raise Log.error("{{type}} has no `vars` method", type=self.__class__.__name__)
+        raise Log.error("{type} has no `vars` method", type=self.__class__.__name__)
 
     def map(self, map):
-        raise Log.error("{{type}} has no `map` method", type=self.__class__.__name__)
+        raise Log.error("{type} has no `map` method", type=self.__class__.__name__)
 
     def missing(self, lang):
         """
@@ -168,7 +167,7 @@ class Expression(BaseExpression):
                 return False
         except Exception:
             return False
-        Log.note("this is slow on {{type}}", type=self.__class__.__name__)
+        Log.note("this is slow on {type}", type=self.__class__.__name__)
         return self.__data__() == other.__data__()
 
     def __contains__(self, item):
@@ -190,8 +189,20 @@ class Expression(BaseExpression):
     def __getattr__(self, item):
         if item == "__json__":
             raise AttributeError()
-        Log.error(
-            """{{type}} object has no attribute {{item}}, did you .register_ops() for {{type}}?""",
-            type=self.__class__.__name__,
-            item=item,
-        )
+
+        op = operators.get(item)
+        if not op or not hasattr(self, "precedence"):
+            Log.error(
+                """{type} object has no attribute {item}, did you .register_ops() for {type}?""",
+                type=self.__class__.__name__,
+                item=item,
+            )
+
+        if op.precedence > self.precedence:
+            # SYMBIOTIC FUNCTION
+            return getattr(self.frum, item)
+        elif self.op == item:
+            return self
+        else:
+            return None
+

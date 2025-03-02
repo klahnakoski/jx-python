@@ -7,6 +7,8 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from mo_logs import logger
+
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.all_op import AllOp
@@ -30,7 +32,7 @@ class AggregateOp(Expression):
         return self.frum.vars() | self.op.vars()
 
     def map(self, map_):
-        return AggregateOp(self.frum.map(mao_), self.op.map(map_))
+        return AggregateOp(self.frum.map(map_), self.op.map(map_))
 
     @property
     def jx_type(self):

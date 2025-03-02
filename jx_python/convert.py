@@ -28,7 +28,7 @@ def list2cube(rows, column_names=None):
     data = {k: [] for k in keys}
     output = dict_to_data({
         "meta": {"format": "cube"},
-        "edges": [{"name": "rownum", "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1}}],
+        "edges": [{"name": "rownum", "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},}],
         "data": data,
     })
 

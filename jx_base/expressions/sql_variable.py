@@ -22,7 +22,7 @@ class SqlVariable(Variable):
         if not es_path:
             raise ValueError("es_path cannot be empty")
         if jx_type != to_jx_type(jx_type):
-            raise ValueError("jx_type must must be a valid type, not "+str(jx_type))
+            raise ValueError("jx_type must must be a valid type, not " + str(jx_type))
         self._jx_type = jx_type
 
     def __data__(self):

@@ -16,6 +16,7 @@ class MostOp(BaseMultiOp):
     """
     CONSERVATIVE MAXIMUM (SEE MaxOp FOR DECISIVE MAXIMUM)
     """
+
     def __call__(self, row, rownum=None, rows=None):
         maxi = None
         for t in self.terms:

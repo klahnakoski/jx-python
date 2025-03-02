@@ -56,4 +56,3 @@ class CountOp(Expression):
 
     def exists(self):
         return TRUE
-

@@ -227,7 +227,7 @@ class FormatOp(Expression):
 
             output = Data(meta={"format": "list"}, data=data)
         else:
-            Log.error("unknown format {{format}}", format=format)
+            Log.error("unknown format {format}", format=format)
 
 
 formats = {

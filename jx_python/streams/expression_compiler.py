@@ -47,7 +47,7 @@ def compile_expression(code: PythonScript, function_name="output"):
                 + f"    try:\n"
                 + f"        return {code.source}\n"
                 + f"    except Exception as e:\n"
-                + "        logger.error('Problem with dynamic function {{func|quote}}', func=_source, cause=e)\n"
+                + "        logger.error('Problem with dynamic function {func|quote}', func=_source, cause=e)\n"
             ),
             fake_globals,
             fake_locals,
@@ -56,7 +56,7 @@ def compile_expression(code: PythonScript, function_name="output"):
         setattr(func, "_source", code.source)
         return func
     except Exception as e:
-        raise Log.error("Bad source: {{source}}", source=code.source, cause=e)
+        raise Log.error("Bad source: {source}", source=code.source, cause=e)
 
 
 export("jx_python.expressions._utils", compile_expression)

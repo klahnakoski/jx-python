@@ -39,3 +39,65 @@ class GroupOp(Expression):
 
     def invert(self, lang):
         return self.missing(lang)
+
+
+def _normalize_groupby(groupby, limit, schema=None):
+    if groupby == None:
+        return None
+    output = list_to_data([n for e in enlist(groupby) for n in _normalize_group(e, None, limit, schema=schema)])
+    for i, o in enumerate(output):
+        o.dim = i
+    if any(o == None for o in output):
+        Log.error("not expected")
+    return output
+
+
+def _normalize_group(edge, dim_index, limit, schema=None):
+    """
+    :param edge: Not normalized groupby
+    :param dim_index: Dimensions are ordered; this is this groupby's index into that order
+    :param schema: for context
+    :return: a normalized groupby
+    """
+    if is_text(edge):
+        if edge == "*":
+            return list_to_data([{
+                "name": ".",
+                "value": LeavesOp(Variable(".")),
+                "allowNulls": True,
+                "dim": dim_index,
+                "domain": DefaultDomain(limit=limit, desc=edge),
+            }])
+        elif edge.endswith(".*"):
+            prefix = edge[:-2]
+            return list_to_data([{
+                "name": ".",
+                "value": LeavesOp(Variable(prefix)),
+                "allowNulls": True,
+                "dim": dim_index,
+                "domain": DefaultDomain(limit=limit, desc=edge),
+            }])
+        return list_to_data([{
+            "name": edge,
+            "value": jx_expression(edge),
+            "allowNulls": True,
+            "dim": dim_index,
+            "domain": DefaultDomain(limit=limit, desc=edge),
+        }])
+    else:
+        edge = to_data(edge)
+        if edge.domain and edge.domain.jx_type != "default":
+            Log.error("groupby does not accept complicated domains")
+
+        if not edge.name and not is_text(edge.value):
+            Log.error("You must name compound edges: {edge}", edge=edge)
+
+        return list_to_data([{
+            "name": coalesce(edge.name, edge.value),
+            "value": jx_expression(edge.value),
+            "allowNulls": True,
+            "dim": dim_index,
+            "domain": DefaultDomain(limit=limit, desc=edge),
+        }])
+
+

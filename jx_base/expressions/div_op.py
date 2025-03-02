@@ -16,7 +16,6 @@ from jx_base.expressions.or_op import OrOp
 
 
 class DivOp(BaseBinaryOp):
-
     def __call__(self, row=None, rownum=None, rows=None):
         lhs = self.lhs(row)
         rhs = self.rhs(row)

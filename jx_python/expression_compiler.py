@@ -73,4 +73,4 @@ def compile_expression(source, function_name="output"):
         setattr(func, "_source", source)
         return func
     except Exception as e:
-        raise Log.error("Bad source: {{source}}", source=source, cause=e)
+        raise Log.error("Bad source: {source}", source=source, cause=e)

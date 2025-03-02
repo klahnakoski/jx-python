@@ -10,6 +10,7 @@
 
 
 from jx_base.expressions.expression import Expression
+from mo_imports import expect
 from mo_json import JX_ANY
 
 
@@ -17,13 +18,15 @@ class ValueOp(Expression):
     """
     A NO-OP FOR SYMBIOTIC FUNCTIONS
     """
-
-    has_simple_form = True
     _jx_type = JX_ANY
 
     def __init__(self, value):
         Expression.__init__(self, value)
         self.value = value
+
+    @property
+    def schema(self):
+        return self.value.schema
 
     def vars(self):
         return self.value.vars()

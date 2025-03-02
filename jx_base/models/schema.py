@@ -16,7 +16,7 @@ from mo_json.typed_encoder import untype_path
 from mo_logs import Log
 
 
-class Schema(object):
+class Schema:
     """
     A Schema MAPS COLUMN NAMES OF A SINGLE TABLE TO COLUMN INSTANCES THAT MATCH
     """
@@ -38,7 +38,7 @@ class Schema(object):
 
     @property
     def columns(self):
-        return [c for c in self.snowflake.columns if c.nested_path==self.nested_path]
+        return [c for c in self.snowflake.columns if c.nested_path == self.nested_path]
 
     def __getitem__(self, column_name):
         cs = self.lookup.get(column_name)

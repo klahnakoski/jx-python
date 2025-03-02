@@ -13,7 +13,6 @@ from jx_base.expressions.expression import Expression
 
 
 class CardinalityOp(Expression):
-
     def __init__(self, frum):
         Expression.__init__(self, frum)
         self.frum = frum

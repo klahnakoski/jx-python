@@ -68,7 +68,7 @@ KNOWN = {
 PARTITION = {"uid", "set", "boolean"}
 
 
-class Domain(object):
+class Domain:
     __slots__ = [
         "name",
         "type",

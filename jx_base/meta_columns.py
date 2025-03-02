@@ -9,15 +9,12 @@
 #
 
 
-import datetime
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List, Optional
 
-from jx_base.expressions.variable import QueryOp
-from mo_dots.datas import register_data
-
 from jx_base.expressions._utils import JX, _jx_expression as jx_expression
-from jx_base.models.namespace import Namespace
+from jx_base.expressions.variable import QueryOp
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from mo_collections import UniqueIndex
@@ -28,9 +25,15 @@ from mo_dots import (
     concat_field,
     to_data,
     is_many,
-    is_missing, relative_field, last, endswith_field, join_field, split_field,
+    is_missing,
+    relative_field,
+    last,
+    endswith_field,
+    join_field,
+    split_field,
 )
-from mo_future import Mapping, first
+from mo_dots.datas import register_data
+from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, text
 from mo_imports import export
 from mo_json import (
@@ -39,7 +42,10 @@ from mo_json import (
     STRING,
     OBJECT,
     EXISTS,
-    ARRAY, python_type_to_json_type, ARRAY_KEY, jx_type_to_json_type,
+    ARRAY,
+    python_type_to_json_type,
+    ARRAY_KEY,
+    jx_type_to_json_type,
 )
 from mo_json.typed_encoder import EXISTS_KEY
 from mo_logs import logger
@@ -71,19 +77,19 @@ class TableDesc:
         self.last_updated = last_updated
         self.columns = columns
 
-        if last(query_path)==".":
+        if last(query_path) == ".":
             logger.error(f"query_path cannot end with a period: {query_path}")
 
 
 column_constraint = {"and": [
-    {
-        "when": {"ne": {"name": "."}},
-        "then": {"or": [
-            {"and": [{"eq": {"json_type": OBJECT}}, {"eq": {"multi": 1}}]},
-            {"ne": ["name", {"first": "nested_path"}]},
-        ]},
-        "else": True,
-    },
+    # {
+    #     "when": {"ne": {"name": "."}},
+    #     "then": {"or": [
+    #         {"and": [{"eq": {"json_type": OBJECT}}, {"eq": {"multi": 1}}]},
+    #         {"ne": ["name", {"first": "nested_path"}]},
+    #     ]},
+    #     "else": True,
+    # },
     {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT]}}, "else": True},
     {"not": {"find": {"es_column": "null"}}},
     {"not": {"eq": {"es_column": "string"}}},
@@ -96,7 +102,7 @@ column_constraint = {"and": [
         {"first": "nested_path"},
         {"literal": "testdata"},
     ]}},  # USED BY THE TEST GENERATOR.  IF THIS EXISTS IN A CONTAINER THEN IT FAILED
-    {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
+    # {"ne": [{"last": "nested_path"}, {"literal": "."}]},  # NESTED PATHS MUST BE REAL TABLE NAMES INSIDE Namespace
     {
         "when": {"eq": [{"literal": f".{ARRAY_KEY}"}, {"right": {"es_column": 4}}]},
         "then": {"or": [
@@ -114,7 +120,19 @@ column_constraint = {"and": [
 
 
 class Column(Mapping):
-    _slots = ["name", "es_column", "es_index", "es_type", "json_type", "nested_path", "count", "cardinality", "multi", "last_updated", "partitions"]
+    _slots = [
+        "name",
+        "es_column",
+        "es_index",
+        "es_type",
+        "json_type",
+        "nested_path",
+        "count",
+        "cardinality",
+        "multi",
+        "last_updated",
+        "partitions",
+    ]
 
     def __init__(
         self,
@@ -127,9 +145,9 @@ class Column(Mapping):
         nested_path: List[str],  # AN ARRAY OF PATHS (FROM DEEPEST TO SHALLOWEST) INDICATING THE JSON SUB-ARRAYS
         multi: int,
         last_updated,
-        partitions: int=None,
-        count: Optional[int]=None,
-        cardinality: Optional[int]=None,
+        partitions: int = None,
+        count: Optional[int] = None,
+        cardinality: Optional[int] = None,
     ):
         _set(self, "_checking", True)
         self.name = name
@@ -175,7 +193,17 @@ class Column(Mapping):
         _set(self, key, value)
 
     def __hash__(self):
-        return hash((self.name, self.es_column, self.es_index, self.es_type, self.json_type, tuple(self.nested_path), self.multi, self.last_updated, self.partitions))
+        return hash((
+            self.name,
+            self.es_column,
+            self.es_index,
+            self.es_type,
+            self.json_type,
+            tuple(self.nested_path),
+            self.multi,
+            self.last_updated,
+            self.partitions,
+        ))
 
     def __len__(self):
         return len(Column._slots)
@@ -195,6 +223,7 @@ class Column(Mapping):
     def __bool__(self):
         return True
 
+
 register_data(Column)
 
 
@@ -209,6 +238,7 @@ def get_schema_from_jx_type(table_name, jx_type):
     schema = Schema([table_name], Snowflake(None, paths, columns))
     schema.snowflake.namespace = schema.snowflake
     return schema
+
 
 def _get_columns_from_jx_type(nested_path, jx_type):
     paths = [nested_path[0]]
@@ -229,9 +259,10 @@ def _get_columns_from_jx_type(nested_path, jx_type):
             json_type=jx_type_to_json_type(type),
             nested_path=nested_path,
             multi=1,
-            last_updated=Date.now()
+            last_updated=Date.now(),
         ))
     return paths, columns
+
 
 def get_schema_from_list(table_name, frum, native_type_to_json_type=python_type_to_json_type):
     """
@@ -263,7 +294,7 @@ def _get_schema_from_list(
             continue
 
         full_name = concat_field(nested_path[0], prefix)
-        if prefix!="." and full_name in snowflake.query_paths and not is_many(row):
+        if prefix != "." and full_name in snowflake.query_paths and not is_many(row):
             row = [row]
             es_type = list.__name__
         elif is_many(row):  # GET TYPE OF MULTIVALUE
@@ -312,6 +343,7 @@ def _get_schema_from_list(
                 multi=1,
             )
             snowflake.columns.add(column)
+
 
 def get_id(column):
     """
@@ -501,9 +533,11 @@ def _merge_python_type(A, B):
 
 def query_metadata(container, query):
     container = container.namespace.columns.denormalized()
-    normalized = QueryOp.wrap(query, container, JX)
+    normalized = QueryOp.wrap(query)
     return container.query(normalized)
 
+
 export("jx_base.expressions.query_op", Column)
-export("jx_python.containers.list", Column)
-export("jx_python.containers.list", get_schema_from_list)
+export("jx_base.expressions.edges_op", Column)
+
+export("jx_base.expressions.literal", get_schema_from_list)

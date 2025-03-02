@@ -26,6 +26,7 @@ class BaseMultiOp(Expression):
     """
     conservative eval of multi-operand operators
     """
+
     has_simple_form = True
     _jx_type = JX_NUMBER
 

@@ -17,6 +17,7 @@ class StrictEqOp(BaseInequalityOp):
     """
     STRICT `==` OPERATOR (CAN NOT DEAL WITH NULLS)
     """
+
     op = "strict.eq"
 
     def __call__(self, row, rownum=None, rows=None):

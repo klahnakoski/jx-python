@@ -27,11 +27,11 @@ from mo_imports import export
 from mo_logs import Log
 from mo_math import MAX, OR
 
-from jx_base.expressions.query_op import _normalize_edge
+from jx_base.expressions.edges_op import _normalize_edge
 from jx_base.models.container import Container
 from jx_base.utils import enlist
-from jx_python.cubes.aggs import cube_aggs
-from jx_python.lists.aggs import is_aggs
+from jx_python.containers.cubes.aggs import cube_aggs
+from jx_python.containers.lists.aggs import is_aggs
 
 
 class Cube(Container):
@@ -131,7 +131,7 @@ class Cube(Container):
         columns = dot.dict_to_data({s.name: s for s in self.select + self.edges})
 
         # DEFER TO ListContainer
-        from jx_python.containers.list import ListContainer
+        from jx_python.containers.list_container import ListContainer
 
         frum = ListContainer(name="", data=frum.values(), schema=columns)
         return frum.query(q)
@@ -252,11 +252,11 @@ class Cube(Container):
             # RETURN A VALUE CUBE
             if self.is_value:
                 if item != self.select.name:
-                    Log.error("{{name}} not found in cube", name=item)
+                    Log.error("{name} not found in cube", name=item)
                 return self
 
             if item not in self.select.name:
-                Log.error("{{name}} not found in cube", name=item)
+                Log.error("{name} not found in cube", name=item)
 
             output = Cube(
                 select=first(s for s in self.select if s.name == item), edges=self.edges, data={item: self.data[item]},

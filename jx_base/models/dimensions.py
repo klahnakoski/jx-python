@@ -33,7 +33,7 @@ from mo_future import transpose
 DEFAULT_QUERY_LIMIT = 20
 
 
-class Dimension(object):
+class Dimension:
     __slots__ = [
         "name",
         "full_name",
@@ -98,7 +98,7 @@ class Dimension(object):
                 "where": self.where,
                 "limit": self.limit,
             })
-            Log.note("{{name}} has {{num}} parts", name=self.name, num=len(parts))
+            Log.note("{name} has {num} parts", name=self.name, num=len(parts))
 
         d = parts.edges[0].domain
 

@@ -11,7 +11,6 @@
 
 from jx_base.expressions._utils import jx_expression
 from jx_base.expressions.add_op import AddOp
-from jx_base.expressions.strict_substring_op import StrictSubstringOp
 from jx_base.expressions.case_op import CaseOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.find_op import FindOp
@@ -21,9 +20,9 @@ from jx_base.expressions.literal import Literal, ZERO, is_literal
 from jx_base.expressions.max_op import MaxOp
 from jx_base.expressions.min_op import MinOp
 from jx_base.expressions.null_op import NULL
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.strict_substring_op import StrictSubstringOp
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.expressions.when_op import WhenOp
-from jx_base.language import is_op
 from mo_dots import is_data, is_sequence, to_data, coalesce
 from mo_json.types import JX_TEXT
 from mo_logs import Log

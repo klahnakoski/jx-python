@@ -9,8 +9,11 @@
 #
 from typing import Tuple, Iterable, Dict
 
-from jx_base.expressions._utils import TYPE_CHECK
 from jx_base.expressions import Expression, SelectOne
+from jx_base.expressions._utils import TYPE_CHECK
+from jx_base.expressions.sql_alias_op import SqlAliasOp
+from jx_base.expressions.sql_variable import SqlVariable
+from jx_base.language import is_op
 from jx_base.models.container import Container
 from mo_json import union_type
 from mo_logs import Log
@@ -19,18 +22,21 @@ from mo_logs import Log
 class SqlSelectOp(Expression):
     has_simple_form = True
 
-    def __init__(self, frum, *terms: Tuple[SelectOne], **kwargs: Dict[str, Expression]):
+    def __init__(self, frum, *terms: Tuple[SqlAliasOp], **kwargs: Dict[str, Expression]):
         """
         :param terms: list OF SelectOne DESCRIPTORS
         """
+        terms = tuple(SqlAliasOp(term, term.es_path[-1]) if is_op(term, SqlVariable) else term for term in terms)
+
         if TYPE_CHECK and (
-            not all(isinstance(term, SelectOne) for term in terms) or any(term.name is None for term in terms)
+            not all(is_op(term, SqlAliasOp) for term in terms) or any(term.name is None for term in terms)
         ):
-            Log.error("expecting list of SelectOne")
+            Log.error("expecting list of SqlAliasOp")
         Expression.__init__(self, frum, *[t.value for t in terms], *kwargs.values())
         self.frum = frum
-        self.terms = terms + tuple(*(SelectOne(k, v) for k, v in kwargs.items()))
+        self.terms = terms + tuple(*(SqlAliasOp(v, k) for k, v in kwargs.items()))
         self._jx_type = union_type(*(t.name + t.value.jx_type for t in terms))
+
 
     @property
     def jx_type(self):

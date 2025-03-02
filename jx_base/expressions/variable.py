@@ -88,7 +88,7 @@ class Variable(Expression):
                 base = "rows." + path[0] + "()"
                 path = path[1:]
             else:
-                Log.error("do not know what {{var}} of `rows` is", var=path[1])
+                Log.error("do not know what {var} of `rows` is", var=path[1])
 
         return lang.GetOp(base, *(Literal(p) for p in path))
 

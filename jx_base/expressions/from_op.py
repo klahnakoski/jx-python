@@ -12,10 +12,9 @@
 from jx_base.expressions.expression import Expression, _jx_expression
 from jx_base.expressions.sql_inner_join_op import SqlJoinOne
 from jx_base.expressions.sql_left_joins_op import SqlLeftJoinsOp
-from jx_base.language import is_op
+from jx_base.language import is_op, is_expression
 from jx_base.models.container import Container
-from mo_dots import is_many, coalesce, is_data
-from mo_logs import logger
+from mo_dots import to_data
 
 
 class FromOp(Expression):
@@ -28,11 +27,7 @@ class FromOp(Expression):
 
     @classmethod
     def define(cls, expr):
-        if len(expr) != 1:
-            logger.error("Expecting a single from expression, not {expr}", expr=expr)
-        frum = expr["from"]
-        if not is_many(frum):
-            return _jx_expression(frum, cls.lang)
+        return FromOp(_jx_expression(to_data(expr)["from"], cls.lang))
 
         root, *rest = frum
         joins = []
@@ -42,12 +37,19 @@ class FromOp(Expression):
             if "left_join" not in join:
                 logger.error("Expecting a left join, not {join}", join=join)
             joins.append(SqlJoinOne(
-                _jx_expression(join['left_join'], cls.lang),
-                _jx_expression(coalesce(join.get('on'), True), cls.lang)
+                _jx_expression(join["left_join"], cls.lang), _jx_expression(coalesce(join.get("on"), True), cls.lang)
             ))
 
         return SqlLeftJoinsOp(_jx_expression(root, cls.lang), *joins)
 
+    def __call__(self, row=None, rownum=None, rows=None):
+        if is_expression(self.frum):
+            return self.frum(row, rownum, rows)
+        return self.frum
+
+    @property
+    def schema(self):
+        return self.frum.schema
 
     def apply(self, container: Container):
         return container.query(self.frum)

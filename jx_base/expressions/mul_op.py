@@ -28,4 +28,3 @@ class MulOp(BaseMultiOp):
                 else:
                     return None
             return output
-

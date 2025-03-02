@@ -67,7 +67,7 @@ class ToNumberOp(Expression):
             elif isinstance(v, (int, float)):
                 return term
             else:
-                Log.error("can not convert {{value|json}} to number", value=term.value)
+                Log.error("can not convert {value|json} to number", value=term.value)
         elif base_type(term.jx_type) == JX_NUMBER:
             return term
         elif is_op(term, CaseOp):  # REWRITING

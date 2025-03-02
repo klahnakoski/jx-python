@@ -18,7 +18,6 @@ from jx_base.language import is_op
 
 
 class NeOp(BaseInequalityOp):
-
     def __call__(self, row, rownum=None, rows=None):
         v1 = self.lhs(row, rownum, rows)
         v2 = self.rhs(row, rownum, rows)
