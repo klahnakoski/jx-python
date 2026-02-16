@@ -11,6 +11,8 @@ from jx_base.models.schema import Schema
 
 from mo_dots import startswith_field
 
+from mo_json import JX_IS_NULL, to_jx_type
+
 
 class Snowflake:
     """
@@ -19,7 +21,7 @@ class Snowflake:
 
     def __init__(self, namespace, query_paths, columns):
         self.namespace = namespace
-        self.query_paths = query_paths
+        self.query_paths = query_paths  # ALL THE ARRAYS IN THIS SNOWFLAKE, CHILD BEFORE PARENT
         self.columns = columns
 
     def get_schema(self, query_path):
@@ -29,3 +31,13 @@ class Snowflake:
                 nested_path.append(step)
 
         return Schema(nested_path, self)
+
+    @property
+    def jx_type(self):
+        output = JX_IS_NULL
+        for table_name, columns in self.namespace.columns.data.items():
+            if startswith_field(table_name, self.fact_name):
+                for cols in columns.values():
+                    for col in cols:
+                        output |= col.nested_path[0] + (col.name + to_jx_type(col.json_type))
+        return output

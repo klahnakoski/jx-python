@@ -10,11 +10,11 @@
 
 from jx_base.expressions import NULL, FALSE
 from jx_base.expressions.expression import Expression
-from mo_json import JX_INTEGER
+from mo_json import JX_TEXT
 
 
 class SqlSubstrOp(Expression):
-    _jx_type = JX_INTEGER
+    _jx_type = JX_TEXT
 
     def __init__(self, value, start, length=NULL):
         Expression.__init__(self, value, start, length)

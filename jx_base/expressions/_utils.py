@@ -85,7 +85,10 @@ def _jx_expression(json, lang):
         return TupleOp(*(_jx_expression(e, lang) for e in json))
 
     try:
-        items = list(json.items())
+        try:
+            items = list(json.items())
+        except Exception:
+            print("hi")
         if len(items) > 1:
             for op in precedence:
                 rhs = json.get(op)

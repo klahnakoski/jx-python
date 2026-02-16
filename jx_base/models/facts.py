@@ -7,17 +7,18 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from jx_base.language import ID
 from mo_future import is_text
 from mo_logs import Log
 
+from jx_base.language import ID
+from jx_base.models.container import Container
 
-class Facts:
+
+class Facts(Container):
     """
     REPRESENT A HIERARCHICAL DATASTORE: MULTIPLE TABLES IN A DATABASE ALONG
     WITH THE RELATIONS THAT CONNECT THEM ALL, BUT LIMITED TO A TREE
     """
-
 
     def __init__(self, name, container):
         if not is_text(name):
@@ -37,3 +38,7 @@ class Facts:
     @property
     def schema(self):
         return self.container.namespace.get_schema(self.name)
+
+    @property
+    def jx_type(self):
+        return self.snowflake.jx_type

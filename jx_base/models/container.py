@@ -22,6 +22,11 @@ config = Data()  # config.default IS EXPECTED TO BE SET BEFORE CALLS ARE MADE
 
 
 class Container:
+    """
+    CONTAINERS HOLD MULTIPLE INDICES AND CAN HANDLE
+    GENERAL JSON QUERY EXPRESSIONS ON ITS CONTENTS
+    METADATA FOR A Container IS CALLED A Namespace
+    """
 
     @staticmethod
     def create(container):

@@ -11,6 +11,7 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from mo_json import JxType
 
 
 class SqlSelectAllFromOp(Expression):
