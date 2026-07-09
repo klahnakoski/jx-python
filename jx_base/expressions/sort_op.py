@@ -11,7 +11,7 @@
 from typing import List
 
 from jx_base.expressions._utils import jx_expression, _jx_expression
-from jx_base.expressions.expression import Expression
+from jx_base.expressions.expression import Expression, is_expression
 from jx_base.utils import enlist
 from mo_dots import coalesce
 from mo_future import is_text

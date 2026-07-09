@@ -483,6 +483,10 @@ def sort(frum, *sorts):
     :param already_normalized: True IF fieldnames IS SORT STRUCTURE:  {"field":field_name, "sort":direction}
     :return: A NEW LIST OF DATA, BUT SORTED
     """
+    if frum == None:
+        return Null
+    if not sorts:
+        return to_data(sort_using_cmp(frum, value_compare))
     if not isinstance(frum, Container):
         frum = Container.create(frum)
     if not all(isinstance(s, SortOne) for s in sorts):
