@@ -12,7 +12,7 @@ from tests.mocks import mock
 
 @add_error_reporting
 class TestJxImmediate(TestCase):
-    @mock(Date, "now", function=lambda: Date("2025/03/01 22:35:56"))
+    @mock(Date, "now", value=Date("2025/03/01 22:35:56"))
     def test_aws_complex(self):
         Date.now, old = lambda: Date("2025/03/01 22:35:56"), Date.now
         data = [
