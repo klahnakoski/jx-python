@@ -5,7 +5,15 @@ The suite there now passes 142 / errors 62 / skips 147; the items below are the 
 share of the remaining errors, plus fixes already applied that need to survive the next
 lib sync. Each item states what was verified vs. suspected.
 
+> STATUS 2026-07-10: #1 FIXED (confirmed in source + coverage), #2 FIXED, #3 FIXED on the
+> jx_python side (root-cause leak still downstream), #4 jx.tuple(FlatList) FIXED; the rest of
+> #4 is jx-sqlite-side or an unbuilt feature. Details under each item.
+
 ## 1. `jx.sort` lost its default sort-by-value (FIXED in jx-sqlite; keep upstream)
+
+**FIXED:** escape hatch confirmed present in source `jx_python/jx.py`; coverage in
+`tests/test_sort.py`. Also fixed `jx_base/expressions/sort_op.py` (used `is_integer`/`Log`
+without importing them, crashing the `{"field":..,"sort":-1}` form).
 
 The rewrite of `jx.py sort(frum, *sorts)` dropped the old no-fieldnames branch. Two
 consequences, both verified:
@@ -34,7 +42,11 @@ source repo or the next sync reverts it.**
 Coverage to add: no-arg sort of list/set/FlatList; mixed types; None in data; single
 fieldname; `{"field": ..., "sort": -1}` form; empty input; None input.
 
-## 2. `Container.create` on scalar lists → invalid Column (VERIFIED, not fixed)
+## 2. `Container.create` on scalar lists → invalid Column (FIXED)
+
+**FIXED:** the `Column` constraint now permits a primitive `json_type` at `es_column="."`
+(nameless scalar list), matching the dynamically-typed python target; tests in
+`tests/test_lists.py`. list-of-lists is intentionally out of scope (see `jx_base/CLAUDE.md`).
 
 `Container.create([1, 2, 3])` (or any list/set of scalars) → `ListContainer.__init__`
 → `get_schema_from_list` builds `Column(es_column=".", json_type="string"/"number")`,
@@ -45,7 +57,12 @@ container is affected; item 1's fix merely routes the common `jx.sort` case arou
 Coverage to add: `get_schema_from_list` over scalars, list-of-lists, and mixed
 scalar/object data.
 
-## 3. `python_type_to_json_type` receives expression objects (VERIFIED symptom, root cause downstream)
+## 3. `python_type_to_json_type` receives expression objects (jx_python side FIXED)
+
+**FIXED (jx_python side):** `get_schema_from_list` now treats a jx `NULL` literal as missing
+(via `_jx_type is JX_IS_NULL`) instead of hard-failing the whole container; tests in
+`tests/test_lists.py`. The root-cause leak (a `NullOp` reaching result rows) is still
+downstream in jx-sqlite edge queries.
 
 `mo_json.types.python_type_to_json_type` errors "not expected NullOp" when schema
 inference meets a row containing a jx_base `NULL` (NullOp) instance. The leak is in
@@ -60,6 +77,11 @@ errors share this signature; `test_edge_1.test_count_constant` is a small reprod
   used where a pull/callable is expected.
 - `AttributeError: 'ListContainer' object has no attribute 'get_id'` (1 test).
 - `jx.py tuple()` raises "not supported yet" for Cube and FlatList inputs.
+  **FlatList FIXED** (`tests/test_tuple.py`); **Cube** remains genuinely unimplemented (feature).
+
+STATUS of the other two leads: `'FlatList' not callable` and `'ListContainer' has no get_id`
+are jx-sqlite-side symptoms — the calling code is not in jx_python (all `.get_id()` here is on
+Expression ops), so they are not reproducible or fixable in this repo.
 
 ## Context
 
