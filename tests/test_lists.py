@@ -7,6 +7,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_base import Container
+from jx_base.expressions import NULL
 from jx_base.language import value_compare
 from jx_python import ListContainer
 from mo_json import INTEGER, STRING, NUMBER, value2json
@@ -124,3 +125,17 @@ class TestLists(FuzzyTestCase):
         c = Container.create([1, {"a": 2}])
         es_columns = {col.es_column for col in c.schema.columns}
         self.assertTrue("." in es_columns)  # the scalar value column
+
+    def test_null_op_value_skipped(self):
+        # BUGS.md #3: a jx NULL literal in data is treated as missing (like None), not a crash
+        c = Container.create([{"a": NULL}, {"a": 1}])
+        self.assertEqual(c.schema.columns, [{"es_column": "a", "json_type": INTEGER}])
+
+    def test_null_op_only(self):
+        # a lone NULL contributes no type -> empty schema, same as None
+        c = Container.create([{"a": NULL}])
+        self.assertEqual(len(c.schema.columns), 0)
+
+    def test_null_op_in_scalar_list(self):
+        c = Container.create([NULL, 1])
+        self.assertEqual(c.schema.columns, [{"es_column": ".", "json_type": INTEGER}])

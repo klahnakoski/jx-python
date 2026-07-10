@@ -51,6 +51,7 @@ from mo_json import (
     ARRAY_KEY,
     jx_type_to_json_type,
 )
+from mo_json.types import JX_IS_NULL
 from mo_json.typed_encoder import EXISTS_KEY
 from mo_logs import logger
 from mo_times.dates import Date
@@ -296,7 +297,8 @@ def _get_schema_from_list(
     native_type_to_json_type,  # dict from storage type name to json type name
 ):
     for row in frum:
-        if is_missing(row):
+        if is_missing(row) or getattr(row, "_jx_type", None) is JX_IS_NULL:
+            # a jx NULL literal (leaked from a downstream expression) is missing, not a type
             continue
 
         full_name = concat_field(nested_path[0], prefix)
