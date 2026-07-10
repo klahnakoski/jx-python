@@ -63,3 +63,13 @@ Full spec: `C:\Users\kyle\code\ActiveData\docs\jx_decisive_operators.md`.
   demand `es_column="~i~"` etc., and would split a list/set into per-item schemas with
   (possibly different) operations per record — the schema-specific-JX path above. Kyle notes
   the `es_column="."` choice *may* be wrong long-term, but it is what this code assumes.
+
+- **arrays-of-arrays are out of scope by design.** JX assumes **named properties**; its
+  automatic projection over lists is recursive and blind to structure (it is emphatically NOT
+  numpy). A bare list-of-lists like `[[1, 2], [3]]` has no elegant representation — the
+  operations may not make sense, and schema inference currently errors on it (the inner list
+  hits the `json_type=ARRAY → cardinality in [0,1]` constraint; a single-element inner list is
+  also unwrapped to a scalar, so a column gets conflicting types). Kyle's stance: an array of
+  arrays is really a **tuple** — position carries meaning and should be given **names** — so
+  the fix is to name the positions, not to teach JX positional arrays. Left unhandled on
+  purpose; do not "fix" `[[...],[...]]` by forcing a nameless-array schema.
