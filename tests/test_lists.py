@@ -6,6 +6,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
+from jx_base import Container
 from jx_base.language import value_compare
 from jx_python import ListContainer
 from mo_json import INTEGER, STRING, NUMBER, value2json
@@ -96,3 +97,30 @@ class TestLists(FuzzyTestCase):
         a = [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}]
         b = [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}]
         self.assertEqual(value_compare(a, b), 0)
+
+    def test_scalar_list_schema(self):
+        # BUGS.md #2: a nameless list of scalars keeps es_column="." (dynamically-typed target)
+        c = Container.create([1, 2, 3])
+        self.assertEqual(
+            c.schema.columns,
+            [{"name": ".", "es_column": ".", "json_type": INTEGER, "nested_path": ["."]}],
+        )
+
+    def test_scalar_list_strings(self):
+        c = Container.create(["a", "b"])
+        self.assertEqual(
+            c.schema.columns,
+            [{"name": ".", "es_column": ".", "json_type": STRING, "nested_path": ["."]}],
+        )
+
+    def test_scalar_set(self):
+        c = Container.create({1, 2, 3})
+        self.assertEqual(len(c.schema.columns), 1)
+        self.assertEqual(c.schema.columns[0].es_column, ".")
+        self.assertEqual(c.schema.columns[0].json_type, INTEGER)
+
+    def test_mixed_scalar_and_object(self):
+        # scalar rows alongside object rows must not raise
+        c = Container.create([1, {"a": 2}])
+        es_columns = {col.es_column for col in c.schema.columns}
+        self.assertTrue("." in es_columns)  # the scalar value column

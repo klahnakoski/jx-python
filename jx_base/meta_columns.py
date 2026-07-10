@@ -37,12 +37,16 @@ from mo_future import Mapping
 from mo_future import binary_type, items, long, none_type, text
 from mo_imports import export
 from mo_json import (
+    BOOLEAN,
     INTEGER,
     NUMBER,
+    TIME,
+    INTERVAL,
     STRING,
     OBJECT,
     EXISTS,
     ARRAY,
+    JSON,
     python_type_to_json_type,
     ARRAY_KEY,
     jx_type_to_json_type,
@@ -90,7 +94,9 @@ column_constraint = {"and": [
     #     ]},
     #     "else": True,
     # },
-    {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT]}}, "else": True},
+    # es_column="." is the nameless root; for the dynamically-typed python target it may hold a
+    # primitive value (a nameless scalar list), not only a container. See jx_base/CLAUDE.md.
+    {"when": {"eq": {"es_column": "."}}, "then": {"in": {"json_type": [ARRAY, OBJECT, BOOLEAN, INTEGER, NUMBER, TIME, INTERVAL, STRING, JSON]}}, "else": True},
     {"not": {"find": {"es_column": "null"}}},
     {"not": {"eq": {"es_column": "string"}}},
     {"not": {"eq": {"es_type": "object", "json_type": EXISTS}}},
