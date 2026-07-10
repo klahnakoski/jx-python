@@ -3,16 +3,17 @@ from unittest import TestCase
 
 from dateutil.tz import tzutc
 
+import mo_times
 from jx_base import Container
 from jx_python import jx
 from mo_testing import add_error_reporting, assertAlmostEqual
-from mo_times import Date
+from mo_times import dates, Date
 from tests.mocks import mock
 
 
 @add_error_reporting
 class TestJxImmediate(TestCase):
-    @mock(Date, "now", value=Date("2025/03/01 22:35:56"))
+    @mock(dates, "unix_now", value=Date("2025/03/01 22:35:56").unix)
     def test_aws_complex(self):
         Date.now, old = lambda: Date("2025/03/01 22:35:56"), Date.now
         data = [
@@ -108,6 +109,6 @@ class TestJxImmediate(TestCase):
                 {"expire": Date(datetime(2025, 2, 26, 22, 35, 3, tzinfo=tzutc()))},
                 {"expire": Date(datetime(2025, 2, 27, 22, 35, 27, tzinfo=tzutc()))},
                 {"expire": Date(datetime(2025, 2, 28, 22, 35, 56, tzinfo=tzutc()))},
-                {"expire": 1740960000.0},
+                {"expire": 1740873600.0},
             ],
         )
