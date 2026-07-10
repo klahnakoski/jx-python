@@ -172,8 +172,7 @@ def tuple(data, field_name):
     if isinstance(data, Cube):
         Log.error("not supported yet")
 
-    if isinstance(data, FlatList):
-        Log.error("not supported yet")
+    # a FlatList is just an iterable of records; the branches below handle it
 
     if is_data(field_name) and "value" in field_name:
         # SIMPLIFY {"value":value} AS STRING
