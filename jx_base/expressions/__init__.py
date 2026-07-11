@@ -205,9 +205,10 @@ set_default(
         "missing": MissingOp,
         "mod": ModOp,
         "most": MostOp,
-        "mul": ProductOp,
-        "mult": ProductOp,
-        "multiply": ProductOp,
+        # CONSERVATIVE PRODUCT, LIKE "add"->AddOp; "product" REMAINS THE DECISIVE ProductOp
+        "mul": MulOp,
+        "mult": MulOp,
+        "multiply": MulOp,
         "name": NameOp,
         "ne": NeOp,
         "neq": NeOp,

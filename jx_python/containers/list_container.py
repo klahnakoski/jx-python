@@ -17,7 +17,6 @@ from jx_base.expressions.variable import is_variable
 from jx_base.language import is_expression, ID
 from jx_base.meta_columns import get_schema_from_jx_type, get_schema_from_list
 from jx_base.models.container import Container
-from jx_base.models.namespace import Namespace
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
@@ -46,7 +45,7 @@ from mo_threads import Lock
 jx = expect("jx")
 
 
-class ListContainer(Container, Namespace, Table):
+class ListContainer(Container, Table):
     """
     A CONTAINER WITH ONLY ONE TABLE
     A PYTHON LIST PAIRED WITH SCHEMA SO QUERY EXPRESSIONS CAN BE TRANSPILED

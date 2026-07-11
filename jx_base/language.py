@@ -303,7 +303,8 @@ def is_op(call, op) -> bool:
 
 def is_expression(call):
     try:
-        return getattr(call, ID, None) != None
+        # isinstance CHECK: FlatList BROADCASTS getattr OVER ITS ITEMS, RETURNING A (NON-None) FlatList
+        return isinstance(getattr(call, ID, None), int)
     except Exception:
         return False
 

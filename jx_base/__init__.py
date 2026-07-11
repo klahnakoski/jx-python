@@ -18,7 +18,7 @@ from jx_base.language import is_op
 from jx_base.meta_columns import get_schema_from_list
 from jx_base.models.container import Container
 from jx_base.models.facts import Facts
-from jx_base.models.namespace import Namespace
+from jx_base.models.names import Names
 from jx_base.models.nested_path import NestedPath
 from jx_base.models.relation import Relation
 from jx_base.models.schema import Schema
@@ -40,7 +40,7 @@ __all__ = [
     "is_op",
     "jx_expression",
     "JX",
-    "Namespace",
+    "Names",
     "NestedPath",
     "NULL",
     "Python",

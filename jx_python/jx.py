@@ -15,7 +15,7 @@ from jx_base import jx_expression, Snowflake, Schema, get_schema_from_list
 from jx_base.expressions import FALSE, TRUE
 from jx_base.expressions.query_op import _normalize_sort, Column
 from jx_base.expressions.select_op import _normalize_selects, SelectOne
-from jx_base.expressions.sort_op import SortOne
+from jx_base.expressions.sort_op import SortOne, _normalize_sort as _normalize_sort_ones
 from jx_base.language import value_compare
 from jx_base.models.container import Container
 from jx_base.utils import enlist
@@ -486,12 +486,17 @@ def sort(frum, *sorts):
         return Null
     if not sorts:
         return to_data(sort_using_cmp(frum, value_compare))
-    if not isinstance(frum, Container):
-        frum = Container.create(frum)
-    if not all(isinstance(s, SortOne) for s in sorts):
-        sorts = jx_expression({"from": frum, "sort": sorts}).sorts
 
-    funcs = [(f.expr, f.direction) for f in sorts]
+    # NORMALIZE sorts WITHOUT WRAPPING frum IN A CONTAINER; SORTING MUST NOT
+    # REQUIRE SCHEMA INFERENCE OVER THE DATA (ROWS MAY HOLD OPAQUE VALUES)
+    normalized = []
+    for s in sorts:
+        if isinstance(s, SortOne):
+            normalized.append(s)
+        else:
+            normalized.extend(_normalize_sort_ones(s))
+
+    funcs = [(f.expr, f.direction) for f in normalized]
 
     def comparer(left, right):
         for func, sort_ in funcs:
@@ -503,10 +508,7 @@ def sort(frum, *sorts):
                 Log.error("problem with compare", cause)
         return 0
 
-    sorted_data = list(sorted((from_data(d) for d in frum), key=cmp_to_key(comparer)))
-    return ListContainer(
-        ".", data=sorted_data, schema=frum.schema
-    )
+    return to_data(list(sorted((from_data(d) for d in frum), key=cmp_to_key(comparer))))
 
 
 def count(values):

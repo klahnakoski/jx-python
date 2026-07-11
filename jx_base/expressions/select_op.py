@@ -17,7 +17,7 @@ from jx_base.expressions.leaves_op import LeavesOp
 from jx_base.expressions.literal import Literal
 from jx_base.expressions.name_op import NameOp
 from jx_base.expressions.null_op import NULL
-from jx_base.expressions.variable import Variable
+from jx_base.expressions.variable import Variable, is_variable
 from jx_base.language import is_op
 from jx_base.models.container import Container
 from jx_base.utils import is_variable_name
@@ -252,7 +252,8 @@ def normalize_one(frum, select, format):
     if is_text(select):
         if select == "*":
             return SelectOp(frum, SelectOne(".", LeavesOp(Variable("."))))
-        select = SelectOne(select, jx_expression(select))
+        # KEEP AS TEXT VALUE (NO NAME) SO `.*`/`*` WILDCARD HANDLING BELOW APPLIES
+        select = to_data({"value": select})
     else:
         select = to_data(select)
         unexpected = select.keys() - {
@@ -284,7 +285,7 @@ def normalize_one(frum, select, format):
             canonical = SelectOne(coalesce(name, aggregate, "."), jx_expression(value))
         elif value.endswith(".*"):
             root_name = value[:-2]
-            value = jx_expression(root_nam)
+            value = jx_expression(root_name)
             if not is_variable(value):
                 Log.error("do not know what to do")
             canonical = SelectOne(coalesce(name, root_name), LeavesOp(value, prefix=select.prefix))
