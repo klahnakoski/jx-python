@@ -1,1 +1,2 @@
 mo-testing>=8.667.25032
+python-dateutil
