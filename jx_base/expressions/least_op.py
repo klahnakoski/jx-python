@@ -19,7 +19,8 @@ from jx_base.expressions.null_op import NULL
 
 class LeastOp(BaseMultiOp):
     """
-    DECISIVE MINIMUM (SEE LeastOp FOR CONSERVATIVE MINIMUM)
+    CONSERVATIVE MINIMUM by default (any null ⇒ null); decisive with nulls=True.
+    MinOp is the decisive minimum. See docs/null_semantics.md.
     """
 
     def __call__(self, row, rownum=None, rows=None):
@@ -43,7 +44,9 @@ class LeastOp(BaseMultiOp):
         for t in self.terms:
             simple = t.partial_eval(lang)
             if simple is NULL:
-                pass
+                if not self.decisive:
+                    return NULL  # CONSERVATIVE: ANY NULL OPERAND ⇒ NULL
+                # DECISIVE: SKIP THE NULL
             elif is_literal(simple):
                 minimum = MIN([minimum, simple.value])
             else:

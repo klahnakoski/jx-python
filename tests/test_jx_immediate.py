@@ -1,7 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import TestCase
-
-from dateutil.tz import tzutc
 
 import mo_times
 from jx_base import Container
@@ -22,70 +20,70 @@ class TestJxImmediate(TestCase):
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 28, 22, 35, 56, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 28, 22, 35, 56, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 27, 22, 35, 27, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 27, 22, 35, 27, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 26, 22, 35, 3, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 26, 22, 35, 3, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015600",
-                "Timestamp": datetime(2025, 2, 26, 7, 2, 38, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 26, 7, 2, 38, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 26, 5, 18, 35, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 26, 5, 18, 35, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 25, 5, 17, 59, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 25, 5, 17, 59, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015600",
-                "Timestamp": datetime(2025, 2, 24, 11, 18, 53, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 24, 11, 18, 53, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 24, 5, 19, 4, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 24, 5, 19, 4, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 23, 5, 18, 47, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 23, 5, 18, 47, tzinfo=timezone.utc),
             },
             {
                 "AvailabilityZone": "us-east-1d",
                 "InstanceType": "m8g.medium",
                 "ProductDescription": "Linux/UNIX",
                 "SpotPrice": "0.015700",
-                "Timestamp": datetime(2025, 2, 22, 5, 18, 38, tzinfo=tzutc()),
+                "Timestamp": datetime(2025, 2, 22, 5, 18, 38, tzinfo=timezone.utc),
             },
         ]
         result = jx.run({
@@ -100,15 +98,15 @@ class TestJxImmediate(TestCase):
         assertAlmostEqual(
             result,
             [
-                {"expire": Date(datetime(2025, 2, 23, 5, 18, 47, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 24, 5, 19, 4, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 24, 11, 18, 53, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 25, 5, 17, 59, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 26, 5, 18, 35, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 26, 7, 2, 38, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 26, 22, 35, 3, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 27, 22, 35, 27, tzinfo=tzutc()))},
-                {"expire": Date(datetime(2025, 2, 28, 22, 35, 56, tzinfo=tzutc()))},
+                {"expire": Date(datetime(2025, 2, 23, 5, 18, 47, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 24, 5, 19, 4, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 24, 11, 18, 53, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 25, 5, 17, 59, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 26, 5, 18, 35, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 26, 7, 2, 38, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 26, 22, 35, 3, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 27, 22, 35, 27, tzinfo=timezone.utc))},
+                {"expire": Date(datetime(2025, 2, 28, 22, 35, 56, tzinfo=timezone.utc))},
                 {"expire": 1740873600.0},
             ],
         )

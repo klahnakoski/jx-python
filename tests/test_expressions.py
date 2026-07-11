@@ -9,7 +9,7 @@ from jx_python.expression_compiler import compile_expression
 
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 
-from jx_base import jx_expression
+from jx_base import jx_expression, NULL
 from jx_python.expressions import Python
 
 
@@ -60,8 +60,56 @@ class TestOther(FuzzyTestCase):
     def test_multiply4(self):
         expr = jx_expression({"multiply": [2, None, 4]})
 
+        self.assertEqual(expr(), NULL)
+        self.assertEqual(expr.partial_eval(Python).to_python().source, "None")
+
+    def test_product(self):
+        expr = jx_expression({"product": [2, None, 4]})
+
         self.assertEqual(expr(), 8)
         self.assertEqual(expr.partial_eval(Python).to_python().source, "8")
+
+    # ------ conservative-vs-decisive null policy (docs/null_semantics.md) ------
+    # scalar operators (add, mul, least, most) are CONSERVATIVE: any null ⇒ null.
+    # aggregates (sum, product, min, max) are DECISIVE: skip null; null only if all null.
+    # the `nulls` clause overrides the default per call.
+
+    def test_add_conservative(self):
+        # any null operand ⇒ null
+        self.assertEqual(jx_expression({"add": [42, None]})(), NULL)
+
+    def test_add_nulls_override_is_decisive(self):
+        # nulls:true flips add to decisive (skip the null)
+        self.assertEqual(jx_expression({"add": [42, None], "nulls": True})(), 42)
+
+    def test_sum_decisive(self):
+        # aggregate: null skipped
+        self.assertEqual(jx_expression({"sum": [42, None]})(), 42)
+        # null only when every operand is null
+        self.assertEqual(jx_expression({"sum": [None, None]})(), NULL)
+
+    def test_mul_conservative(self):
+        self.assertEqual(jx_expression({"mul": [2, None, 4]})(), NULL)
+
+    def test_least_conservative(self):
+        # least = conservative minimum (like BigQuery LEAST): any null ⇒ null
+        self.assertEqual(jx_expression({"least": [5, 3]})(), 3)
+        self.assertEqual(jx_expression({"least": [5, None, 3]})(), NULL)
+
+    def test_most_conservative(self):
+        # most = conservative maximum (like BigQuery GREATEST): any null ⇒ null
+        self.assertEqual(jx_expression({"most": [5, 3]})(), 5)
+        self.assertEqual(jx_expression({"most": [5, None, 3]})(), NULL)
+
+    def test_min_on_fixed_list_decisive(self):
+        # min over a fixed-parameter list: decisive, skips null
+        self.assertEqual(jx_expression({"min": [5, 3]})(), 3)
+        self.assertEqual(jx_expression({"min": [5, None, 3]})(), 3)
+
+    def test_max_on_fixed_list_decisive(self):
+        # max over a fixed-parameter list: decisive, skips null
+        self.assertEqual(jx_expression({"max": [5, 3]})(), 5)
+        self.assertEqual(jx_expression({"max": [5, None, 3]})(), 5)
 
     def test_and(self):
         value = {"a": False, "b": True, "c": False}

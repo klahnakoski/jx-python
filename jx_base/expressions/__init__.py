@@ -201,6 +201,7 @@ set_default(
         "le": LteOp,
         "match_all": TrueOp,
         "max": MaxOp,
+        "min": MinOp,
         "minus": SubOp,
         "missing": MissingOp,
         "mod": ModOp,
