@@ -1,0 +1,399 @@
+# encoding: utf-8
+#
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at https://www.mozilla.org/en-US/MPL/2.0/.
+#
+# Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
+#
+from unittest import skipIf
+
+from jx_base.expressions import NULL
+from mo_dots import concat_field
+from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
+
+
+@skipIf(global_settings.use == "sqlite", "not ready")
+class TestSchemaMerging(BaseTestCase):
+    """
+    TESTS THAT DEMONSTRATE DIFFERENT SCHEMAS
+    """
+
+    @skipIf(global_settings.use == "sqlite", "broken")
+    def test_select(self):
+        test = {
+            "data": [
+                {"a": "b"},
+                {"a": [{"b": 1}, {"b": 2}]},
+                {"a": 3}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "a"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    "b",
+                    [{"b": 1}, {"b": 2}],
+                    3
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a"],
+                "data": [
+                        ["b"],
+                        [[{"b": 1}, {"b": 2}]],
+                        [3]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [
+                    {
+                        "name": "rownum",
+                        "domain": {"type": "rownum", "min": 0, "max": 3, "interval": 1}
+                    }
+                ],
+                "data": {
+                    "a": [
+                        "b",
+                        [{"b": 1}, {"b": 2}],
+                        3
+                    ]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_mixed_primitives(self):
+        test = {
+            "data": [
+                # _id USED TO CONTROL INSERT
+                {"_id": "1", "a": "b"},
+                {"_id": "2", "a": 3},
+                {"_id": "3", "a": "c"}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "a"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    "b",
+                    3,
+                    "c"
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a"],
+                "data": [
+                    ["b"],
+                    [3],
+                    ["c"]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [
+                    {
+                        "name": "rownum",
+                        "domain": {"type": "rownum", "min": 0, "max": 3, "interval": 1}
+                    }
+                ],
+                "data": {
+                    "a": ["b", 3, "c"]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_dots_in_property_names(self):
+        test = {
+            "data": [
+                {"a.html": "hello"},
+                {"a": {"html": "world"}}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "a..html"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    "hello",
+                    NULL
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a..html"],
+                "data": [
+                    ["hello"],
+                    [NULL]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [
+                    {
+                        "name": "rownum",
+                        "domain": {"type": "rownum", "min": 0, "max": 2, "interval": 1}
+                    }
+                ],
+                "data": {
+                    "a..html": ["hello", NULL]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_dots_in_property_names2(self):
+        test = {
+            "data": [
+                {"a.html": "hello"},
+                {"a": {"html": "world"}}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "a.html"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    NULL,
+                    "world"
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.html"],
+                "data": [
+                    [NULL],
+                    ["world"]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [
+                    {
+                        "name": "rownum",
+                        "domain": {"type": "rownum", "min": 0, "max": 2, "interval": 1}
+                    }
+                ],
+                "data": {
+                    "a.html": [NULL, "world"]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use == "sqlite", "broken")
+    def test_dots_in_property_names3(self):
+        test = {
+            "data": [
+                {"a.html": "hello"},
+                {"a": {"html": "world"}}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": ["a..html", "a.html"]
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"a.html": "hello"},
+                    {"a": {"html": "world"}}
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a..html", "a.html"],
+                "data": [
+                    ["hello", NULL],
+                    [NULL, "world"]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [
+                    {
+                        "name": "rownum",
+                        "domain": {"type": "rownum", "min": 0, "max": 2, "interval": 1}
+                    }
+                ],
+                "data": {
+                    "a..html": ["hello", NULL],
+                    "a.html": [NULL, "world"]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_count(self):
+        test = {
+            "data": [
+                {"a": "b"},
+                {"a": {"b": 1}},
+                {"a": {}},
+                {"a": [{"b": 1}, {"b": 2}]},  # TEST THAT INNER CAN BE MAPPED TO NESTED
+                {"a": {"b": 4}},  # TEST THAT INNER IS MAPPED TO NESTED, AFTER SEEING NESTED
+                {"a": 3},
+                {}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"value": "a", "aggregate": "count"}
+            },
+            "expecting_list": {
+                "meta": {"format": "value"},
+                "data": 6
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a"],
+                "data": [[6]]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "data": {
+                    "a": 6
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_select2(self):
+        test = {
+            "data": [
+                {"k": 1, "a": "b"},
+                {"k": 2, "a": {"b": 1}},
+                {"k": 3, "a": {}},
+                {"k": 4, "a": [{"b": 1}, {"b": 2}]},  # TEST THAT INNER CAN BE MAPPED TO NESTED
+                {"k": 5, "a": {"b": 4}},  # TEST THAT INNER IS MAPPED TO NESTED, AFTER SEEING NESTED
+                {"k": 6, "a": 3},
+                {"k": 7, }
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": ["a.b"],
+                "where": {"eq": {"k": 2}}
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": 1}}]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.b"],
+                "data": [[1]]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "data": {
+                    "a.b": [1]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use == "sqlite", "complicated where clause needs support")
+    def test_where(self):
+        test = {
+            "data": [
+                {"k": 1, "a": "b"},
+                {"k": 2, "a": {"b": 1}},
+                {"k": 3, "a": {}},
+                {"k": 4, "a": [{"b": 1}, {"b": 2}]},  # TEST THAT INNER CAN BE MAPPED TO NESTED
+                {"k": 5, "a": {"b": 4}},  # TEST THAT INNER IS MAPPED TO NESTED, AFTER SEEING NESTED
+                {"k": 6, "a": 3},
+                {"k": 7, }
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "select": ["k"],
+                "where": {"eq": {"a.b": 1}}
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"k": 2}, {"k": 4}]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["k"],
+                "data": [[2], [4]]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "data": {
+                    "k": [2, 4]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_sum(self):
+        test = {
+            "data": [
+                {"a": "b"},
+                {"a": {"b": 1}},
+                {"a": {}},
+                {"a": [{"b": 1}, {"b": 2}]},  # TEST THAT INNER CAN BE MAPPED TO NESTED
+                {"a": {"b": 4}},  # TEST THAT INNER IS MAPPED TO NESTED, AFTER SEEING NESTED
+                {"a": 3},
+                {}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"value": "a.b", "aggregate": "sum"}
+            },
+            "expecting_list": {
+                "meta": {"format": "value"},
+                "data": 8
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.b"],
+                "data": [[8]]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "data": {
+                    "a.b": 8
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_edge(self):
+        test = {
+            "data": [
+                {"v": 1, "a": "b"},
+                {"v": 2, "a": {"b": 1}},
+                {"v": 3, "a": {}},
+                {"v": 4, "a": [{"b": 1}, {"b": 2}, {"b": 2}]},  # TEST THAT INNER CAN BE MAPPED TO NESTED
+                {"v": 5, "a": {"b": 4}},  # TEST THAT INNER IS MAPPED TO NESTED, AFTER SEEING NESTED
+                {"v": 6, "a": 3},
+                {"v": 7}
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "edges": [{"value": "b"}],
+                "select": {"value": "v", "aggregate": "sum"}
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"b": 1, "v": 6},
+                    {"b": 2, "v": 4},
+                    {"b": 4, "v": 5},
+                    {"v": 14}
+                ]
+            }
+        }
+        self.utils.execute_tests(test)
+
