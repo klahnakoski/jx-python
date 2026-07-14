@@ -22,7 +22,7 @@ service backends' concern):
 A new mode subclasses `JxTestHarness` and implements `execute_query`.
 """
 
-from jx_base.expressions import QueryOp, TRUE
+from jx_base.expressions import FilterOp, QueryOp
 from jx_python import jx
 from jx_python.containers.list_container import ListContainer
 from jx_python.expressions._utils import Python
@@ -237,15 +237,7 @@ class InterpretedHarness(JxTestHarness):
         container = self.container
 
         query_op = QueryOp.wrap(q, container, self.lang)
-        where = query_op.where
-        if where is TRUE:
-            rows = container.data
-        else:
-            rows = [
-                r
-                for i, r in enumerate(container.data)
-                if where(to_data(r), i, container.data)
-            ]
+        rows = FilterOp(container, query_op.where)()
 
         survivors = ListContainer(name=".", data=rows, schema=container.schema)
         q2 = to_data(dict(from_data(q)))
