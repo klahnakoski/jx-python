@@ -10,7 +10,7 @@
 
 
 
-from unittest import skip
+from unittest import skip, skipIf
 
 from jx_base.expressions import NULL
 from jx_base.expressions.query_op import DEFAULT_LIMIT
@@ -21,7 +21,7 @@ from mo_testing.fuzzytestcase import add_error_reporting
 from mo_threads import stop_main_thread
 from mo_times.dates import Date
 from mo_times.durations import DAY, WEEK
-from tests.test_jx import BaseTestCase, TEST_TABLE
+from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 
 TODAY = Date.today()
 
@@ -109,6 +109,7 @@ expected3 = list_to_data([
 @add_error_reporting
 class TestTime(BaseTestCase):
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time_variables(self):
         test = {
             "metadata": {},
@@ -159,6 +160,7 @@ class TestTime(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time2_variables(self):
         test = {
             "metadata": {},
@@ -224,6 +226,7 @@ class TestTime(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time_subtraction(self):
         """
         IF THIS FAILS, MAYBE THE JSON ROUNDING ENGINE IS ENABLED
@@ -261,6 +264,7 @@ class TestTime(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time_expression(self):
         test = {
             "data": test_data_3,

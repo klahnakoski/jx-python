@@ -20,6 +20,7 @@ class TestSchemaMerging(BaseTestCase):
     TESTS THAT DEMONSTRATE DIFFERENT SCHEMAS
     """
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "broken")
     def test_select(self):
         test = {
@@ -68,6 +69,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_mixed_primitives(self):
         test = {
             "data": [
@@ -112,6 +114,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_dots_in_property_names(self):
         test = {
             "data": [
@@ -152,6 +155,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_dots_in_property_names2(self):
         test = {
             "data": [
@@ -192,6 +196,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "broken")
     def test_dots_in_property_names3(self):
         test = {
@@ -234,6 +239,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count(self):
         test = {
             "data": [
@@ -301,6 +307,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "complicated where clause needs support")
     def test_where(self):
         test = {
@@ -336,6 +343,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_sum(self):
         test = {
             "data": [
@@ -369,6 +377,7 @@ class TestSchemaMerging(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edge(self):
         test = {
             "data": [

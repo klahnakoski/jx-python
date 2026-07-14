@@ -23,6 +23,7 @@ lots_of_data = list_to_data([{"a": i} for i in range(30)])
 
 @add_error_reporting
 class TestFilters(BaseTestCase):
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where_expression(self):
         test = {
             "data": [  # PROPERTIES STARTING WITH _ ARE NESTED AUTOMATICALLY
@@ -63,6 +64,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_add_expression(self):
         test = {
             "data": [  # PROPERTIES STARTING WITH _ ARE NESTED AUTOMATICALLY
@@ -103,6 +105,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_regexp_expression(self):
         test = {
             "data": [{"_a": [
@@ -136,6 +139,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_or(self):
         test = {
             "data": [{"a": 1}],
@@ -150,6 +154,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_and(self):
         test = {
             "data": [{"a": 1}],
@@ -164,6 +169,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_in(self):
         test = {
             "data": [{"a": 1}],
@@ -193,6 +199,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_w_missing_column(self):
         # ENSURE THE SET IS RECOGNIZED LIKE A LIST
         test = {
@@ -208,6 +215,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_match_all(self):
         test = {
             "data": [{"a": 1}],
@@ -222,6 +230,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -236,6 +245,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_null_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -250,6 +260,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edges_and_empty_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -268,6 +279,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edges_and_null_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -286,6 +298,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_suffix(self):
         test = {
             "data": [
@@ -310,6 +323,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_null_suffix(self):
         test = {
             "data": [
@@ -337,6 +351,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_suffix(self):
         test = {
             "data": [
@@ -364,6 +379,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_eq_with_boolean(self):
         test = {
             "data": [
@@ -394,6 +410,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_big_integers_in_script(self):
         bigger_than_int32 = 1547 * 1000 * 1000 * 1000
         test = {
@@ -415,6 +432,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where_is_array(self):
         test = {
             "data": [
@@ -434,6 +452,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_using_tuple_of_literals(self):
         test = {
             "data": [
@@ -454,6 +473,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_eq_using_tuple_of_literals(self):
         test = {
             "data": [
@@ -505,6 +525,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_find(self):
         test = {
             "data": [

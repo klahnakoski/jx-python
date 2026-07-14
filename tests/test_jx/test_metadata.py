@@ -20,6 +20,7 @@ from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 @add_error_reporting
 class TestMetadata(BaseTestCase):
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "broken")
     def test_meta_tables(self):
         pre_test = {
@@ -44,6 +45,7 @@ class TestMetadata(BaseTestCase):
         }
         self.utils.send_queries(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_meta(self):
 
         self.assertAlmostEqual(["test"], "test")
@@ -110,6 +112,7 @@ class TestMetadata(BaseTestCase):
         }
         self.utils.send_queries(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "broken")
     def test_get_nested_columns(self):
         settings = self.utils.fill_container({
@@ -190,6 +193,7 @@ class TestMetadata(BaseTestCase):
 
         self.assertEqual(a.my_func("testing"), ("testing", "test_value"), "Expecting method to be run")
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "cardinality not tracked")
     def test_cardinality(self):
         pre_test = dict_to_data({

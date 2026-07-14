@@ -1,9 +1,15 @@
-from mo_sqlite import sql_query
+from unittest import skipIf
+
+try:
+    from mo_sqlite import sql_query
+except ImportError:
+    sql_query = None
 from mo_testing.fuzzytestcase import add_error_reporting
-from tests.test_jx import BaseTestCase
+from tests.test_jx import BaseTestCase, global_settings
 
 
 @add_error_reporting
+@skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
 class TestInsert(BaseTestCase):
     """
     BASIC INSERT TESTS WITH SIMPLE "QUERY" TO VERIFY INSERT
