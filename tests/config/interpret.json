@@ -1,0 +1,7 @@
+{
+	"use": "interpret",
+	"constants": {},
+	"debug": {
+		"trace": true
+	}
+}

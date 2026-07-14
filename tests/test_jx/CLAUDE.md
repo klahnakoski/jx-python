@@ -50,33 +50,38 @@ globals at import time. Minimum surface actually used by the suite:
 | `setUpClass` / `tearDownClass` | per-class lifecycle; called from `BaseTestCase` |
 | `execute_tests(subtest, tjson=False, places=6)` | the main entry: load `subtest.data`, then run every `expecting_*` clause and compare |
 | `fill_container(subtest, typed=False)` | load `subtest.data` into the backend under `TEST_TABLE`; also used directly by a few tests |
-| `execute_query(query)` | run one query dict, return a result whose `.meta.format` is `list`/`table`/`cube` |
+| `execute_query(query)` | run one query dict, return a result whose `.meta.format` matches a supported format |
 | `execute_update(command)` | apply a `{set,clear,where}` update (only `test_update.py`) |
 | `try_till_response(...)` | http-service shim; only the ES/service tests call it — safe to stub/raise otherwise |
 
 `execute_tests` should mirror the reference harnesses: for each key on the subtest,
 `expecting_<fmt>` selects the requested format (`expecting` = default format), it sets
 `query.format` and `query.meta.testing = True`, runs the query, and compares. `expecting_error`
-means the query *should* raise, and the expected string must appear in the raised cause.
+means the query *should* raise, and the expected string must appear in the raised cause. A
+backend that only produces some formats declares `supported_formats` and simply skips the rest
+(the jx_python harnesses are `list`-only; `table`/`cube` are the SQL/service backends' concern).
 
-The comparison is format-aware and order-insensitive unless the query has an explicit `sort`
-(the reference `compare_to_expected` sorts both sides first). Reuse that logic rather than
-reimplementing it: in jx_python it lives as methods on `JxTestHarness` (`compare_to_expected`
-plus the `sort_table` / `cube2list` / `list2cube` staticmethods), so a second backend just
-subclasses and inherits them. They are backend-neutral (they only use `jx.sort`,
-`jx.get_columns`, `assertAlmostEqual`, and `QueryOp.wrap(query, container_or_Null, self.lang)`).
+The comparison is order-insensitive unless the query has an explicit `sort` (the reference
+`compare_to_expected` sorts both sides first). Reuse that logic rather than reimplementing it: in
+jx_python it is a method on the `JxTestHarness` base, so each backend subclasses and inherits it.
+It is backend-neutral (only `jx.sort`, `jx.get_columns`, `assertAlmostEqual`, and
+`QueryOp.wrap(query, container_or_Null, self.lang)`).
 
-### Two reference implementations
+### Reference implementations
 
-- **jx_python** — `jx-python/tests/__init__.py`, class `JxTestHarness`. All the generic
-  machinery is on the class; the backend seam is just `make_container` + `execute_query`
-  (override those to add another jx_python execution mode, e.g. interpreted over Data/FlatList;
-  set the `lang` class attr if the language differs). The default builds a
-  `ListContainer(name=".", data=...)`, substitutes that container object into `query["from"]`
-  (replacing the `TEST_TABLE` string), normalizes with `QueryOp.wrap(query, container, self.lang)`,
-  and runs `container.query(query_op)` (which honors `format`). Config: `tests/config/python.json`
-  (`"use": "python"`). Note `name="."`, **not** `"testdata"` — a container named `testdata`
-  makes the schema treat it as a nested-path prefix and violates a `Column` constraint.
+- **jx_python** — `jx-python/tests/harness.py`. A `JxTestHarness` base holds all the generic
+  machinery; the backend seam is just `make_container` + `execute_query` (set the `lang` class
+  attr if the language differs). `tests/__init__.py` reads the config and picks a harness by
+  `use`. Two coordinate, **list-only** modes both build a `ListContainer(name=".", data=...)` and
+  substitute that container object into `query["from"]` (replacing the `TEST_TABLE` string):
+  - `PythonHarness` (`"use": "python"`) — **compiles** each query to the Python language
+    (`to_python()` + `compile_expression`) and runs `container.query(query_op)`.
+  - `InterpretedHarness` (`"use": "interpret"`) — **interprets** the `where` predicate directly
+    through its `__call__` (tree-walk, no generated source), then shapes select/sort/format over
+    the survivors.
+
+  Note `name="."`, **not** `"testdata"` — a container named `testdata` makes the schema treat it
+  as a nested-path prefix and violates a `Column` constraint.
 - **jx_sqlite** — `jx-sqlite/tests/__init__.py`, class `SQLiteUtils`. Inserts into a
   `mo_sqlite` `Facts` table, rewrites `TEST_TABLE` → the real table name, and runs
   `table.query(query)`. Config: `tests/config/sqlite.json`.
