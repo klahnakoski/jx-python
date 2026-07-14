@@ -60,16 +60,20 @@ globals at import time. Minimum surface actually used by the suite:
 means the query *should* raise, and the expected string must appear in the raised cause.
 
 The comparison is format-aware and order-insensitive unless the query has an explicit `sort`
-(the reference `compare_to_expected` sorts both sides first). Reuse that logic — copy
-`compare_to_expected` / `sort_table` / `cube2list` / `list2cube` from an existing harness;
-they are backend-neutral (they only use `jx.sort`, `jx.get_columns`, `assertAlmostEqual`, and
-`QueryOp.wrap(query, container_or_Null, <this-repo's Language>)`).
+(the reference `compare_to_expected` sorts both sides first). Reuse that logic rather than
+reimplementing it: in jx_python it lives as methods on `JxTestHarness` (`compare_to_expected`
+plus the `sort_table` / `cube2list` / `list2cube` staticmethods), so a second backend just
+subclasses and inherits them. They are backend-neutral (they only use `jx.sort`,
+`jx.get_columns`, `assertAlmostEqual`, and `QueryOp.wrap(query, container_or_Null, self.lang)`).
 
 ### Two reference implementations
 
-- **jx_python** — `jx-python/tests/__init__.py`, class `PythonUtils`. Builds a
+- **jx_python** — `jx-python/tests/__init__.py`, class `JxTestHarness`. All the generic
+  machinery is on the class; the backend seam is just `make_container` + `execute_query`
+  (override those to add another jx_python execution mode, e.g. interpreted over Data/FlatList;
+  set the `lang` class attr if the language differs). The default builds a
   `ListContainer(name=".", data=...)`, substitutes that container object into `query["from"]`
-  (replacing the `TEST_TABLE` string), normalizes with `QueryOp.wrap(query, container, Python)`,
+  (replacing the `TEST_TABLE` string), normalizes with `QueryOp.wrap(query, container, self.lang)`,
   and runs `container.query(query_op)` (which honors `format`). Config: `tests/config/python.json`
   (`"use": "python"`). Note `name="."`, **not** `"testdata"` — a container named `testdata`
   makes the schema treat it as a nested-path prefix and violates a `Column` constraint.
