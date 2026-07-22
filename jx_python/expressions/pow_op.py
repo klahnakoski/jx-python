@@ -9,8 +9,9 @@
 #
 
 
-from jx_base.expressions.base_binary_op import BaseBinaryOp
+from jx_base.expressions import PowOp as _PowOp
+from jx_python.expressions._utils import _binaryop_to_python
 
 
-class ExpOp(BaseBinaryOp):
-    pass
+class PowOp(_PowOp):
+    to_python = _binaryop_to_python

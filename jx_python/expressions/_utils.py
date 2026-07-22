@@ -147,7 +147,7 @@ _python_operators = {
     "mul": (" * ", "1"),
     "sub": (" - ", None),
     "div": (" / ", None),
-    "exp": (" ** ", None),
+    "pow": (" ** ", None),
     "mod": (" % ", None),
     "gt": (" > ", None),
     "gte": (" >= ", None),

@@ -156,7 +156,7 @@ builtin_ops = {
     "sub": operator.sub,
     "mul": operator.mul,
     "mod": operator.mod,
-    "exp": operator.pow,
+    "pow": operator.pow,
     "floor": lambda v, m: mo_math.floor(v, m),
     "max": lambda *v: max(*v),
     "min": lambda *v: min(*v),

@@ -26,7 +26,7 @@ from jx_base.expressions.eq_op import EqOp
 from jx_base.expressions.es_script import EsScript
 from jx_base.expressions.es_select_op import ESSelectOp
 from jx_base.expressions.exists_op import ExistsOp
-from jx_base.expressions.exp_op import ExpOp
+from jx_base.expressions.pow_op import PowOp
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FalseOp, FALSE
 from jx_base.expressions.filter_op import FilterOp
@@ -169,7 +169,9 @@ set_default(
         "edges": EdgesOp,
         "eq": EqOp,
         "exists": ExistsOp,
-        "exp": ExpOp,
+        "pow": PowOp,
+        "power": PowOp,
+        # "exp" is reserved for the unary natural exponential e**x (not implemented)
         "filter": FilterOp,
         "find": FindOp,
         "first": FirstOp,

@@ -330,8 +330,8 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    def test_where_exp(self):
-        # exp raises lhs to the power of rhs
+    def test_where_pow(self):
+        # pow raises lhs to the power of rhs
         test = {
             "data": [
                 {"x": 2, "y": 3},
@@ -341,7 +341,25 @@ class TestFilters(BaseTestCase):
             "query": {
                 "from": TEST_TABLE,
                 "select": "*",
-                "where": {"eq": [{"exp": ["x", "y"]}, 8]},
+                "where": {"eq": [{"pow": ["x", "y"]}, 8]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 2, "y": 3}]
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_where_power_alias(self):
+        # "power" is an alias for pow
+        test = {
+            "data": [
+                {"x": 2, "y": 3},
+                {"x": 3, "y": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"power": ["x", "y"]}, 8]},
             },
             "expecting_list": {
                 "meta": {"format": "list"}, "data": [{"x": 2, "y": 3}]

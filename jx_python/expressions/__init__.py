@@ -13,7 +13,7 @@ from jx_python.expressions.date_op import DateOp
 from jx_python.expressions.div_op import DivOp
 from jx_python.expressions.eq_op import EqOp
 from jx_python.expressions.exists_op import ExistsOp
-from jx_python.expressions.exp_op import ExpOp
+from jx_python.expressions.pow_op import PowOp
 from jx_python.expressions.false_op import FalseOp
 from jx_python.expressions.filter_op import FilterOp
 from jx_python.expressions.find_op import FindOp
