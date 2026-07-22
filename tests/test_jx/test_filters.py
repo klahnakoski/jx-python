@@ -543,3 +543,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_find_non_string(self):
+        # find is defined only over strings; non-string values are out of class,
+        # not an error
+        test = {
+            "data": [
+                {"a": "hello"},
+                {"a": 42},
+                {"a": "world"},
+                {"a": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"find": {"a": "or"}},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": "world"}],
+            },
+        }
+        self.utils.execute_tests(test)
+

@@ -14,7 +14,7 @@ from jx_base.expressions.literal import ZERO
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.variable import is_variable
-from mo_dots import is_missing
+from mo_future import is_text
 from mo_json import JX_INTEGER
 
 
@@ -52,10 +52,9 @@ class FindOp(Expression):
 
     def __call__(self, row, rownum=None, rows=None):
         value = self.value(row, rownum, rows)
-        if is_missing(value):
-            return None
         find = self.find(row, rownum, rows)
-        if is_missing(find):
+        if not is_text(value) or not is_text(find):
+            # find is defined only over strings; anything else is out of class
             return None
         start = self.start(row, rownum, rows)
 

@@ -20,10 +20,21 @@ class StrictIndexOfOp(_StrictIndexOfOp):
         find = self.find.to_python(loop_depth)
         value = self.value.to_python(loop_depth)
 
+        # the dynamically typed target may hold a non-string here; .find only
+        # exists on strings, so anything else is "not found" (-1)
+        source = with_var(
+            "v",
+            value.source,
+            with_var(
+                "g",
+                find.source,
+                "(v.find(g) if isinstance(v, str) and isinstance(g, str) else -1)",
+            ),
+        )
         return PythonScript(
             merge_locals(value.locals, find.locals),
             loop_depth,
             JX_INTEGER,
-            f"({value.source}).find({find.source})",
+            source,
             self,
         )
