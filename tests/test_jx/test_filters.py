@@ -376,6 +376,26 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_max(self):
+        # max(...) is decisive: it takes the largest present value, skipping nulls
+        test = {
+            "data": [
+                {"a": 6, "b": 2},
+                {"a": 1, "b": 9},
+                {"a": 6, "b": None},  # null skipped -> max is 6
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"max": ["a", "b"]}, 6]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": 6, "b": 2}, {"a": 6, "b": None}],
+            },
+        }
+        self.utils.execute_tests(test)
+
     def test_where_div_by_zero_and_null(self):
         # div is decisive: dividing by zero or by null yields null, not an error
         test = {
