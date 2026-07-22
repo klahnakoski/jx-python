@@ -376,6 +376,24 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_value_identity(self):
+        # value() is a no-op wrapper: value(v) == v
+        test = {
+            "data": [
+                {"x": 5},
+                {"x": 6},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"value": "x"}, 5]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_to_text(self):
         # text() coerces to a string; a whole-number float normalises to the int
         # string (2.0 -> "2", not "2.0"); 2.5 -> "2.5"; a missing value stays null
