@@ -217,6 +217,44 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_and_non_boolean_term(self):
+        # a non-boolean term of `and` becomes true iff it exists (and is not False)
+        test = {
+            "data": [
+                {"x": 5, "g": 9},
+                {"x": 5},
+                {"x": 6, "g": 9},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"and": [{"eq": {"x": 5}}, "g"]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5, "g": 9}]
+            }
+        }
+        self.utils.execute_tests(test)
+
+    def test_where_or_non_boolean_term(self):
+        # a non-boolean term of `or` becomes true iff it exists (and is not False)
+        test = {
+            "data": [
+                {"g": 9},
+                {"h": 1},
+                {"other": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"or": ["g", "h"]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"g": 9}, {"h": 1}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_w_missing_column(self):
         # ENSURE THE SET IS RECOGNIZED LIKE A LIST

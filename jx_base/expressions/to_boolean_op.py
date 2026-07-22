@@ -9,6 +9,7 @@
 #
 
 from jx_base.expressions.expression import Expression, TRUE
+from mo_dots import exists
 from mo_imports import export
 from mo_json import JX_BOOLEAN
 
@@ -23,6 +24,10 @@ class ToBooleanOp(Expression):
     def __init__(self, term):
         Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        v = self.term(row, rownum, rows)
+        return exists(v) and v is not False
 
     def __data__(self):
         return {"boolean": self.term.__data__()}
