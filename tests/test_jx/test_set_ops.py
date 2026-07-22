@@ -706,6 +706,24 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_select_star_prefixed(self):
+        # "a*" is LeavesOp("a", prefix="a."): a's leaves re-keyed under the prefix
+        test = {
+            "data": [
+                {"o": 3, "a": {"b": "x", "v": 2}},
+                {"o": 1, "a": {"b": "y", "v": 5}},
+            ],
+            "query": {"from": TEST_TABLE, "select": "a*"},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"a.b": "x", "a.v": 2},
+                    {"a.b": "y", "a.v": 5},
+                ],
+            },
+        }
+        self.utils.execute_tests(test)
+
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_leaves(self):
         """
