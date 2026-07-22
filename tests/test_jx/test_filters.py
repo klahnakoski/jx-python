@@ -311,6 +311,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_floor(self):
+        # floor rounds down to the nearest whole number (default modulus 1)
+        test = {
+            "data": [
+                {"f": 2.7},
+                {"f": 9.1},
+                {"f": 2.1},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"floor": "f"}, 2]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"f": 2.7}, {"f": 2.1}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
