@@ -376,6 +376,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_div_by_zero_and_null(self):
+        # div is decisive: dividing by zero or by null yields null, not an error
+        test = {
+            "data": [
+                {"a": 6, "b": 2},
+                {"a": 6, "b": 0},
+                {"a": 6, "b": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"div": ["a", "b"]}, 3]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"a": 6, "b": 2}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_value_identity(self):
         # value() is a no-op wrapper: value(v) == v
         test = {

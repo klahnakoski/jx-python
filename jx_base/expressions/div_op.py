@@ -33,4 +33,4 @@ class DivOp(BaseBinaryOp):
         lhs = self.lhs.partial_eval(lang)
         if is_literal(lhs) and is_literal(rhs):
             return Literal(lhs.value / rhs.value)
-        return DivOp(lhs, rhs)
+        return lang.DivOp(lhs, rhs)
