@@ -47,19 +47,6 @@ class FindOp(_FindOp):
             merge_locals(value.locals, find.locals),
             loop_depth,
             JX_INTEGER,
-            with_var(
-                "f",
-                with_var(
-                    "v",
-                    value.source,
-                    with_var(
-                        "g",
-                        find.source,
-                        # non-strings have no .find; treat as "not found"
-                        "(v.find(g) if isinstance(v, str) and isinstance(g, str) else -1)",
-                    ),
-                ),
-                "None if f==-1 else f",
-            ),
+            with_var("f", f"({value.source}).find({find.source})", "None if f==-1 else f",),
             self,
         )
