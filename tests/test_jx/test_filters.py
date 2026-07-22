@@ -235,6 +235,24 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_mod(self):
+        # mod is the remainder operator
+        test = {
+            "data": [
+                {"x": 5, "y": 2},
+                {"x": 4, "y": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"mod": ["x", "y"]}, 1]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5, "y": 2}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
