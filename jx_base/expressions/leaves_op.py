@@ -13,7 +13,7 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
-from mo_dots import concat_field, is_data, to_data
+from mo_dots import is_data, to_data
 from mo_json import OBJECT
 from mo_logs import Log
 
@@ -39,7 +39,7 @@ class LeavesOp(Expression):
         if not is_data(value):
             return value
         prefix = "" if self.prefix is NULL else self.prefix.value
-        return to_data({concat_field(prefix, k): v for k, v in to_data(value).leaves()})
+        return to_data({prefix + k: v for k, v in to_data(value).leaves()})
 
     def __data__(self):
         if self.prefix is not NULL:

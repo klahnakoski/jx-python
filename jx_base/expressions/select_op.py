@@ -262,6 +262,7 @@ def normalize_one(frum, select, format):
             "default",
             "aggregate",
             "percentile",
+            "prefix",
         }
         if unexpected:
             Log.error(
@@ -288,7 +289,14 @@ def normalize_one(frum, select, format):
             value = jx_expression(root_name)
             if not is_variable(value):
                 Log.error("do not know what to do")
-            canonical = SelectOne(coalesce(name, root_name), LeavesOp(value, prefix=select.prefix))
+            if name:
+                # explicit name qualifies the leaves; fold it into the prefix so
+                # they surface as flat `name.<prefix><leaf>` columns
+                leaf_prefix = concat_field(name, select.prefix or "")
+                canonical = SelectOne(".", LeavesOp(value, prefix=Literal(leaf_prefix)))
+            else:
+                prefix = Literal(select.prefix) if select.prefix else None
+                canonical = SelectOne(root_name, LeavesOp(value, prefix=prefix))
         elif value.endswith("*"):
             root_name = value[:-1]
             path = split_field(root_name)
