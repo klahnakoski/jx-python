@@ -198,6 +198,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_coalesce(self):
+        # coalesce returns the first non-null term
+        test = {
+            "data": [
+                {"a": None, "b": 5},
+                {"a": 3, "b": 9},
+                {"a": None, "b": 1},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"coalesce": ["a", "b"]}, 5]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"b": 5}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_w_missing_column(self):
         # ENSURE THE SET IS RECOGNIZED LIKE A LIST

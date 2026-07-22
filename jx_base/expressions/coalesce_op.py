@@ -27,9 +27,9 @@ class CoalesceOp(Expression):
         self.terms = terms
         self._jx_type = union_type(*(t.jx_type for t in terms))
 
-    def __call__(self, row, row_num, rows):
+    def __call__(self, row, rownum=None, rows=None):
         for t in self.terms:
-            v = t(row, row_num, rows)
+            v = t(row, rownum, rows)
             if exists(v):
                 return v
         return None
