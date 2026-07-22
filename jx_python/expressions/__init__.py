@@ -1,4 +1,5 @@
 from jx_python.expressions._utils import jx_expression_to_function, Python
+from jx_python.expressions.abs_op import AbsOp
 from jx_python.expressions.add_op import AddOp
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.array_of_op import ArrayOfOp

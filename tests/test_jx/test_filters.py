@@ -292,6 +292,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_abs(self):
+        # abs returns the magnitude
+        test = {
+            "data": [
+                {"n": -3},
+                {"n": 5},
+                {"n": -1},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"abs": "n"}, 3]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"n": -3}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
