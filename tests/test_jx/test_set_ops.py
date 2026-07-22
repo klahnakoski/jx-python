@@ -116,6 +116,38 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_select_absent_nested_field(self):
+        # value form: a single select returns the value only; an absent nested
+        # field is missing (null), not the parent object
+        test = {
+            "data": [
+                {"a": {"b": 1}},
+                {"a": {"c": 9}},
+            ],
+            "query": {"from": TEST_TABLE, "select": "a.b"},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [1, NULL],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    def test_select_absent_nested_field_named(self):
+        # array form: the name is kept as the destination path; an absent nested
+        # field yields an empty object, not the parent
+        test = {
+            "data": [
+                {"a": {"b": 1}},
+                {"a": {"c": 9}},
+            ],
+            "query": {"from": TEST_TABLE, "select": ["a.b"]},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": 1}}, {}],
+            },
+        }
+        self.utils.execute_tests(test)
+
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_single_deep_select(self):
         test = {
