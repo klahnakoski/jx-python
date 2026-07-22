@@ -8,7 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_base.expressions import IsIntegerOp as _IsIntegerOp, PythonScript
-from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_python.expressions._utils import Python
 from mo_json.types import JX_INTEGER
 
 
@@ -21,5 +21,5 @@ class IsIntegerOp(_IsIntegerOp):
             JX_INTEGER,
             f"[v if isinstance(v, int) and not isinstance(v, bool) else None for v in [{term.source}]][0]",
             self,
-            ToBooleanOp(self),
+            self.term.missing(Python),
         )

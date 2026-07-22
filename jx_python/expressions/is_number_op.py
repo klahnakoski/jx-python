@@ -8,7 +8,7 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_base.expressions import IsNumberOp as _IsNumberOp, PythonScript
-from jx_base.expressions.to_boolean_op import ToBooleanOp
+from jx_python.expressions._utils import Python
 from mo_json.types import JX_NUMBER
 
 
@@ -21,5 +21,5 @@ class IsNumberOp(_IsNumberOp):
             JX_NUMBER,
             f"[v if isinstance(v, (int, float)) and not isinstance(v, bool) else None for v in [{term.source}]][0]",
             self,
-            ToBooleanOp(self),
+            self.term.missing(Python),
         )

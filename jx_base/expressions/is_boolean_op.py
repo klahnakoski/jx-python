@@ -28,7 +28,7 @@ class IsBooleanOp(Expression):
         elif term is self.term:
             return self
         else:
-            return IsBooleanOp(term)
+            return lang.IsBooleanOp(term)
 
     def __call__(self, row=None, rownum=None, rows=None):
         value = self.term(row, rownum, rows)

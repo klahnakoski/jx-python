@@ -41,4 +41,4 @@ class IsIntegerOp(Expression):
         return self.term.missing(lang)
 
     def partial_eval(self, lang):
-        return IsIntegerOp(self.term.partial_eval(lang))
+        return lang.IsIntegerOp(self.term.partial_eval(lang))

@@ -455,6 +455,26 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_is_number_eq(self):
+        # is_number wrapped in eq must compile (the type predicate lowers to a
+        # lang-consistent op); is_number(v) returns v, so eq 5 keeps x == 5
+        test = {
+            "data": [
+                {"x": 5},
+                {"x": 25},
+                {"x": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"is_number": "x"}, 5]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_is_boolean(self):
         # is_boolean returns the boolean value, null for non-booleans; as a where
         # predicate that keeps the True row (False is a boolean but tests falsy)
