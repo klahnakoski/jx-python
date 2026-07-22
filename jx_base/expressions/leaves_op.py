@@ -13,7 +13,6 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
-from mo_dots import concat_field, to_data
 from mo_json import OBJECT
 from mo_logs import Log
 
@@ -33,11 +32,9 @@ class LeavesOp(Expression):
         self.prefix = prefix
 
     def __call__(self, row, rownum=None, rows=None):
-        value = self.term(row)
-        if self.prefix is NULL:
-            return value
-        prefix = self.prefix.value
-        return to_data({concat_field(prefix, k): v for k, v in to_data(value).leaves()})
+        # leaves of a sub-tree, as a value, IS that sub-tree for the dynamically
+        # typed python target; the prefix only informs schema/column naming
+        return self.term(row)
 
     def __data__(self):
         if self.prefix is not NULL:

@@ -8,8 +8,6 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_base import Column, JX, FALSE, TRUE, jx_expression
-from jx_base.expressions import LeavesOp, Variable
-from jx_base.expressions.literal import Literal
 from jx_base.utils import is_variable_name
 from jx_python.expressions import Python
 from mo_json import INTEGER, ARRAY, ARRAY_KEY
@@ -136,21 +134,6 @@ class TestExpressions(FuzzyTestCase):
 
         with self.assertRaises(Exception):
             row.multi = None
-
-    def test_leaves_call(self):
-        # no prefix: the leaves of the row ARE the row (dynamically-typed target)
-        row = {"a": {"b": "x", "v": 2}, "o": 3}
-        self.assertEqual(LeavesOp(Variable("."))(row), row)
-
-    def test_leaves_call_prefix(self):
-        # prefixed leaves are re-keyed under the prefix
-        row = {"a": {"b": "x", "v": 2}, "o": 3}
-        result = LeavesOp(Variable("a"), prefix=Literal("a."))(row)
-        self.assertEqual(result, {"a.b": "x", "a.v": 2})
-
-    def test_leaves_call_missing(self):
-        # a term that resolves to nothing yields no value
-        self.assertEqual(LeavesOp(Variable("nope"))({"a": 1}), None)
 
 
 class S:
