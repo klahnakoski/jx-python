@@ -236,11 +236,14 @@ class TestFilters(BaseTestCase):
         self.utils.execute_tests(test)
 
     def test_where_mod(self):
-        # mod is the remainder operator
+        # mod is the remainder operator; a null operand makes it null (decisive),
+        # so those rows drop out
         test = {
             "data": [
                 {"x": 5, "y": 2},
                 {"x": 4, "y": 2},
+                {"x": 5, "y": None},   # null divisor -> null
+                {"x": None, "y": 2},   # null dividend -> null
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -261,6 +264,7 @@ class TestFilters(BaseTestCase):
                 {"x": -7, "y": 3},   # 2
                 {"x": -8, "y": 3},   # 1
                 {"x": -9, "y": 3},   # 0
+                {"x": -7, "y": None},  # null -> null
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -299,6 +303,7 @@ class TestFilters(BaseTestCase):
                 {"n": -3},
                 {"n": 5},
                 {"n": -1},
+                {"n": None},   # null -> null
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -318,6 +323,7 @@ class TestFilters(BaseTestCase):
                 {"f": 2.7},
                 {"f": 9.1},
                 {"f": 2.1},
+                {"f": None},   # null -> null
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -337,6 +343,8 @@ class TestFilters(BaseTestCase):
                 {"x": 2, "y": 3},
                 {"x": 2, "y": 2},
                 {"x": 3, "y": 2},
+                {"x": 2, "y": None},   # null exponent -> null
+                {"x": None, "y": 3},   # null base -> null
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -355,6 +363,7 @@ class TestFilters(BaseTestCase):
             "data": [
                 {"x": 2, "y": 3},
                 {"x": 3, "y": 2},
+                {"x": None, "y": 3},   # null -> null
             ],
             "query": {
                 "from": TEST_TABLE,
