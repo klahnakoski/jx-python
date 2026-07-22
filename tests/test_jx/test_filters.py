@@ -376,6 +376,28 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_is_boolean(self):
+        # is_boolean returns the boolean value, null for non-booleans; as a where
+        # predicate that keeps the True row (False is a boolean but tests falsy)
+        test = {
+            "data": [
+                {"x": True},
+                {"x": False},
+                {"x": 5},
+                {"x": "y"},
+                {"x": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"is_boolean": "x"},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": True}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_is_integer(self):
         # is_integer keeps rows whose value is an integer (not float, text, bool, null)
         test = {

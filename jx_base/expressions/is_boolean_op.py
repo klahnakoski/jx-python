@@ -17,8 +17,8 @@ from mo_json.types import JX_BOOLEAN
 class IsBooleanOp(Expression):
     _jx_type = JX_BOOLEAN
 
-    def __init__(self, *term):
-        Expression.__init__(self, [term])
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
 
     def partial_eval(self, lang):
