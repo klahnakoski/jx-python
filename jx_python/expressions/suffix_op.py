@@ -11,15 +11,23 @@
 
 from jx_base.expressions import SuffixOp as _SuffixOp
 from jx_base.expressions.python_script import PythonScript
+from jx_python.expressions._utils import with_var
+from jx_python.utils import merge_locals
 from mo_json import JX_BOOLEAN
 
 
 class SuffixOp(_SuffixOp):
     def to_python(self, loop_depth=0):
+        expr = self.expr.to_python(loop_depth)
+        suffix = self.suffix.to_python(loop_depth)
         return PythonScript(
-            locals={},
-            loop_depth=loop_depth,
-            type=JX_BOOLEAN,
-            source=f"({self.expr.to_python(loop_depth)}).endswith({self.suffix.to_python(loop_depth)})",
-            frum=self,
+            merge_locals(expr.locals, suffix.locals),
+            loop_depth,
+            JX_BOOLEAN,
+            with_var(
+                "e",
+                expr.source,
+                with_var("s", suffix.source, "False if e is None or s is None else e.endswith(s)"),
+            ),
+            self,
         )

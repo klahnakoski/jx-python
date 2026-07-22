@@ -783,7 +783,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_suffix(self):
         test = {
             "data": [
