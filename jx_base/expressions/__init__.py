@@ -190,6 +190,7 @@ set_default(
         "group_by": GroupOp,
         "in": InOp,
         "instr": FindOp,
+        "integer": ToIntegerOp,
         "is_boolean": IsBooleanOp,
         "is_integer": IsIntegerOp,
         "is_number": IsNumberOp,

@@ -21,6 +21,7 @@ from jx_base.expressions.select_op import SelectOp
 from jx_base.expressions.true_op import TRUE
 from jx_base.expressions.when_op import WhenOp
 from jx_base.language import is_op
+from mo_dots import is_missing
 from mo_json.types import JX_INTEGER, base_type
 from mo_logs import Log
 from mo_times import Date
@@ -32,6 +33,15 @@ class ToIntegerOp(Expression):
     def __init__(self, term):
         Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if is_missing(value):
+            return None
+        try:
+            return int(value)  # truncates toward zero, like the compiled int(...)
+        except Exception:
+            return None
 
     def __data__(self):
         return {"integer": self.term.__data__()}

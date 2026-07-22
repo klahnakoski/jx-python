@@ -376,6 +376,26 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_to_integer(self):
+        # integer() truncates to an int; a null stays null (decisive)
+        test = {
+            "data": [
+                {"x": "5"},
+                {"x": 2.9},
+                {"x": 7},
+                {"x": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"integer": "x"}, 2]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 2.9}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_is_boolean(self):
         # is_boolean returns the boolean value, null for non-booleans; as a where
         # predicate that keeps the True row (False is a boolean but tests falsy)
