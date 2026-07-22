@@ -330,6 +330,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_exp(self):
+        # exp raises lhs to the power of rhs
+        test = {
+            "data": [
+                {"x": 2, "y": 3},
+                {"x": 2, "y": 2},
+                {"x": 3, "y": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"exp": ["x", "y"]}, 8]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 2, "y": 3}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
