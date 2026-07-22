@@ -258,11 +258,12 @@ class TestFilters(BaseTestCase):
     # compiled path can not yet transpile count() inside a where (ToArrayOp)
     @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_where_count_decisive(self):
-        # count(...) is the decisive tally: a null term is skipped, not poisoning
+        # count(...) is the decisive tally: a missing term (absent or null) is
+        # skipped, not poisoning the whole count
         test = {
             "data": [
                 {"a": 3, "b": 4},
-                {"a": 3, "b": None},
+                {"a": 3},  # b absent -> skipped, count == 3
             ],
             "query": {
                 "from": TEST_TABLE,

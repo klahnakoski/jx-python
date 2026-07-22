@@ -56,7 +56,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "interpret", "jx_python known failure")
     def test_select_on_missing_field(self):
         test = {
             "data": [
@@ -87,7 +86,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "interpret", "jx_python known failure")
     def test_select_on_shallow_missing_field(self):
         test = {
             "data": [

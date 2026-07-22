@@ -251,6 +251,9 @@ def _get_columns_from_jx_type(nested_path, jx_type):
     paths = [nested_path[0]]
     columns = []
     for path, type in jx_type.leaves():
+        if type is JX_IS_NULL:
+            # an always-missing value carries no type; it gets no column
+            continue
         if endswith_field(path, ARRAY_KEY):
             child = concat_field(nested_path[0], join_field(split_field(path)[:-1]))
             more_paths, more_columns = _get_columns_from_jx_type([child, *nested_path], type)
