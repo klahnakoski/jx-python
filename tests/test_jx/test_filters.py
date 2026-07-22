@@ -376,6 +376,24 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_add(self):
+        # add() in a where must compile (multi-operand sum over the terms)
+        test = {
+            "data": [
+                {"a": 2, "b": 3},
+                {"a": 1, "b": 1},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"add": ["a", "b"]}, 5]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"a": 2, "b": 3}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_max(self):
         # max(...) is decisive: it takes the largest present value, skipping nulls
         test = {

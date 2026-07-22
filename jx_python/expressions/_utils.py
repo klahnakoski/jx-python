@@ -111,7 +111,7 @@ def multiop_to_python(self, loop_depth):
         merge_locals(*(t.locals for t in terms), coalesce=coalesce),
         loop_depth,
         JX_NUMBER,
-        sign.join(f"coalesce({t.source}, {zero})" for t in self.terms),
+        sign.join(f"coalesce({t.source}, {zero})" for t in terms),
         self,
     )
 
