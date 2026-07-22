@@ -7,7 +7,7 @@
 #
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
-from os.path import exists
+from mo_dots import exists
 
 from jx_base.expressions import ConcatOp as _ConcatOp
 from jx_base.expressions.python_script import PythonScript

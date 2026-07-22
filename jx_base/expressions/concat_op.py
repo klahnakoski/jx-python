@@ -14,7 +14,7 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.expressions.variable import Variable, is_variable
 from jx_base.utils import is_variable_name
-from mo_dots import is_data, is_many
+from mo_dots import exists, is_data, is_many
 from mo_future import first, is_text
 from mo_json.types import JX_TEXT
 from mo_logs import Log
@@ -64,6 +64,13 @@ class ConcatOp(Expression):
             return terms[0]
         else:
             return NULL
+
+    def __call__(self, row, rownum=None, rows=None):
+        values = [v for v in (t(row, rownum, rows) for t in self.terms) if exists(v)]
+        if not values:
+            return None
+        separator = self.separator(row, rownum, rows)
+        return (separator or "").join(values)
 
     def __data__(self):
         terms = self.terms

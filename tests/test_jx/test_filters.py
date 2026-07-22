@@ -217,6 +217,24 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_concat(self):
+        # concat joins its (existing) terms with the separator
+        test = {
+            "data": [
+                {"s": "hello"},
+                {"s": "world"},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"concat": {"s": "!"}}, {"literal": "hello!"}]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"s": "hello"}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
