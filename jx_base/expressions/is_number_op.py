@@ -22,6 +22,14 @@ class IsNumberOp(Expression):
         Expression.__init__(self, term)
         self.term = term
 
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if isinstance(value, bool):
+            return None  # a boolean is not a number
+        if isinstance(value, (int, float)):
+            return value
+        return None
+
     def __data__(self):
         return {"is_number": self.term.__data__()}
 

@@ -376,6 +376,27 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_is_number(self):
+        # is_number keeps rows whose value is numeric (not text, bool, or null)
+        test = {
+            "data": [
+                {"x": 5},
+                {"x": "hello"},
+                {"x": 2.5},
+                {"x": True},
+                {"x": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"is_number": "x"},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5}, {"x": 2.5}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_number_coercion(self):
         # number() coerces a string to its numeric value (null if not a number)
         test = {
