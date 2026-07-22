@@ -394,6 +394,40 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_count_collection(self):
+        # count() over a multi-valued field = number of existing values in it
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3, "arr": [5, 5, 9]},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "id",
+                "where": {"eq": [{"count": "arr"}, 3]},
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [1, 3]},
+        }
+        self.utils.execute_tests(test)
+
+    def test_where_cardinality_collection(self):
+        # cardinality() over a multi-valued field = number of distinct values
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3, "arr": [5, 5, 9]},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "id",
+                "where": {"eq": [{"cardinality": "arr"}, 2]},
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [3]},
+        }
+        self.utils.execute_tests(test)
+
     def test_where_max(self):
         # max(...) is decisive: it takes the largest present value, skipping nulls
         test = {

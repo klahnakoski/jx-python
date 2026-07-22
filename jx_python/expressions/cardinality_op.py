@@ -11,11 +11,20 @@
 
 from jx_base.expressions import CardinalityOp as _CardinalityOp
 from jx_base.expressions.python_script import PythonScript
+from jx_python.expressions._utils import Python
+from jx_python.utils import merge_locals
+from mo_dots import listwrap
+from mo_json import JX_INTEGER
 
 
 class CardinalityOp(_CardinalityOp):
     def to_python(self, loop_depth=0):
-        if not self.terms:
-            return PythonScript({}, loop_depth, "0")
-        else:
-            return PythonScript({}, loop_depth, "len(set(" + self.terms.to_python(loop_depth) + "))")
+        frum = self.frum.partial_eval(Python).to_python(loop_depth)
+        loop_depth = frum.loop_depth + 1
+        return PythonScript(
+            merge_locals(frum.locals, listwrap=listwrap),
+            loop_depth,
+            JX_INTEGER,
+            f"len(set(v for v in listwrap({frum.source}) if v is not None))",
+            self,
+        )

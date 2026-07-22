@@ -10,6 +10,8 @@
 
 
 from jx_base.expressions.expression import Expression
+from jx_base.utils import enlist
+from mo_dots import exists
 
 
 class CardinalityOp(Expression):
@@ -17,9 +19,18 @@ class CardinalityOp(Expression):
         Expression.__init__(self, frum)
         self.frum = frum
 
-    def __call__(self, row, rownum, rows):
-        values = self.terms(row, rownum, rows)
-        return len(set(values))
+    def __call__(self, row, rownum=None, rows=None):
+        values = enlist(self.frum(row, rownum, rows))
+        return len(set(v for v in values if exists(v)))
 
     def __data__(self):
         return {"cardinality": self.frum.__data__()}
+
+    def vars(self):
+        return self.frum.vars()
+
+    def map(self, map_):
+        return CardinalityOp(self.frum.map(map_))
+
+    def partial_eval(self, lang):
+        return lang.CardinalityOp(self.frum.partial_eval(lang))

@@ -5,6 +5,7 @@ from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.array_of_op import ArrayOfOp
 from jx_python.expressions.between_op import BetweenOp
 from jx_python.expressions.call_op import CallOp
+from jx_python.expressions.cardinality_op import CardinalityOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.coalesce_op import CoalesceOp
 from jx_python.expressions.concat_op import ConcatOp

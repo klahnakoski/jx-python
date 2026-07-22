@@ -311,7 +311,8 @@ def _get_schema_from_list(
         elif is_many(row):  # GET TYPE OF MULTIVALUE
             v = list(row)
             if len(v) == 1:
-                es_type = v[0].__class__.__name__
+                row = v[0]  # a single-element array is the scalar (JX convention)
+                es_type = row.__class__.__name__
             else:
                 es_type = row.__class__.__name__
         else:
