@@ -154,7 +154,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_and(self):
         test = {
             "data": [{"a": 1}],
@@ -215,7 +214,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_match_all(self):
         test = {
             "data": [{"a": 1}],
@@ -230,7 +228,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -245,7 +242,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_null_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -432,7 +428,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where_is_array(self):
         test = {
             "data": [
