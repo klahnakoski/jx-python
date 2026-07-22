@@ -17,6 +17,7 @@ from jx_base.expressions.literal import Literal
 from jx_base.expressions.literal import is_literal
 from jx_base.expressions.null_op import NULL
 from jx_base.language import is_op
+from mo_dots import is_missing
 from mo_json.types import JX_TEXT, JX_IS_NULL
 
 
@@ -28,9 +29,14 @@ class ToTextOp(Expression):
         self.term = term
 
     def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if is_missing(value):
+            return None  # a missing value stays null, not the string "None"/""
+        if isinstance(value, float) and value.is_integer():
+            return str(int(value))  # 2.0 -> "2", not "2.0"
         try:
-            return str(self.term(row, rownum, rows))
-        except:
+            return str(value)
+        except Exception:
             return None
 
     def __data__(self):

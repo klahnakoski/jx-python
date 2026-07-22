@@ -376,6 +376,28 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_to_text(self):
+        # text() coerces to a string; a whole-number float normalises to the int
+        # string (2.0 -> "2", not "2.0"); 2.5 -> "2.5"; a missing value stays null
+        test = {
+            "data": [
+                {"x": 2},     # int -> "2"
+                {"x": 2.0},   # whole float -> "2"
+                {"x": 2.5},   # -> "2.5"
+                {"x": 5},     # -> "5"
+                {"x": None},  # -> null
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"text": "x"}, {"literal": "2"}]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 2}, {"x": 2.0}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_to_integer(self):
         # integer() truncates to an int; a null stays null (decisive)
         test = {
