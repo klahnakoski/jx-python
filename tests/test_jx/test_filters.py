@@ -253,32 +253,33 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    def test_where_mod_negative_divisor(self):
-        # remainder follows the sign of the (negative) divisor: 7 % -3 == -2
+    def test_where_mod_negative_dividend(self):
+        # negative dividend, positive divisor: remainder follows the divisor sign,
+        # so -7 % 3 == 2
         test = {
             "data": [
-                {"x": 7, "y": -3},   # -2
-                {"x": 5, "y": -3},   # -1
-                {"x": 6, "y": -3},   #  0
+                {"x": -7, "y": 3},   # 2
+                {"x": -8, "y": 3},   # 1
+                {"x": -9, "y": 3},   # 0
             ],
             "query": {
                 "from": TEST_TABLE,
                 "select": "*",
-                "where": {"eq": [{"mod": ["x", "y"]}, -2]},
+                "where": {"eq": [{"mod": ["x", "y"]}, 2]},
             },
             "expecting_list": {
-                "meta": {"format": "list"}, "data": [{"x": 7, "y": -3}]
+                "meta": {"format": "list"}, "data": [{"x": -7, "y": 3}]
             }
         }
         self.utils.execute_tests(test)
 
-    def test_where_mod_negative_divisor_zero(self):
-        # a positive dividend evenly divisible by a negative divisor: 9 % -3 == 0
+    def test_where_mod_negative_dividend_zero(self):
+        # negative dividend evenly divisible: -9 % 3 == 0
         test = {
             "data": [
-                {"x": 9, "y": -3},   #  0
-                {"x": 8, "y": -3},   # -1
-                {"x": 7, "y": -3},   # -2
+                {"x": -9, "y": 3},   # 0
+                {"x": -8, "y": 3},   # 1
+                {"x": -7, "y": 3},   # 2
             ],
             "query": {
                 "from": TEST_TABLE,
@@ -286,7 +287,7 @@ class TestFilters(BaseTestCase):
                 "where": {"eq": [{"mod": ["x", "y"]}, 0]},
             },
             "expecting_list": {
-                "meta": {"format": "list"}, "data": [{"x": 9, "y": -3}]
+                "meta": {"format": "list"}, "data": [{"x": -9, "y": 3}]
             }
         }
         self.utils.execute_tests(test)
