@@ -255,8 +255,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    # compiled path can not yet transpile count() inside a where (ToArrayOp)
-    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_where_count_decisive(self):
         # count(...) is the decisive tally: a missing term (absent or null) is
         # skipped, not poisoning the whole count
@@ -268,7 +266,7 @@ class TestFilters(BaseTestCase):
             "query": {
                 "from": TEST_TABLE,
                 "select": "*",
-                "where": {"eq": [{"count": ["a", "b"]}, 7]},
+                "where": {"eq": [{"count": ["a", "b"]}, 2]},
             },
             "expecting_list": {
                 "meta": {"format": "list"}, "data": [{"a": 3, "b": 4}]

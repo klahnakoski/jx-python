@@ -25,5 +25,5 @@ class TallyOp(BaseMultiOp):
                 if self.decisive:
                     continue
                 return None
-            total += v
+            total += 1  # count existing values, not their sum
         return total

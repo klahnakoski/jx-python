@@ -63,6 +63,7 @@ from jx_python.expressions.strict_substring_op import StrictSubstringOp
 from jx_python.expressions.sub_op import SubOp
 from jx_python.expressions.suffix_op import SuffixOp
 from jx_python.expressions.sum_op import SumOp
+from jx_python.expressions.tally_op import TallyOp
 from jx_python.expressions.to_array_op import ToArrayOp
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.expressions.to_integer_op import ToIntegerOp
