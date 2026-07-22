@@ -217,6 +217,25 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_number_coercion(self):
+        # number() coerces a string to its numeric value (null if not a number)
+        test = {
+            "data": [
+                {"s": "5"},
+                {"s": "9"},
+                {"s": "x"},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"eq": [{"number": "s"}, 5]},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"s": "5"}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_and_non_boolean_term(self):
         # a non-boolean term of `and` becomes true iff it exists (and is not False)
         test = {
