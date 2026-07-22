@@ -203,7 +203,7 @@ class TestFilters(BaseTestCase):
         test = {
             "data": [
                 {"a": None, "b": 5},
-                {"a": 3, "b": 9},
+                {"a": 3, "b": 5},
                 {"a": None, "b": 1},
             ],
             "query": {
