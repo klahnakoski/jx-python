@@ -190,6 +190,7 @@ set_default(
         "group_by": GroupOp,
         "in": InOp,
         "instr": FindOp,
+        "is_integer": IsIntegerOp,
         "is_number": IsNumberOp,
         "is_text": IsTextOp,
         "least": LeastOp,

@@ -24,6 +24,7 @@ from jx_python.expressions.group_op import GroupOp
 from jx_python.expressions.gt_op import GtOp
 from jx_python.expressions.gte_op import GteOp
 from jx_python.expressions.in_op import InOp
+from jx_python.expressions.is_integer_op import IsIntegerOp
 from jx_python.expressions.is_number_op import IsNumberOp
 from jx_python.expressions.is_text_op import IsTextOp
 from jx_python.expressions.last_op import LastOp

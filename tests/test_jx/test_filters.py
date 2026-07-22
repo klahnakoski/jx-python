@@ -376,6 +376,27 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_is_integer(self):
+        # is_integer keeps rows whose value is an integer (not float, text, bool, null)
+        test = {
+            "data": [
+                {"x": 5},
+                {"x": 2.7},
+                {"x": "5"},
+                {"x": True},
+                {"x": None},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "*",
+                "where": {"is_integer": "x"},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"}, "data": [{"x": 5}]
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_where_is_number(self):
         # is_number keeps rows whose value is numeric (not text, bool, or null)
         test = {

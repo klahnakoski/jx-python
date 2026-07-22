@@ -16,9 +16,17 @@ from mo_json import JX_INTEGER
 class IsIntegerOp(Expression):
     _jx_type = JX_INTEGER
 
-    def __init__(self, *term):
-        Expression.__init__(self, [term])
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if isinstance(value, bool):
+            return None  # a boolean is not an integer
+        if isinstance(value, int):
+            return value
+        return None
 
     def __data__(self):
         return {"is_integer": self.term.__data__()}
@@ -30,12 +38,7 @@ class IsIntegerOp(Expression):
         return IsIntegerOp(self.term.map(map_))
 
     def missing(self, lang):
-        return self.expr.missing()
+        return self.term.missing(lang)
 
     def partial_eval(self, lang):
-        term = self.term.partial_eval(lang)
-
-        if term.jx_type in JX_INTEGER:
-            return term
-        else:
-            return NULL
+        return IsIntegerOp(self.term.partial_eval(lang))
