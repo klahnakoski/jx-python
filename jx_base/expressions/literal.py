@@ -80,7 +80,8 @@ class Literal(Expression):
 
     @property
     def json(self):
-        if self._value == "":
+        if is_text(self._value) and self._value == "":
+            # value2json("") IS "null"; AN EMPTY LIST ALSO == "", SO CHECK TYPE FIRST
             self._json = '""'
         else:
             self._json = value2json(self._value)

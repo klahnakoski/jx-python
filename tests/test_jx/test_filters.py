@@ -165,7 +165,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_empty_in(self):
         test = {
             "data": [{"a": 1}],
