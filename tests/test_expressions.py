@@ -121,3 +121,19 @@ class TestOther(FuzzyTestCase):
         expr = jx_expression({"count": "nested_path"})
         python = expr.to_python(0)
         self.assertEqual(str(python), 'sum(((0 if v==None else 1) for v in listwrap(get_attr(enlist(row0), "nested_path"))), 0)')
+
+    def test_union(self):
+        # union COLLECTS THE DISTINCT VALUES, SKIPPING THE NULLS (DECISIVE)
+        expr = jx_expression({"union": "a"})
+        row = {"a": ["x", "y", "x", None]}
+
+        self.assertEqual(expr(row), {"x", "y"})
+        func = compile_expression(expr.partial_eval(Python).to_python())
+        self.assertEqual(func(row), {"x", "y"})
+
+    def test_union_of_one_value(self):
+        # A SCALAR COLUMN IS A COLLECTION OF ONE
+        expr = jx_expression({"union": "a"})
+
+        self.assertEqual(expr({"a": "x"}), {"x"})
+        self.assertEqual(expr({}), set())

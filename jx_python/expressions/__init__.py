@@ -79,6 +79,7 @@ from jx_python.expressions.to_text_op import ToTextOp
 from jx_python.expressions.to_value_op import ToValueOp
 from jx_python.expressions.true_op import TrueOp
 from jx_python.expressions.tuple_op import TupleOp
+from jx_python.expressions.union_op import UnionOp
 from jx_python.expressions.variable import Variable
 from jx_python.expressions.when_op import WhenOp
 
