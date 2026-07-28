@@ -63,7 +63,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_add_expression(self):
         test = {
             "data": [  # PROPERTIES STARTING WITH _ ARE NESTED AUTOMATICALLY
@@ -138,7 +137,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_or(self):
         test = {
             "data": [{"a": 1}],
@@ -167,7 +165,7 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_empty_in(self):
         test = {
             "data": [{"a": 1}],
@@ -686,7 +684,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_w_missing_column(self):
         # ENSURE THE SET IS RECOGNIZED LIKE A LIST
         test = {
@@ -893,7 +890,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "python", "jx_python known failure")
     def test_big_integers_in_script(self):
         bigger_than_int32 = 1547 * 1000 * 1000 * 1000
         test = {
@@ -934,7 +930,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_in_using_tuple_of_literals(self):
         test = {
             "data": [
