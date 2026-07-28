@@ -15,6 +15,7 @@ from jx_python.expressions.strict_eq_op import StrictEqOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.when_op import WhenOp
 from jx_python.utils import merge_locals
+from mo_dots import is_many
 from mo_json import JX_BOOLEAN
 
 
@@ -35,7 +36,12 @@ class EqOp(_EqOp):
         lhs = self.lhs.partial_eval(lang)
         rhs = self.rhs.partial_eval(lang)
 
-        if is_literal(lhs) and is_literal(rhs):
+        if is_literal(rhs) and is_many(rhs.value):
+            # EQ TO AN ARRAY IS TRUE FOR ANY MEMBER OF THAT ARRAY
+            return lang.InOp(lhs, rhs).partial_eval(lang)
+        elif is_literal(lhs) and is_many(lhs.value):
+            return lang.InOp(rhs, lhs).partial_eval(lang)
+        elif is_literal(lhs) and is_literal(rhs):
             return FALSE if value_compare(lhs.value, rhs.value) else TRUE
         else:
             return CaseOp(

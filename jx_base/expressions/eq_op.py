@@ -68,7 +68,14 @@ class EqOp(BaseInequalityOp):
             Log.error("do not not know what to do")
 
     def __call__(self, row, rownum=None, rows=None):
-        return self.lhs(row, rownum, rows) == self.rhs(row, rownum, rows)
+        lhs = self.lhs(row, rownum, rows)
+        rhs = self.rhs(row, rownum, rows)
+        # EQ TO AN ARRAY IS TRUE FOR ANY MEMBER OF THAT ARRAY (SEE __new__)
+        if is_many(rhs):
+            return lhs in rhs
+        elif is_many(lhs):
+            return rhs in lhs
+        return lhs == rhs
 
     def partial_eval(self, lang):
         lhs = self.lhs.partial_eval(lang)
