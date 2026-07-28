@@ -9,6 +9,8 @@
 
 from mo_dots import exists
 
+from jx_base.utils import enlist
+
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.tally_op import TallyOp
@@ -42,8 +44,8 @@ class CountOp(Expression):
         Expression.__init__(self, frum)
         self.frum = frum
 
-    def __call__(self, row, rownum, rows):
-        return sum((1 for t in self.frum(row, rownum, rows) if exists(t)), 0)
+    def __call__(self, row, rownum=None, rows=None):
+        return sum((1 for t in enlist(self.frum(row, rownum, rows)) if exists(t)), 0)
 
     def __data__(self):
         return {"count": self.frum.__data__()}

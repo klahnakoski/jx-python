@@ -9,7 +9,7 @@
 
 import re
 
-from mo_dots import is_list, is_many, is_data
+from mo_dots import is_list, is_many, is_data, is_missing
 from mo_json.typed_object import TypedObject
 
 from mo_logs import Log
@@ -69,6 +69,14 @@ def coalesce(*args):
         if a != None:
             return a
     return None
+
+
+def is_true(value):
+    """
+    THE VALUE OF A `where` CLAUSE IS true IF IT EXISTS, AND IS NOT False;
+    ZERO IS A VALUE (NOT false), WHILE null/""/[] ARE MISSING (NOT true)
+    """
+    return value is not False and not is_missing(value)
 
 
 def enlist(value):

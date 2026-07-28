@@ -9,9 +9,13 @@
 #
 
 
-from jx_base.expressions import ExpOp as _ExpOp
-from jx_python.expressions._utils import _binaryop_to_python
+from jx_base.expressions.base_binary_op import BaseBinaryOp
 
 
-class ExpOp(_ExpOp):
-    to_python = _binaryop_to_python
+class PowOp(BaseBinaryOp):
+    """
+    RAISE lhs TO THE POWER rhs (lhs ** rhs); SQL POWER(lhs, rhs).
+    (EXP -- the unary natural exponential e**x -- is a different, unimplemented op.)
+    """
+
+    pass

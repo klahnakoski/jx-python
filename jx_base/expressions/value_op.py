@@ -24,6 +24,13 @@ class ValueOp(Expression):
         Expression.__init__(self, value)
         self.value = value
 
+    def __call__(self, row, rownum=None, rows=None):
+        return self.value(row, rownum, rows)
+
+    def partial_eval(self, lang):
+        # a no-op wrapper: unwrap to the inner value
+        return self.value.partial_eval(lang)
+
     @property
     def schema(self):
         return self.value.schema

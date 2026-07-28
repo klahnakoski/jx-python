@@ -352,6 +352,14 @@ def value_compare(left, right, ordering=1):
             right = None
             rtype = none_type
 
+        # THE EMPTY STRING IS NULL (SEE Literal.missing), SO IT SORTS WITH THE NULLS
+        if ltype is text and not left:
+            left = None
+            ltype = none_type
+        if rtype is text and not right:
+            right = None
+            rtype = none_type
+
         ltype_num = type_order(ltype, ordering)
         rtype_num = type_order(rtype, ordering)
 

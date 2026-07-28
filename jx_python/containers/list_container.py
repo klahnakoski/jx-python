@@ -20,7 +20,7 @@ from jx_base.models.container import Container
 from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
-from jx_base.utils import delist, enlist
+from jx_base.utils import delist, enlist, is_true
 from jx_python.containers.lists.aggs import is_aggs, list_aggs
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
@@ -180,12 +180,12 @@ class ListContainer(Container, Table):
         else:
             temp = where
 
-        return ListContainer("from " + self.name, filter(temp, self.data), self.schema)
+        return ListContainer("from " + self.name, [d for d in self.data if is_true(temp(d))], self.schema)
 
     filter = where
 
     def sort(self, sort):
-        return ListContainer("sorted " + self.name, jx.sort(self.data, sort, already_normalized=True), self.schema,)
+        return ListContainer("sorted " + self.name, jx.sort(self.data, *enlist(sort)), self.schema,)
 
     def get(self, select):
         """

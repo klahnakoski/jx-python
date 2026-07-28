@@ -4,6 +4,13 @@ JX query expressions interpreted over in-memory Python objects. The two main pac
 `jx_base` (the abstract JX language — see `jx_base/CLAUDE.md`) and `jx_python` (the Python
 mapping — see `jx_python/CLAUDE.md`). Known defects are tracked in `jx_python/BUGS.md`.
 
+## Add the test before changing code
+
+Write (or unskip) a failing test that pins the intended behavior **before** editing the
+implementation, then make it pass. Prefer unskipping/extending an existing case in the shared
+`tests/test_jx` suite over a bespoke test. A fix is not done until a test covers it on every
+harness it applies to (interpret and compiled/`python`, at least).
+
 ## Dependencies come from two places
 
 - **`vendor/`** — svn-synced source copies of several `mo_*` libraries (mo_logs, mo_json,

@@ -9,11 +9,24 @@
 #
 
 
-from jx_base.expressions import MostOp as _MostOp, AndOp
+from jx_base.expressions import MostOp as _MostOp
+from jx_python.expressions.and_op import AndOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
 from jx_python.utils import merge_locals
 from mo_json import union_type
+
+
+def most(decisive, values):
+    best = None
+    for v in values:
+        if v is None:
+            if decisive:
+                continue  # skip nulls, take the largest present value
+            return None  # conservative: any null poisons the result
+        if best is None or v > best:
+            best = v
+    return best
 
 
 class MostOp(_MostOp):
@@ -21,10 +34,10 @@ class MostOp(_MostOp):
         terms = [t.partial_eval(Python).to_python(loop_depth) for t in self.terms]
         source, locals = zip(*((t.source, t.locals) for t in terms))
         return PythonScript(
-            merge_locals(locals),
+            merge_locals(locals, most=most),
             loop_depth,
             union_type(*(t.jx_type for t in terms)),
-            "max([" + ",".join(source) + "])",
+            f"most({self.decisive}, [" + ",".join(source) + "])",
             self,
             AndOp(*(t.miss for t in terms)),
         )

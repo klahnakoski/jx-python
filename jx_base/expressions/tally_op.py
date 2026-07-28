@@ -17,11 +17,13 @@ class TallyOp(BaseMultiOp):
 
     has_simple_form = False
 
-    def __call__(self, row, rownum, rows):
+    def __call__(self, row, rownum=None, rows=None):
         total = 0
         for t in self.terms:
             v = t(row, rownum, rows)
             if is_missing(v):
+                if self.decisive:
+                    continue
                 return None
-            total += v
+            total += 1  # count existing values, not their sum
         return total

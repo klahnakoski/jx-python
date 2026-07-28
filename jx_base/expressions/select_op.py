@@ -262,6 +262,7 @@ def normalize_one(frum, select, format):
             "default",
             "aggregate",
             "percentile",
+            "prefix",
         }
         if unexpected:
             Log.error(
@@ -290,7 +291,8 @@ def normalize_one(frum, select, format):
                 Log.error("do not know what to do")
             # IMPLICIT STAR IS NAMED dot: LEAVES LAND AT TOP LEVEL, PREFIX STRIPPED
             # (SEE docs/jx_expressions_leaves.md; AN EXPLICIT name MAKES A CONTAINER)
-            canonical = SelectOne(coalesce(name, "."), LeavesOp(value, prefix=select.prefix))
+            prefix = Literal(select.prefix) if select.prefix else None
+            canonical = SelectOne(coalesce(name, "."), LeavesOp(value, prefix=prefix))
         elif value.endswith("*"):
             root_name = value[:-1]
             path = split_field(root_name)

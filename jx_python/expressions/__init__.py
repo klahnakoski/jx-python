@@ -1,9 +1,11 @@
 from jx_python.expressions._utils import jx_expression_to_function, Python
+from jx_python.expressions.abs_op import AbsOp
 from jx_python.expressions.add_op import AddOp
 from jx_python.expressions.and_op import AndOp
 from jx_python.expressions.array_of_op import ArrayOfOp
 from jx_python.expressions.between_op import BetweenOp
 from jx_python.expressions.call_op import CallOp
+from jx_python.expressions.cardinality_op import CardinalityOp
 from jx_python.expressions.case_op import CaseOp
 from jx_python.expressions.coalesce_op import CoalesceOp
 from jx_python.expressions.concat_op import ConcatOp
@@ -12,7 +14,7 @@ from jx_python.expressions.date_op import DateOp
 from jx_python.expressions.div_op import DivOp
 from jx_python.expressions.eq_op import EqOp
 from jx_python.expressions.exists_op import ExistsOp
-from jx_python.expressions.exp_op import ExpOp
+from jx_python.expressions.pow_op import PowOp
 from jx_python.expressions.false_op import FalseOp
 from jx_python.expressions.filter_op import FilterOp
 from jx_python.expressions.find_op import FindOp
@@ -23,6 +25,9 @@ from jx_python.expressions.group_op import GroupOp
 from jx_python.expressions.gt_op import GtOp
 from jx_python.expressions.gte_op import GteOp
 from jx_python.expressions.in_op import InOp
+from jx_python.expressions.is_boolean_op import IsBooleanOp
+from jx_python.expressions.is_integer_op import IsIntegerOp
+from jx_python.expressions.is_number_op import IsNumberOp
 from jx_python.expressions.is_text_op import IsTextOp
 from jx_python.expressions.last_op import LastOp
 from jx_python.expressions.least_op import LeastOp
@@ -65,6 +70,7 @@ from jx_python.expressions.strict_substring_op import StrictSubstringOp
 from jx_python.expressions.sub_op import SubOp
 from jx_python.expressions.suffix_op import SuffixOp
 from jx_python.expressions.sum_op import SumOp
+from jx_python.expressions.tally_op import TallyOp
 from jx_python.expressions.to_array_op import ToArrayOp
 from jx_python.expressions.to_boolean_op import ToBooleanOp
 from jx_python.expressions.to_integer_op import ToIntegerOp

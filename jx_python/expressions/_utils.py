@@ -38,14 +38,14 @@ def jx_expression_to_function(expr):
         if is_op(expr, ScriptOp) and not is_text(expr.script):
             return expr.script
         else:
-            func = compile_expression(expr.to_python())
+            func = compile_expression(expr.partial_eval(Python).to_python())
             return JXExpression(func, expr.__data__())
     if not is_data(expr) and not is_list(expr) and hasattr(expr, "__call__"):
         # THIS APPEARS TO BE A FUNCTION ALREADY
         return expr
 
     expr = jx_expression(expr)
-    func = compile_expression(expr.to_python())
+    func = compile_expression(expr.partial_eval(Python).to_python())
     return JXExpression(func, expr)
 
 
@@ -111,7 +111,7 @@ def multiop_to_python(self, loop_depth):
         merge_locals(*(t.locals for t in terms), coalesce=coalesce),
         loop_depth,
         JX_NUMBER,
-        sign.join(f"coalesce({t.source}, {zero})" for t in self.terms),
+        sign.join(f"coalesce({t.source}, {zero})" for t in terms),
         self,
     )
 
@@ -147,7 +147,7 @@ _python_operators = {
     "mul": (" * ", "1"),
     "sub": (" - ", None),
     "div": (" / ", None),
-    "exp": (" ** ", None),
+    "pow": (" ** ", None),
     "mod": (" % ", None),
     "gt": (" > ", None),
     "gte": (" >= ", None),

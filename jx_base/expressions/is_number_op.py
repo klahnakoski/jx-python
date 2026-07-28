@@ -22,6 +22,14 @@ class IsNumberOp(Expression):
         Expression.__init__(self, term)
         self.term = term
 
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if isinstance(value, bool):
+            return None  # a boolean is not a number
+        if isinstance(value, (int, float)):
+            return value
+        return None
+
     def __data__(self):
         return {"is_number": self.term.__data__()}
 
@@ -32,7 +40,7 @@ class IsNumberOp(Expression):
         return IsNumberOp(self.term.map(map_))
 
     def missing(self, lang):
-        return self.expr.missin(lang)
+        return self.term.missing(lang)
 
     def partial_eval(self, lang):
         term = self.term.partial_eval(lang)
@@ -47,4 +55,4 @@ class IsNumberOp(Expression):
         elif term.jx_type in JX_NUMBER_TYPES:
             return term
         else:
-            return IsNumberOp(term)
+            return lang.IsNumberOp(term)

@@ -25,15 +25,17 @@ class TallyOp(_TallyOp):
             merge_locals(*(t.locals for t in terms), tally=tally),
             loop_depth,
             JX_INTEGER,
-            f"tally({','.join(t.source for t in terms)})",
+            f"tally({self.decisive},{','.join(t.source for t in terms)})",
             self,
         )
 
 
-def tally(*terms):
+def tally(decisive, *terms):
     output = 0
     for t in terms:
         if is_missing(t):
-            return None
-        output += 1
+            if decisive:
+                continue  # decisive: skip missing and count the rest
+            return None  # conservative: any missing value poisons the count
+        output += 1  # count existing values, not their sum
     return output

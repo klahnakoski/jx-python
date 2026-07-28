@@ -38,6 +38,24 @@ JX ops are decisive: null means "out of class", so `add(42, null) = 42`,
 semantics; the translation from decisive to strict happens in jx_sqlite/mo_sqlite `to_sql`.
 Full spec: `C:\Users\kyle\code\ActiveData\docs\jx_decisive_operators.md`.
 
+## This is a transpiler; not every op is a JX op
+
+A **mixed-type column is a valid JX scenario** — JX values are heterogeneous, and JX operators
+are defined over that. The hard part is not JX; it is *re-expressing* JX operators in a target
+language (Python, C, SQL) whose type systems and operator sets differ. So this codebase carries
+**more operators than JX has**: alongside the decisive JX ops there are lower-level primitives
+that model the *target* language — e.g. `StrictIndexOfOp`, `StrictEqOp`. Their `Strict*` name
+means exactly "decisive/conservative/strict": a host-level operator that assumes its inputs were
+already validated and narrowed to the right type.
+
+Consequence: **a strict op is allowed to crash on an out-of-class input** (e.g.
+`StrictIndexOfOp.to_python` emits a bare `.find()` that throws on a non-string). That is the
+contract, not a bug — do **not** add type guards to strict-op `__call__`/`to_python`. The
+decisive→strict lowering is what guarantees valid inputs: a decisive op's `partial_eval` wraps
+the strict primitive in the necessary `missing`/type guards (a `WhenOp`, an `IsTextOp`, a schema
+`json_type` narrowing) so the strict op only ever runs on values of the type it expects. Fix a
+"crash on wrong type" upstream in that lowering, never by softening the strict primitive.
+
 ## Open questions (Kyle)
 
 - (query, namespace, language) combination — commits 7aafd1d/37768d8 note the namespace is

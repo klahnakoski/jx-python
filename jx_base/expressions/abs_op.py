@@ -11,15 +11,22 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.language import is_op
+from mo_dots import is_missing
 from mo_json.types import JX_NUMBER
 
 
 class AbsOp(Expression):
     _jx_type = JX_NUMBER
 
-    def __init__(self, *term):
-        Expression.__init__(self, *term)
+    def __init__(self, term):
+        Expression.__init__(self, term)
         self.term = term
+
+    def __call__(self, row, rownum=None, rows=None):
+        value = self.term(row, rownum, rows)
+        if is_missing(value):
+            return None
+        return abs(value)
 
     def __data__(self):
         return {"abs": self.term.__data__()}

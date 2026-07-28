@@ -12,6 +12,8 @@
 from jx_base.expressions import CountOp as _CountOp
 from jx_base.expressions.python_script import PythonScript
 from jx_python.expressions import Python
+from jx_python.utils import merge_locals
+from mo_dots import listwrap
 from mo_json import JX_INTEGER
 
 
@@ -20,5 +22,9 @@ class CountOp(_CountOp):
         frum = self.frum.partial_eval(Python).to_python(loop_depth)
         loop_depth = frum.loop_depth + 1
         return PythonScript(
-            frum.locals, loop_depth, JX_INTEGER, f"sum(((0 if v==None else 1) for v in {frum.source}), 0)", self
+            merge_locals(frum.locals, listwrap=listwrap),
+            loop_depth,
+            JX_INTEGER,
+            f"sum(((0 if v==None else 1) for v in listwrap({frum.source})), 0)",
+            self,
         )

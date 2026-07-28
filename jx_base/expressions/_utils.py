@@ -11,6 +11,8 @@
 
 import operator
 
+import mo_math
+
 from jx_base.language import is_expression, Language
 from jx_base.models.container import Container
 from jx_base.utils import enlist, delist
@@ -153,6 +155,9 @@ builtin_ops = {
     "add": operator.add,
     "sub": operator.sub,
     "mul": operator.mul,
+    "mod": operator.mod,
+    "pow": operator.pow,
+    "floor": lambda v, m: mo_math.floor(v, m),
     "max": lambda *v: max(*v),
     "min": lambda *v: min(*v),
     "most": lambda *v: max(*v),

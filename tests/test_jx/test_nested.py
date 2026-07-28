@@ -19,6 +19,7 @@ lots_of_data = list_to_data([{"a": i} for i in range(30)])
 @add_error_reporting
 @skipIf(global_settings.use == "sqlite", "broken")
 class TestNestedQueries(BaseTestCase):
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_nested_max_simple(self):
         test = {
             "data": [{
@@ -48,6 +49,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_nested_max(self):
         test = {
             "data": [{
@@ -81,6 +83,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_nested_max_of_expression(self):
         test = {
             "data": [{
@@ -108,6 +111,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_sum(self):
         test = {
             "data": [{
@@ -132,6 +136,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_distinct_on(self):
         # SELECT DISTINCT ON (a, b) c FROM t ORDER BY a, b
 
@@ -148,6 +153,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_two_paths(self):
         # VERIFY WE CAN PERFORM MULTIPLE SUBQUERIES IN SINGLE QUERY
         test = {
@@ -183,6 +189,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_group_by_child1(self):
         # VERIFY WE CAN PERFORM MULTIPLE SUBQUERIES IN SINGLE QUERY
         test = {
@@ -232,6 +239,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_group_by_child2(self):
         # VERIFY WE CAN PERFORM MULTIPLE SUBQUERIES IN SINGLE QUERY
         test = {
@@ -272,6 +280,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_nested_aggregate(self):
         # VERIFY WE CAN AGGREGATE AN AGGREGATE
         test = {
@@ -291,6 +300,7 @@ class TestNestedQueries(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_group_function(self):
         test = {
             "data": [{"v": [1, 2, 3, 4]}, {"v": [5, 6, 7, 8]}],

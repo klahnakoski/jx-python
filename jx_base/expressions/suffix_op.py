@@ -58,12 +58,12 @@ class SuffixOp(Expression):
             return {"suffix": [self.expr.__data__(), self.suffix.__data__()]}
 
     def __call__(self, row, rownum=None, rows=None):
-        expr = self.expr(row, rownum, rows)
-        if is_missing(expr):
-            return None
         suffix = self.suffix(row, rownum, rows)
         if is_missing(suffix):
-            return None
+            return True  # EVERY VALUE ENDS WITH THE EMPTY SUFFIX
+        expr = self.expr(row, rownum, rows)
+        if is_missing(expr):
+            return False
         return expr.endswith(suffix)
 
     def __eq__(self, other):

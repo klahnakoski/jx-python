@@ -9,22 +9,14 @@
 #
 
 
-import mo_math
-
-from jx_base.expressions import FloorOp as _FloorOp
+from jx_base.expressions import AbsOp as _AbsOp
 from jx_base.expressions.python_script import PythonScript
-from jx_python.utils import merge_locals
 from mo_json import JX_NUMBER
 
 
-class FloorOp(_FloorOp):
+class AbsOp(_AbsOp):
     def to_python(self, loop_depth=0):
-        lhs = self.lhs.to_python(loop_depth)
-        rhs = self.rhs.to_python(loop_depth)
+        value = self.term.to_python(loop_depth)
         return PythonScript(
-            merge_locals(lhs.locals, rhs.locals, mo_math=mo_math),
-            loop_depth,
-            JX_NUMBER,
-            f"mo_math.floor({lhs.source}, {rhs.source})",
-            self,
+            value.locals, loop_depth, JX_NUMBER, f"abs({value.source}) if ({value.source}) != None else None", self
         )

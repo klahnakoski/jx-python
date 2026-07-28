@@ -38,6 +38,12 @@ class ToNumberOp(Expression):
     def __data__(self):
         return {"number": self.term.__data__()}
 
+    def __call__(self, row, rownum=None, rows=None):
+        try:
+            return float(self.term(row, rownum, rows))
+        except Exception:
+            return None
+
     def vars(self):
         return self.term.vars()
 

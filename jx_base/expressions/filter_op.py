@@ -11,13 +11,24 @@
 from jx_base.expressions.expression import Expression, jx_expression, MissingOp
 from jx_base.expressions.literal import TRUE
 from jx_base.language import JX
-from mo_dots import is_many
+from jx_base.utils import is_true
+from mo_dots import is_many, to_data
 
 
 class FilterOp(Expression):
     def __init__(self, frum, predicate):
         Expression.__init__(self, frum, predicate)
         self.frum, self.predicate = frum, predicate
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        frum = self.frum(row, rownum, rows)
+        if self.predicate is TRUE:
+            return frum
+        return [
+            r
+            for i, r in enumerate(to_data(d) for d in frum)
+            if is_true(self.predicate(r, i, frum))
+        ]
 
     def __data__(self):
         return {"filter": [self.frum.__data__(), self.predicate.__data__()]}
