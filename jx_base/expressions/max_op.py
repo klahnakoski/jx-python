@@ -10,6 +10,8 @@
 
 
 from jx_base.expressions.expression import Expression
+from jx_base.utils import enlist
+from mo_dots import Null, exists
 from mo_json.types import JX_NUMBER
 from jx_base.expressions.most_op import MostOp
 
@@ -39,6 +41,12 @@ class MaxOp(Expression):
 
         Expression.__init__(self, frum)
         self.frum = frum
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        values = [v for v in enlist(self.frum(row, rownum, rows)) if exists(v)]
+        if not values:
+            return Null
+        return max(values)
 
     def __data__(self):
         return {"max": self.frum.__data__()}

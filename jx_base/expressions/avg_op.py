@@ -10,9 +10,17 @@
 
 
 from jx_base.expressions.expression import Expression
+from jx_base.utils import enlist
+from mo_dots import Null, exists
 
 
 class AvgOp(Expression):
     def __init__(self, frum):
         Expression.__init__(self, frum)
         self.frum = frum
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        values = [v for v in enlist(self.frum(row, rownum, rows)) if exists(v)]
+        if not values:
+            return Null
+        return sum(values) / len(values)
