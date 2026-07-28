@@ -467,7 +467,9 @@ def _normalize_group(edge, dim_index, limit, schema=None):
         }])
     else:
         edge = to_data(edge)
-        if edge.domain and edge.domain.jx_type != "default":
+        if edge.domain and edge.domain.type not in ("default", None):
+            # NOT jx_type: A Domain OBJECT HAS NO SUCH PROPERTY, AND ON A RAW DOMAIN
+            # dict THE COMPARISON YIELDS Null (FALSY), WHICH LET EVERY DOMAIN THROUGH
             Log.error("groupby does not accept complicated domains")
 
         if not edge.name and not is_text(edge.value):
