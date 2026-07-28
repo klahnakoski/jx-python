@@ -54,6 +54,8 @@ def canonical_aggregates():
     from jx_base.expressions.min_op import MinOp
     from jx_base.expressions.null_op import NullOp
     from jx_base.expressions.percentile_op import PercentileOp
+    from jx_base.expressions.percentiles_op import PercentilesOp
+    from jx_base.expressions.stats_op import StatsOp
     from jx_base.expressions.union_op import UnionOp
     from jx_base.expressions.sum_op import SumOp
 
@@ -63,6 +65,9 @@ def canonical_aggregates():
         "min": MinOp,
         "minimum": MinOp,
         "percentile": PercentileOp,
+        "percentiles": PercentilesOp,
+        "median": PercentilesOp,
+        "stats": StatsOp,
         "max": MaxOp,
         "maximum": MaxOp,
         "add": SumOp,

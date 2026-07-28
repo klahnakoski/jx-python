@@ -72,6 +72,7 @@ from jx_base.expressions.offset_op import OffsetOp
 from jx_base.expressions.or_op import OrOp
 from jx_base.expressions.outer_join_op import OuterJoinOp
 from jx_base.expressions.percentile_op import PercentileOp
+from jx_base.expressions.percentiles_op import PercentilesOp
 from jx_base.expressions.prefix_op import PrefixOp
 from jx_base.expressions.product_op import ProductOp
 from jx_base.expressions.python_function import PythonFunction
@@ -120,6 +121,7 @@ from jx_base.expressions.strict_multi_op import StrictMultiOp
 from jx_base.expressions.strict_not_op import StrictNotOp
 from jx_base.expressions.strict_starts_with_op import StrictStartsWithOp
 from jx_base.expressions.strict_substring_op import StrictSubstringOp
+from jx_base.expressions.stats_op import StatsOp
 from jx_base.expressions.sub_op import SubOp
 from jx_base.expressions.suffix_op import SuffixOp
 from jx_base.expressions.sum_op import SumOp
@@ -201,6 +203,7 @@ set_default(
         "le": LteOp,
         "match_all": TrueOp,
         "max": MaxOp,
+        "median": PercentilesOp,
         "min": MinOp,
         "minus": SubOp,
         "missing": MissingOp,
@@ -221,6 +224,7 @@ set_default(
         "offset": OffsetOp,
         "or": OrOp,
         "percentile": PercentileOp,
+        "percentiles": PercentilesOp,
         "postfix": SuffixOp,
         "prefix": PrefixOp,
         "range": RangeOp,
@@ -234,6 +238,7 @@ set_default(
         "sort": SortOp,
         "orderby": SortOp,
         "split": SplitOp,
+        "stats": StatsOp,
         "sql.and": SqlAndOp,
         "sql.alias": SqlAliasOp,
         "sql.concat": SqlConcatOp,

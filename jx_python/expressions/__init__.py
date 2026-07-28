@@ -45,6 +45,7 @@ from jx_python.expressions.not_op import NotOp
 from jx_python.expressions.not_right_op import NotRightOp
 from jx_python.expressions.offset_op import OffsetOp
 from jx_python.expressions.or_op import OrOp
+from jx_python.expressions.percentiles_op import PercentilesOp
 from jx_python.expressions.prefix_op import PrefixOp
 from jx_python.expressions.python_function import PythonFunction
 from jx_python.expressions.python_script import PythonScript
@@ -55,6 +56,7 @@ from jx_python.expressions.rows_op import RowsOp
 from jx_python.expressions.script_op import ScriptOp
 from jx_python.expressions.select_op import SelectOp
 from jx_python.expressions.split_op import SplitOp
+from jx_python.expressions.stats_op import StatsOp
 from jx_python.expressions.strict_add_op import StrictAddOp
 from jx_python.expressions.strict_eq_op import StrictEqOp
 from jx_python.expressions.strict_index_of_op import StrictIndexOfOp

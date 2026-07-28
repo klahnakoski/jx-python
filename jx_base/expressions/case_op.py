@@ -84,10 +84,13 @@ class CaseOp(Expression):
             return lang.OrOp(*ors).partial_eval(lang)
 
         whens = []
+        _else = None
         for w in self.whens:
             when = ToBooleanOp(w.when).partial_eval(lang)
             if when is TRUE:
-                whens.append(w.then.partial_eval(lang))
+                # THIS BRANCH ALWAYS FIRES: IT IS THE else FOR THE WHENS COLLECTED SO FAR
+                # (NEVER APPEND A BARE then INTO whens - EVERYTHING DOWNSTREAM ASSUMES WhenOps)
+                _else = w.then.partial_eval(lang)
                 break
             elif when is FALSE or when is NULL:
                 pass
@@ -96,15 +99,17 @@ class CaseOp(Expression):
                 if is_op(then, CaseOp):
                     for ww in then.whens:
                         whens.append(lang.WhenOp(AndOp(when, ww.when).partial_eval(lang), then=ww.then))
-                        if then.els_ is not NULL:
-                            whens.append(lang.WhenOp(when, then.els_))
+                    if then.els_ is not NULL:
+                        # AFTER ALL INNER WHENS (INSIDE THE LOOP IT SHADOWED THE ONES AFTER IT)
+                        whens.append(lang.WhenOp(when, then=then.els_))
                 elif is_op(then, WhenOp):
                     whens.append(lang.WhenOp(AndOp(when, then.when).partial_eval(lang), then=then.then))
-                    whens.append(lang.WhenOp(when, then.els_))
+                    whens.append(lang.WhenOp(when, then=then.els_))
                 else:
                     whens.append(lang.WhenOp(when, then=then))
 
-        _else = self._else.partial_eval(lang)
+        if _else is None:
+            _else = self._else.partial_eval(lang)
 
         if len(whens) == 0:
             return _else

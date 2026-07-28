@@ -9,65 +9,36 @@
 #
 
 
-from jx_base.expressions._utils import merge_types
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
-from jx_base.expressions.literal import Literal
-from jx_base.expressions.null_op import NULL
-from jx_base.language import is_op
-from mo_dots import is_many
-from mo_math import MIN
 
 
 class UnionOp(Expression):
-    def __init__(self, *terms):
-        Expression.__init__(self, *terms)
-        if terms == None:
-            self.terms = []
-        elif is_many(terms):
-            self.terms = terms
-        else:
-            self.terms = [terms]
+    """
+    DECISIVE SET UNION: COLLECT THE DISTINCT VALUES OF frum
+    """
+
+    def __init__(self, *terms, frum=None):
+        if terms:
+            frum = terms[0]
+        Expression.__init__(self, frum)
+        self.frum = frum
 
     def __data__(self):
-        return {"union": [t.__data__() for t in self.terms]}
+        return {"union": self.frum.__data__()}
 
     @property
     def jx_type(self):
-        return merge_types(t.type for t in self.terms)
+        return self.frum.jx_type
 
     def vars(self):
-        output = set()
-        for t in self.terms:
-            output |= t.vars()
-        return output
+        return self.frum.vars()
 
     def map(self, map_):
-        return UnionOp(*(t.map(map_) for t in self.terms))
+        return UnionOp(frum=self.frum.map(map_))
 
     def missing(self, lang):
         return FALSE
 
     def partial_eval(self, lang):
-        minimum = None
-        terms = []
-        for t in self.terms:
-            simple = t.partial_eval(lang)
-            if simple is NULL:
-                pass
-            elif is_op(simple, Literal):
-                minimum = MIN([minimum, simple.value])
-            else:
-                terms.append(simple)
-        if len(terms) == 0:
-            if minimum == None:
-                return NULL
-            else:
-                return Literal(minimum)
-        else:
-            if minimum == None:
-                output = UnionOp(*terms)
-            else:
-                output = UnionOp(*[Literal(minimum)] + terms)
-
-        return output
+        return UnionOp(frum=self.frum.partial_eval(lang))

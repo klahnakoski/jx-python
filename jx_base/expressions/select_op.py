@@ -288,7 +288,9 @@ def normalize_one(frum, select, format):
             value = jx_expression(root_name)
             if not is_variable(value):
                 Log.error("do not know what to do")
-            canonical = SelectOne(coalesce(name, root_name), LeavesOp(value, prefix=select.prefix))
+            # IMPLICIT STAR IS NAMED dot: LEAVES LAND AT TOP LEVEL, PREFIX STRIPPED
+            # (SEE docs/jx_expressions_leaves.md; AN EXPLICIT name MAKES A CONTAINER)
+            canonical = SelectOne(coalesce(name, "."), LeavesOp(value, prefix=select.prefix))
         elif value.endswith("*"):
             root_name = value[:-1]
             path = split_field(root_name)

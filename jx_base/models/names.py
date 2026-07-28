@@ -27,19 +27,95 @@ FREE_VAR_PREFIX = "__$"
 is_free_var = re.compile(r"^" + re.escape(FREE_VAR_PREFIX) + r"\d+$")
 
 
+class ResolvedName:
+    """
+    ONE LEAF BINDING.  UNPACKS AS THE LEGACY (relative_name, value) PAIR, AND CARRIES THE
+    TWO-KIND SPLIT OF THE NAME RELATIVE TO THE QUERIED PREFIX - JX NAMES ARE UNIFORM
+    PROPERTY CHAINS, SO WHERE THE RELATION STOPS AND THE VALUE BEGINS IS NOT EXPRESSIBLE
+    IN THE NAME ITSELF (docs/NAMES.md):
+
+    push_name  - THE OUTPUT COLUMN THIS BINDING LANDS UNDER; "." MEANS THE QUERIED NAME
+                 ITSELF IS A VALUE (AN ARRAY, OR AN ELEMENT OF ONE) AND THE BINDING
+                 COLLAPSES UNDER IT
+    push_child - PATH TO THIS BINDING INSIDE THAT VALUE ("." = THE VALUE ITSELF)
+    """
+
+    __slots__ = ["name", "value", "push_name", "push_child"]
+
+    def __init__(self, name, value, push_name=".", push_child="."):
+        self.name = name
+        self.value = value
+        self.push_name = push_name
+        self.push_child = push_child
+
+    def __iter__(self):
+        # LEGACY (relative_name, value) UNPACKING
+        return iter((self.name, self.value))
+
+    def __getitem__(self, index):
+        return (self.name, self.value)[index]
+
+    def __eq__(self, other):
+        try:
+            n, v = other
+        except Exception:
+            return False
+        return self.name == n and (self.value is v or self.value == v)
+
+    def __repr__(self):
+        return f"ResolvedName({self.name!r}, {self.value!r}, push_name={self.push_name!r}, push_child={self.push_child!r})"
+
+
+def _push_split(prefix: str, rel_name: str, boundary: str, root_is_array: bool) -> Tuple[str, str]:
+    """
+    THE TWO-KIND SPLIT OF ONE BINDING'S NAME, RELATIVE TO THE QUERIED prefix.
+    boundary IS THE PATH (RELATIVE TO THE SCOPE ROOT) OF THE ARRAY HOLDING THE VALUE;
+    "." MEANS THE VALUE LIVES IN THE SCOPE'S OWN TABLE.
+    """
+    if boundary == ".":
+        if root_is_array:
+            # QUERIED NAME IS (INSIDE) AN ARRAY ELEMENT: COLLAPSE UNDER IT
+            return ".", rel_name
+        # PLAIN TUPLE LEAF: EACH LEAF ITS OWN COLUMN
+        return rel_name, "."
+    if root_is_array or startswith_field(prefix, boundary):
+        # QUERIED NAME IS AT OR INSIDE THE ARRAY: COLLAPSE UNDER IT
+        return ".", rel_name
+    # ARRAY STRICTLY BELOW THE QUERIED NAME: SPREAD TO THE ARRAY; THE REST IS INSIDE ITS VALUE
+    name = concat_field(prefix, rel_name)
+    return relative_field(boundary, prefix), relative_field(name, boundary)
+
+
 class Scope:
     """
     BINDINGS VISIBLE FROM ONE VANTAGE POINT (ONE TABLE OF A SNOWFLAKE, ONE stack() OVERLAY)
 
-    names   - ENUMERABLE: JX (UNTYPED) NAMES -> TUPLE OF VALUES
-    aliases - EXACT LOOKUP ONLY: PHYSICAL (TYPED) NAMES -> TUPLE OF VALUES
+    names         - ENUMERABLE: JX (UNTYPED) NAMES -> TUPLE OF VALUES
+    aliases       - EXACT LOOKUP ONLY: PHYSICAL (TYPED) NAMES -> TUPLE OF VALUES
+    root_is_array - THE SCOPE'S OWN TABLE IS AN ARRAY (ITS ROWS ARE ELEMENTS, NOT FACTS)
+    boundaries    - PER NAME: TUPLE (ALIGNED WITH names[name]) OF THE ARRAY PATH HOLDING
+                    EACH VALUE, RELATIVE TO THE SCOPE ROOT ("." = THE SCOPE'S OWN TABLE)
     """
 
-    __slots__ = ["names", "aliases"]
+    __slots__ = ["names", "aliases", "root_is_array", "boundaries"]
 
-    def __init__(self, names: Dict[str, Tuple] = None, aliases: Dict[str, Tuple] = None):
+    def __init__(
+        self,
+        names: Dict[str, Tuple] = None,
+        aliases: Dict[str, Tuple] = None,
+        root_is_array: bool = False,
+        boundaries: Dict[str, Tuple] = None,
+    ):
         self.names = names or {}
         self.aliases = aliases or {}
+        self.root_is_array = root_is_array
+        self.boundaries = boundaries or {}
+
+    def _boundary(self, name: str, index: int) -> str:
+        found = self.boundaries.get(name)
+        if found is None:
+            return "."
+        return found[index]
 
 
 class Names:
@@ -75,24 +151,59 @@ class Names:
                 return tuple(self._deref(v) for v in found)
         return None
 
-    def leaves(self, prefix: str) -> List[Tuple[str, Any]]:
+    def leaves(self, prefix: str) -> List[ResolvedName]:
         """
-        ALL LEAF BINDINGS UNDER prefix: (relative_name, value) PAIRS
+        ALL LEAF BINDINGS UNDER prefix, EACH WITH ITS PUSH-NAME SPLIT (ResolvedName
+        UNPACKS AS THE LEGACY (relative_name, value) PAIR)
         SHADOWING IS SCOPE-GRANULAR: THE FIRST SCOPE WITH ANY MATCH SUPPLIES THEM ALL
         """
         for scope in self.scopes:
             output = [
-                (relative_field(name, prefix), self._deref(v))
+                ResolvedName(
+                    rel_name,
+                    self._deref(v),
+                    *_push_split(prefix, rel_name, scope._boundary(name, i), scope.root_is_array),
+                )
                 for name, values in scope.names.items()
                 if values is not AMBIGUOUS and startswith_field(name, prefix)
-                for v in values
+                for rel_name in [relative_field(name, prefix)]
+                for i, v in enumerate(values)
             ]
             if output:
                 return output
             exact = scope.aliases.get(prefix)
             if exact is not None and exact is not AMBIGUOUS:
-                return [(".", self._deref(v)) for v in exact]
+                return [ResolvedName(".", self._deref(v)) for v in exact]
         return []
+
+    def all_leaves(self, prefix: str) -> List[ResolvedName]:
+        """
+        DOCUMENT-ASSEMBLY ENUMERATION (select *): UNION OF LEAF BINDINGS UNDER prefix ACROSS
+        ALL SCOPES, NEAREST FIRST.  A FARTHER SCOPE'S BINDING IS SKIPPED WHEN A NEARER SCOPE
+        ALREADY BOUND THE SAME VALUE (SAME COLUMN SEEN UNDER ANOTHER NAME) OR THE SAME NAME
+        (SHADOWING).  CONTRAST leaves(): FIRST SCOPE WITH ANY MATCH SUPPLIES THEM ALL.
+        """
+        output = []
+        seen_values = set()
+        seen_names = set()
+        for scope in self.scopes:
+            for name, values in scope.names.items():
+                if values is AMBIGUOUS or not startswith_field(name, prefix):
+                    continue
+                rel_name = relative_field(name, prefix)
+                if rel_name in seen_names:
+                    continue
+                seen_names.add(rel_name)
+                for i, v in enumerate(values):
+                    if id(v) in seen_values:
+                        continue
+                    seen_values.add(id(v))
+                    output.append(ResolvedName(
+                        rel_name,
+                        self._deref(v),
+                        *_push_split(prefix, rel_name, scope._boundary(name, i), scope.root_is_array),
+                    ))
+        return output
 
     def _flat(self) -> Dict[str, Tuple]:
         # ALL VISIBLE (ENUMERABLE) BINDINGS, NEARER SCOPES SHADOWING FARTHER

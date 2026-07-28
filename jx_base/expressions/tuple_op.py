@@ -38,7 +38,7 @@ class TupleOp(Expression):
 
     @property
     def jx_type(self):
-        return array_type(union_type(*(t.type for t in self.terms)))
+        return array_type(union_type(*(t.jx_type for t in self.terms)))
 
     def vars(self):
         output = set()
