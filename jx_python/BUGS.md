@@ -33,25 +33,33 @@ non-null values of `frum`, as a set) and `jx_python/expressions/union_op.py to_p
 `partial_eval` now returns `lang.UnionOp` as the language invariant requires. Covered by
 `tests/test_expressions.py test_union` / `test_union_of_one_value` (interpreted + compiled).
 
-**Still open:** `{"aggregate": "union"}` in a *query* cannot work until the aggs path is
-ported (see #4) — `windows.name_to_aggregate` has no `union` entry, and `list_aggs` dies
-first anyway. Then nested/multi-value union coverage (mirror the skipped
-`test_edge_1.py::test_union_*`) and `test_agg_ops.py::test_union` can be unskipped.
+**Still open:** `{"aggregate": "union"}` now works in a query too (the groupby/value paths
+run the aggregate expressions directly — `windows.name_to_aggregate` is no longer consulted),
+but the `edges` form still dies in the cube path (#4). Nested/multi-value union coverage
+(mirror the skipped `test_edge_1.py::test_union_*`) is still missing.
 
-## 4. `list_aggs` still expects the old normalized-select dicts (UNFIXED)
+## 4. `list_aggs`: edges/cube path still expects the old normalized-select dicts (PARTLY FIXED)
 
-`containers/lists/aggs.py list_aggs()` starts with `select = enlist(query.select)`, but
-`query.select` is now a `SelectOp`; `enlist` iterates it into tuples, so `ss.name` raises
+`containers/lists/aggs.py list_aggs()` started with `select = enlist(query.select)`, but
+`query.select` is a `SelectOp`; `enlist` iterates it into tuples, so `ss.name` raised
 `AttributeError: 'tuple' object has no attribute 'name'` — every `edges`/`groupby` query
-through `ListContainer.query` dies there. The terms are `query.select.terms` (a list of
-`SelectOne`, each with `.name`, `.value`, `.aggregate`), but that is only the first line:
-`windows.name_to_aggregate.get(s.aggregate)(**s)` also wants a *string* aggregate name and a
-Data-like `s`, and `Cube(select, edges, result)` downstream has the same assumption. So the
-whole edges/cube path needs porting to the SelectOp model, not a one-line fix.
+through `ListContainer.query` died there.
 
-Blocks `test_filters.py test_edges_and_empty_prefix` / `test_edges_and_null_prefix`, and is
-almost certainly why `test_edge_*`, `test_groupby_*` and `test_agg_ops` are skipped wholesale
-on the python/interpret harnesses.
+**Done:** the two paths the shared suite exercises in `list` format are ported to the
+SelectOp model and no longer touch `windows.py`:
+- `groupby_aggs` — groups the surviving rows by the groupby accessors, then runs each select
+  term's aggregate over its group's values.
+- `value_aggs` — no edges and no groupby is one group; returns the lone unnamed value (or an
+  object of the named aggregates) with `meta.format "value"`.
+Both lean on the aggregates being *collection ops* (`agg.__class__(frum=Literal(values))()`),
+which is why min/max/avg/sum/union needed their `__call__` (see git log).
+
+**Still open:** the `edges` path (`list_aggs` proper) is untouched — it still builds a `Cube`
+of `Matrix` from `windows.name_to_aggregate.get(s.aggregate)(**s)`, which wants a *string*
+aggregate name and a Data-like `s`. Porting it means deciding how edges/domains produce cube
+coordinates under the SelectOp model, and teaching `Cube` about `SelectOne`. That blocks
+`test_edge_*`, most of `test_agg_ops`' cube expectations, and
+`test_filters.py test_edges_and_{empty,null}_prefix`.
 
 ## 5. `SelectOp.__data__` crashes when `frum` is a Schema (UNFIXED)
 
