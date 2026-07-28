@@ -185,7 +185,7 @@ class ListContainer(Container, Table):
     filter = where
 
     def sort(self, sort):
-        return ListContainer("sorted " + self.name, jx.sort(self.data, sort, already_normalized=True), self.schema,)
+        return ListContainer("sorted " + self.name, jx.sort(self.data, *enlist(sort)), self.schema,)
 
     def get(self, select):
         """

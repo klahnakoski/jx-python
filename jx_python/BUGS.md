@@ -24,11 +24,13 @@ Duration); sort a list of strings by `"."` (also `[".", "."]`); sort spec items 
 `Data` (see jx_base note on `_normalize_sort`); result of `jx.sort(data, fields)` is
 list-like, not a container.
 
-## 2. `ListContainer.sort` passes stale `already_normalized=True` (UNFIXED lead)
+## 2. `ListContainer.sort` passed stale `already_normalized=True` (FIXED)
 
-`containers/list_container.py sort()` calls `jx.sort(self.data, sort, already_normalized=True)`
+`containers/list_container.py sort()` called `jx.sort(self.data, sort, already_normalized=True)`
 — that keyword was dropped from `jx.sort`'s signature in the rewrite, so any sorted query
-through `ListContainer.query` raises TypeError. No jx-sqlite test currently exercises it
-(suite green without touching it); left unfixed pending a test that pins the intended `sort`
-argument shape (list of SortOne from QueryOp normalization, presumably `jx.sort(self.data,
-*sort)`).
+through `ListContainer.query` raised TypeError.
+
+**Fix applied:** `jx.sort(self.data, *enlist(sort))` — `query.sort` is already a list of
+`SortOne` from QueryOp normalization, and `jx.sort` passes those through untouched.
+Covered by `tests/test_jx/test_filters.py test_where_expression` (any test with a `sort`
+clause on the `python`/`interpret` harnesses).

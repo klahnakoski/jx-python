@@ -23,7 +23,6 @@ lots_of_data = list_to_data([{"a": i} for i in range(30)])
 
 @add_error_reporting
 class TestFilters(BaseTestCase):
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where_expression(self):
         test = {
             "data": [  # PROPERTIES STARTING WITH _ ARE NESTED AUTOMATICALLY
