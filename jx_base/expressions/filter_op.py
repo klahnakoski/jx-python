@@ -11,6 +11,7 @@
 from jx_base.expressions.expression import Expression, jx_expression, MissingOp
 from jx_base.expressions.literal import TRUE
 from jx_base.language import JX
+from jx_base.utils import is_true
 from mo_dots import is_many, to_data
 
 
@@ -26,7 +27,7 @@ class FilterOp(Expression):
         return [
             r
             for i, r in enumerate(to_data(d) for d in frum)
-            if self.predicate(r, i, frum)
+            if is_true(self.predicate(r, i, frum))
         ]
 
     def __data__(self):
