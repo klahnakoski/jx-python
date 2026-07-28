@@ -25,9 +25,9 @@ class SuffixOp(_SuffixOp):
             loop_depth,
             JX_BOOLEAN,
             with_var(
-                "e",
-                expr.source,
-                with_var("s", suffix.source, "False if e is None or s is None else e.endswith(s)"),
+                "s",
+                suffix.source,
+                with_var("e", expr.source, "True if not s else (False if not e else e.endswith(s))"),
             ),
             self,
         )

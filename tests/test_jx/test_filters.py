@@ -802,7 +802,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_null_suffix(self):
         test = {
             "data": [
@@ -830,7 +829,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_suffix(self):
         test = {
             "data": [
