@@ -11,6 +11,8 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.false_op import FALSE
+from jx_base.utils import enlist
+from mo_dots import exists
 
 
 class UnionOp(Expression):
@@ -23,6 +25,10 @@ class UnionOp(Expression):
             frum = terms[0]
         Expression.__init__(self, frum)
         self.frum = frum
+
+    def __call__(self, row, rownum=None, rows=None):
+        values = enlist(self.frum(row, rownum, rows))
+        return set(v for v in values if exists(v))
 
     def __data__(self):
         return {"union": self.frum.__data__()}
@@ -41,4 +47,4 @@ class UnionOp(Expression):
         return FALSE
 
     def partial_eval(self, lang):
-        return UnionOp(frum=self.frum.partial_eval(lang))
+        return lang.UnionOp(frum=self.frum.partial_eval(lang))

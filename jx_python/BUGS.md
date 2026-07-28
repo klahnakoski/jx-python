@@ -22,15 +22,21 @@ through `ListContainer.query` raised TypeError.
 Covered by `tests/test_jx/test_filters.py test_where_expression` (any test with a `sort`
 clause on the `python`/`interpret` harnesses).
 
-## 3. `union` aggregate has no Python interpretation (UNFIXED — needs tests)
+## 3. `union` aggregate has no Python interpretation (PARTLY FIXED)
 
 `jx_base.UnionOp` was reworked into a single-`frum` decisive set-union aggregate (to fix
-`test_agg_ops.py::test_union` on sqlite). Only the sqlite backend implements it
-(`jx_sqlite/aggregates.py::_union_aggregate` → `JSON_GROUP_ARRAY(DISTINCT ...)`); jx_python
-has no `__call__`/compiled form for it, so a `{"aggregate": "union"}` query run over Python
-objects would error or silently return nothing. Add a jx_python union test (flat scalar
-column) and the interpretation to satisfy it; then nested/multi-value union coverage (mirror
-the skipped `test_edge_1.py::test_union_*`).
+`test_agg_ops.py::test_union` on sqlite). Only the sqlite backend implemented it
+(`jx_sqlite/aggregates.py::_union_aggregate` → `JSON_GROUP_ARRAY(DISTINCT ...)`).
+
+**Done:** the expression itself now evaluates in jx_python — `UnionOp.__call__` (distinct,
+non-null values of `frum`, as a set) and `jx_python/expressions/union_op.py to_python`;
+`partial_eval` now returns `lang.UnionOp` as the language invariant requires. Covered by
+`tests/test_expressions.py test_union` / `test_union_of_one_value` (interpreted + compiled).
+
+**Still open:** `{"aggregate": "union"}` in a *query* cannot work until the aggs path is
+ported (see #4) — `windows.name_to_aggregate` has no `union` entry, and `list_aggs` dies
+first anyway. Then nested/multi-value union coverage (mirror the skipped
+`test_edge_1.py::test_union_*`) and `test_agg_ops.py::test_union` can be unskipped.
 
 ## 4. `list_aggs` still expects the old normalized-select dicts (UNFIXED)
 
