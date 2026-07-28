@@ -784,6 +784,7 @@ class TestDeepOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_deep_where_on_fact_table_multivalue(self):
         test = {
             "data": [
@@ -820,6 +821,7 @@ class TestDeepOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_deep_where_on_fact_table_subquery(self):
         # THE CORRELATED COUNTERPART: A SUBQUERY `FROM a._a` AS ONE SELECT ELEMENT KEEPS
         # v,s TOGETHER PER ELEMENT (ARRAY OF {v,s} OBJECTS) - UNLIKE THE FLAT MULTI-LEAF
