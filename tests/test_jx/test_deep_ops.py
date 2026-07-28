@@ -781,17 +781,81 @@ class TestDeepOps(BaseTestCase):
                     }}},
                 ]
             },
-            # RAW SQL ROWS (docs/JSON in Database.md, "Sorted and Compressed" + metadata):
-            # fact __id__ | fact o | fact-arm a._a.v (NULL pad) | child __id__ | child __order__ |
-            # child-arm o (NULL pad) | child v | sort key (o)
-            # PARENT __id__ ON EVERY ROW; FIRST CHILD JOINED ONTO THE PARENT ROW; REMAINING
-            # CHILDREN UNION'D WITH PARENT VALUES NULL
-            "expecting_resultset": [
-                [1000, 1, NULL, 1002, 0, NULL, "still more", 1],
-                [1005, 2, NULL, 1006, 0, NULL, "string!", 2],
-                [1001, 3, NULL, 1003, 0, NULL, "a string", 3],
-                [1001, NULL, NULL, 1004, 1, NULL, "another string", 3],
+        }
+        self.utils.execute_tests(test)
+
+    def test_deep_where_on_fact_table_multivalue(self):
+        test = {
+            "data": [
+                {"o": 1, "a": {"_a": {
+                    "v": "still more",
+                    "s": False
+                }}},
+                {"o": 3, "a": {"_a": [
+                    {"v": "a string", "s": False},
+                    {"v": "another string"}
+                ]}},
+                {"o": 2, "a": {"_a": [
+                    {"v": "string!", "s": True},
+                ]}},
+                {"o": 4, "a": {"_a": {"s": False}}}
             ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": ["o", "a._a.v", "a._a.s"],
+                "where": {"exists": "a._a.v"},
+                "sort": "o"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"o": 1, "a": {"_a": {"v": "still more", "s": False}}},
+                    {"o": 2, "a": {"_a": {"v": "string!", "s": True}}},
+                    {"o": 3, "a": {"_a": {
+                        "v": ["a string", "another string"],
+                        "s": False
+                    }}}
+                ]
+            },
+        }
+        self.utils.execute_tests(test)
+
+    def test_deep_where_on_fact_table_subquery(self):
+        # THE CORRELATED COUNTERPART: A SUBQUERY `FROM a._a` AS ONE SELECT ELEMENT KEEPS
+        # v,s TOGETHER PER ELEMENT (ARRAY OF {v,s} OBJECTS) - UNLIKE THE FLAT MULTI-LEAF
+        # FORM WHICH SPREADS THEM INTO INDEPENDENT MULTIVALUES.  SAME RESULT AS `select a._a`.
+        test = {
+            "data": [
+                {"o": 1, "a": {"_a": {
+                    "v": "still more",
+                    "s": False
+                }}},
+                {"o": 3, "a": {"_a": [
+                    {"v": "a string", "s": False},
+                    {"v": "another string"}
+                ]}},
+                {"o": 2, "a": {"_a": [
+                    {"v": "string!", "s": True},
+                ]}},
+                {"o": 4, "a": {"_a": {"s": False}}}
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": ["o", {"name": "a._a", "value": {"from": "a._a", "select": ["v", "s"]}}],
+                "where": {"exists": "a._a.v"},
+                "sort": "o"
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"o": 1, "a": {"_a": {"v": "still more", "s": False}}},
+                    {"o": 2, "a": {"_a": {"v": "string!", "s": True}}},
+                    {"o": 3, "a": {"_a": [
+                        {"v": "a string", "s": False},
+                        {"v": "another string"},
+                    ]}},
+                ]
+            },
         }
         self.utils.execute_tests(test)
 
