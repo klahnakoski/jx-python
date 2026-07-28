@@ -653,7 +653,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_script_on_missing_column1(self):
         test = {
             "data": [
@@ -682,7 +681,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_script_missing_column2(self):
         test = {
             "data": [
@@ -711,7 +709,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_boolean_count(self):
         test = {
             "data": [

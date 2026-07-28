@@ -26,7 +26,6 @@ lots_of_data = list_to_data([{"a": i} for i in range(30)])
 
 @add_error_reporting
 class TestSetOps(BaseTestCase):
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_star(self):
         test = {
             "data": [{"a": 1}],
@@ -148,7 +147,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_single_deep_select(self):
         test = {
             "data": [
@@ -299,7 +297,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_single_star_select(self):
         test = {
             "data": [{"a": "b"}],
@@ -363,7 +360,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_all_from_list_of_objects(self):
         test = {
             "data": [{"a": "b"}, {"a": "d"}],
@@ -550,7 +546,6 @@ class TestSetOps(BaseTestCase):
         with self.assertRaises(Exception):
             self.utils.execute_query(test.query)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_w_star(self):
         test = {
             "data": [
@@ -589,7 +584,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_w_deep_star(self):
         test = {
             "data": [
@@ -627,7 +621,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_expression(self):
         test = {
             "data": [
@@ -669,7 +662,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_object(self):
         """
         ES DOES NOT ALLOW YOU TO SELECT AN OBJECT, ONLY THE LEAVES
@@ -792,7 +784,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_leaves(self):
         """
         ES DOES NOT ALLOW YOU TO SELECT AN OBJECT, ONLY THE LEAVES
@@ -831,7 +822,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_leaves2(self):
         test = {
             "data": [
@@ -866,7 +856,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_value_object(self):
         """
         ES DOES NOT ALLOW YOU TO SELECT AN OBJECT, ONLY THE LEAVES
@@ -915,7 +904,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select2_object(self):
         """
         ES DOES NOT ALLOW YOU TO SELECT AN OBJECT, ONLY THE LEAVES
