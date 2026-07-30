@@ -21,7 +21,6 @@ from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 @add_error_reporting
 class TestgroupBy1(BaseTestCase):
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_no_select(self):
         test = {
             "data": simple_test_data,
@@ -48,7 +47,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_rows(self):
         test = {
             "name": "count rows, 1d",
@@ -78,7 +76,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_self(self):
         test = {
             "name": "count column",
@@ -108,7 +105,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_other(self):
         test = {
             "metadata": {},
@@ -137,7 +133,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_2(self):
         test = {
             "name": "count column",
@@ -170,7 +165,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_sum_column(self):
         test = {
             "name": "sum column",
@@ -200,7 +194,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where(self):
         test = {
             "data": simple_test_data,
@@ -225,7 +218,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_where_w_dimension(self):
         test = {
             "data": simple_test_data,
@@ -267,7 +259,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.assertRaises(Exception, self.utils.execute_tests, test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_empty_default_domain(self):
         test = {
             "name": "sum column",
@@ -291,7 +282,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_default(self):
         test = {
             "name": "sum column",
@@ -338,7 +328,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_many_aggs_on_one_column(self):
         # ES WILL NOT ACCEPT TWO (NAIVE) AGGREGATES ON SAME FIELD, COMBINE THEM USING stats AGGREGATION
         test = {
@@ -664,7 +653,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_script_on_missing_column1(self):
         test = {
             "data": [
@@ -693,7 +681,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_script_missing_column2(self):
         test = {
             "data": [
@@ -722,7 +709,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_boolean_count(self):
         test = {
             "data": [
@@ -843,7 +829,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_eq_1(self):
         test = {
             "data": [

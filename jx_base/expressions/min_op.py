@@ -11,6 +11,8 @@
 
 from jx_base.expressions.expression import Expression
 from jx_base.expressions.least_op import LeastOp
+from jx_base.utils import enlist
+from mo_dots import Null, exists
 from mo_json.types import JX_NUMBER
 
 
@@ -39,6 +41,12 @@ class MinOp(Expression):
 
         Expression.__init__(self, frum)
         self.frum = frum
+
+    def __call__(self, row=None, rownum=None, rows=None):
+        values = [v for v in enlist(self.frum(row, rownum, rows)) if exists(v)]
+        if not values:
+            return Null
+        return min(values)
 
     def __data__(self):
         return {"min": self.frum.__data__()}

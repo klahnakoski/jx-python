@@ -12,12 +12,14 @@
 import itertools
 
 from jx_base.domains import DefaultDomain, SimpleSetDomain
-from jx_base.expressions.literal import NULL
+from jx_base.expressions.literal import Literal, NULL
 from jx_python import windows
 from jx_python.expressions import jx_expression_to_function
 from mo_collections.matrix import Matrix
-from mo_dots import to_data
-from jx_base.utils import coalesce, enlist
+from mo_dots import Data, to_data
+from jx_base.utils import coalesce, delist, enlist, is_true
+from mo_future import first
+from mo_json import value2json
 from mo_logs import Log
 from mo_math import UNION
 from mo_times.dates import Date
@@ -33,6 +35,9 @@ def is_aggs(query):
 
 def list_aggs(frum, query):
     frum = to_data(frum)
+    if query.groupby:
+        return groupby_aggs(frum, query)
+
     select = enlist(query.select)
 
     for e in query.edges:
@@ -100,6 +105,68 @@ def list_aggs(frum, query):
 
     output = Cube(select, query.edges, result)
     return output
+
+
+def groupby_aggs(frum, query):
+    """
+    GROUP THE ROWS, THEN RUN EACH select TERM'S AGGREGATE OVER THE VALUES OF ITS
+    GROUP.  RETURNS ROWS (list FORMAT); THE edges/cube PATH IS SEPARATE (list_aggs)
+    """
+    where = jx_expression_to_function(query.where)
+    accessors = [(g.name, jx_expression_to_function(g.value)) for g in query.groupby]
+    terms = [(t.name, t.aggregate, jx_expression_to_function(t.value)) for t in query.select.terms]
+
+    groups = {}  # KEY (AS json) -> (KEY VALUES, ROWS)
+    for row in frum:
+        if not is_true(where(row)):
+            continue
+        keys = [accessor(row) for _, accessor in accessors]
+        _, rows = groups.setdefault(value2json(keys), (keys, []))
+        rows.append(row)
+
+    output = []
+    for keys, rows in groups.values():
+        record = Data()
+        for (name, _), key in zip(accessors, keys):
+            record[name] = key
+        for name, value in _aggregate_group(terms, rows).items():
+            record[name] = value
+        output.append(record)
+
+    from jx_python.containers.list_container import ListContainer
+
+    return ListContainer("from " + query.frum.name, output)
+
+
+def value_aggs(frum, query):
+    """
+    AGGREGATES WITHOUT edges/groupby ARE ONE GROUP: RETURN THE VALUE ITSELF (A LONE,
+    UNNAMED select CLAUSE) OR AN OBJECT OF THE NAMED AGGREGATES
+    """
+    where = jx_expression_to_function(query.where)
+    terms = [(t.name, t.aggregate, jx_expression_to_function(t.value)) for t in query.select.terms]
+    rows = [row for row in frum if is_true(where(row))]
+
+    acc = _aggregate_group(terms, rows)
+    if len(terms) == 1 and terms[0][0] == ".":
+        return first(acc.values())
+    record = Data()
+    for name, value in acc.items():
+        record[name] = value
+    return record
+
+
+def _aggregate_group(terms, rows):
+    """RUN EACH select TERM'S AGGREGATE OVER THE ROWS OF ONE GROUP"""
+    acc = {}
+    for name, aggregate, accessor in terms:
+        values = [accessor(row) for row in rows]
+        if aggregate is NULL:
+            # NOT AN AGGREGATE: EVERY ROW OF THE GROUP HAS THE SAME VALUE
+            acc[name] = delist(values[:1])
+        else:
+            acc[name] = aggregate.__class__(frum=Literal(values))(None)
+    return acc
 
 
 def make_accessor(e):

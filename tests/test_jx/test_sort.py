@@ -26,7 +26,6 @@ lots_of_data = list_to_data([{"a": i} for i in range(30)])
 @add_error_reporting
 class TestSorting(BaseTestCase):
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_name_and_direction_sort(self):
         test = {
             "data": [
@@ -231,7 +230,6 @@ class TestSorting(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_groupby_expression_and_sort(self):
         test = {
             "data": [

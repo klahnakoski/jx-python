@@ -137,3 +137,33 @@ class TestOther(FuzzyTestCase):
 
         self.assertEqual(expr({"a": "x"}), {"x"})
         self.assertEqual(expr({}), set())
+
+    def test_min_of_collection(self):
+        # THE AGGREGATES ARE DECISIVE: NULLS ARE SKIPPED, AN EMPTY COLLECTION IS null
+        expr = jx_expression({"min": "a"})
+
+        self.assertEqual(expr({"a": [3, 1, None, 2]}), 1)
+        self.assertEqual(expr({"a": 3}), 3)
+        self.assertEqual(expr({}), NULL)
+
+    def test_max_of_collection(self):
+        expr = jx_expression({"max": "a"})
+
+        self.assertEqual(expr({"a": [3, 1, None, 2]}), 3)
+        self.assertEqual(expr({"a": 3}), 3)
+        self.assertEqual(expr({}), NULL)
+
+    def test_avg_of_collection(self):
+        expr = jx_expression({"avg": "a"})
+
+        self.assertEqual(expr({"a": [1, 2, None, 6]}), 3)
+        self.assertEqual(expr({"a": 3}), 3)
+        self.assertEqual(expr({}), NULL)
+
+    def test_sum_of_one_value(self):
+        # A SCALAR COLUMN IS A COLLECTION OF ONE
+        expr = jx_expression({"sum": "a"})
+
+        self.assertEqual(expr({"a": [1, 2, None, 6]}), 9)
+        self.assertEqual(expr({"a": 3}), 3)
+        self.assertEqual(expr({}), 0)

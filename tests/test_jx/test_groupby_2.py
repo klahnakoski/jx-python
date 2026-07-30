@@ -18,7 +18,6 @@ from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 
 
 class TestGroupBy2(BaseTestCase):
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_rows(self):
         test = {
             "data": two_dim_test_data,
@@ -56,7 +55,6 @@ class TestGroupBy2(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_sum_rows(self):
         test = {
             "name": "sum rows",
@@ -96,7 +94,6 @@ class TestGroupBy2(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_sum_rows_w_domain(self):
         test = {
             "name": "sum rows",

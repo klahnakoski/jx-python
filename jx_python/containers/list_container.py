@@ -21,7 +21,7 @@ from jx_base.models.schema import Schema
 from jx_base.models.snowflake import Snowflake
 from jx_base.models.table import Table
 from jx_base.utils import delist, enlist, is_true
-from jx_python.containers.lists.aggs import is_aggs, list_aggs
+from jx_python.containers.lists.aggs import is_aggs, list_aggs, value_aggs
 from jx_python.convert import list2cube, list2table
 from jx_python.expressions import jx_expression_to_function
 from mo_collections import UniqueIndex
@@ -117,6 +117,9 @@ class ListContainer(Container, Table):
         query = to_data(query)
         output = self
         if is_aggs(query):
+            if not query.edges and not query.groupby and query.format in (None, "list"):
+                # ONE GROUP, SO THE RESULT IS THE VALUE ITSELF
+                return Data(data=value_aggs(output.data, query), meta={"format": "value"})
             output = list_aggs(output.data, query)
         else:
             if query.where is not TRUE:
