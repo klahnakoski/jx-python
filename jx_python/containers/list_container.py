@@ -135,29 +135,27 @@ class ListContainer(Container, Table):
         for param in query.window:
             output.window(param)
 
-        if query.format:
-            if query.format == "list":
-                return Data(data=output.data, meta={"format": "list"})
-            elif query.format == "table":
-                head = [c.name for c in output.schema.snowflake.columns]
-                data = [[r if h == "." else r[h] for h in head] for r in output.data]
-                return Data(header=head, data=data, meta={"format": "table"})
-            elif query.format == "cube":
-                head = [c.name for c in output.schema.snowflake.columns]
-                rows = [[r[h] for h in head] for r in output.data]
-                data = {h: c for h, c in zip(head, zip(*rows))}
-                return Data(
-                    data=data,
-                    meta={"format": "cube"},
-                    edges=[{
-                        "name": "rownum",
-                        "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},
-                    }],
-                )
-            else:
-                logger.error("unknown format {format}", format=query.format)
+        if query.format in (None, "list"):
+            # NAMING THE format MUST NOT CHANGE THE ANSWER: THE DEFAULT *IS* list
+            return Data(data=output.data, meta={"format": "list"})
+        elif query.format == "table":
+            head = [c.name for c in output.schema.snowflake.columns]
+            data = [[r if h == "." else r[h] for h in head] for r in output.data]
+            return Data(header=head, data=data, meta={"format": "table"})
+        elif query.format == "cube":
+            head = [c.name for c in output.schema.snowflake.columns]
+            rows = [[r[h] for h in head] for r in output.data]
+            data = {h: c for h, c in zip(head, zip(*rows))}
+            return Data(
+                data=data,
+                meta={"format": "cube"},
+                edges=[{
+                    "name": "rownum",
+                    "domain": {"type": "rownum", "min": 0, "max": len(rows), "interval": 1},
+                }],
+            )
         else:
-            return output
+            logger.error("unknown format {format}", format=query.format)
 
     def update(self, command):
         """

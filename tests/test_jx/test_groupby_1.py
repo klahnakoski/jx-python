@@ -21,7 +21,6 @@ from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 @add_error_reporting
 class TestgroupBy1(BaseTestCase):
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_groupby_has_no_null_group(self):
         # A groupby HAS NO DOMAIN: THE GROUPS *ARE* THE VALUES THAT OCCUR, SO THERE IS NO EMPTY
         # GROUP TO REPORT - CONTRAST test_edge_keeps_null_partition, SAME DATA AND SELECT, WHICH
@@ -57,7 +56,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_groupby_cardinality_and_count(self):
         # cardinality COUNTS THE DISTINCT VALUES OF A GROUP, count COUNTS THE VALUES: GROUP "b" HAS
         # v = 1, 1, 2 AND A DOCUMENT WITH NO v AT ALL, SO 2 AND 3 - BOTH SKIP THE NULL.  THE groupby
@@ -93,7 +91,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edge_keeps_null_partition(self):
         # AN EDGE DECLARES A DOMAIN, SO EVERY COORDINATE GETS A CELL - INCLUDING THE NULL PART,
         # EVEN WHERE NO DOCUMENT LANDS.  ONE ROW MORE THAN test_groupby_has_no_null_group OVER THE
@@ -490,7 +487,6 @@ class TestgroupBy1(BaseTestCase):
         }
         self.assertRaises(Exception, self.utils.execute_tests, test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_groupby_is_list(self):
         # THE DEFAULT FORMAT IS list, WHATEVER THE CLAUSES.  THE NULL GROUP IS HERE BECAUSE null IS
         # A VALUE THAT OCCURS (DOCUMENTS WITH NO `a`), NOT BECAUSE A DOMAIN WAS PADDED
