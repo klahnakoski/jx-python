@@ -758,7 +758,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edges_and_empty_prefix(self):
         test = {
             "data": [{"v": "test"}],
@@ -777,7 +776,6 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edges_and_null_prefix(self):
         test = {
             "data": [{"v": "test"}],

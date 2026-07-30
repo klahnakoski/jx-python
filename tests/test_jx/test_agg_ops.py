@@ -569,6 +569,28 @@ class TestAggOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_union_of_multivalue(self):
+        # A UNION OF COLLECTIONS IS FLAT: A MULTI-VALUED ROW CONTRIBUTES EACH OF ITS VALUES
+        test = {
+            "data": [
+                {"b": "a"},
+                {"b": ["a", "b"]},
+                {"b": ["b", "c", None]},
+                {},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": [
+                    {"value": "b", "aggregate": "union"}
+                ]
+            },
+            "expecting_list": {
+                "meta": {"format": "value"},
+                "data": {"b": {"a", "b", "c"}}
+            }
+        }
+        self.utils.execute_tests(test)
+
     def test_booleans_can_be_summed(self):
         test = {
             "data": [

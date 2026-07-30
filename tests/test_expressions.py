@@ -10,7 +10,7 @@ from jx_python.expression_compiler import compile_expression
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 
 from jx_base import jx_expression, NULL
-from jx_python.expressions import Python
+from jx_python.expressions import Python, jx_expression_to_function
 
 
 @add_error_reporting
@@ -38,6 +38,14 @@ class TestOther(FuzzyTestCase):
 
         self.assertEqual(expr(), 6)
         self.assertEqual(expr.partial_eval(Python).to_python().source, "6")
+
+    def test_arithmetic_over_variables_compiles(self):
+        # THE to_python HELPERS SHARED BY THE ARITHMETIC OPS TOOK loop_depth POSITIONALLY, SO
+        # jx_expression_to_function (WHICH CALLS to_python() WITH NO ARGS) COULD NOT COMPILE
+        # THEM.  ONLY A VARIABLE OPERAND GETS THERE - LITERALS FOLD TO A CONSTANT FIRST
+        row = {"a": 5, "b": 2}
+        for op, expected in {"sub": 3, "add": 7, "mul": 10}.items():
+            self.assertEqual(jx_expression_to_function({op: ["a", "b"]})(row), expected)
 
     def test_divide(self):
         expr = jx_expression({"divide": [6, 2]})
@@ -130,6 +138,16 @@ class TestOther(FuzzyTestCase):
         self.assertEqual(expr(row), {"x", "y"})
         func = compile_expression(expr.partial_eval(Python).to_python())
         self.assertEqual(func(row), {"x", "y"})
+
+    def test_union_of_collections(self):
+        # A UNION OF COLLECTIONS IS FLAT - AND A set COULD NOT HOLD THE INNER LIST ANYWAY.
+        # THIS IS THE SHAPE ONE CELL OF AN edges QUERY HAS: A VALUE PER ROW, EACH MULTI-VALUED
+        expr = jx_expression({"union": "a"})
+        row = {"a": [[2, 3], 4, None]}
+
+        self.assertEqual(expr(row), {2, 3, 4})
+        func = compile_expression(expr.partial_eval(Python).to_python())
+        self.assertEqual(func(row), {2, 3, 4})
 
     def test_union_of_one_value(self):
         # A SCALAR COLUMN IS A COLLECTION OF ONE

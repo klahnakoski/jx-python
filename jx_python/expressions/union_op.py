@@ -24,6 +24,6 @@ class UnionOp(_UnionOp):
             merge_locals(frum.locals, listwrap=listwrap, exists=exists),
             loop_depth,
             self.jx_type,
-            f"set(v for v in listwrap({frum.source}) if exists(v))",
+            f"set(w for v in listwrap({frum.source}) for w in listwrap(v) if exists(w))",
             self,
         )

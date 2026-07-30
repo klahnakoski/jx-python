@@ -18,6 +18,9 @@ service backends' concern):
                        normal `ListContainer.query` path.
 - InterpretedHarness - INTERPRETS the query by evaluating expressions directly
                        through their `__call__` (tree-walk), no code generation.
+                       An `edges` query is the exception: pre-filtering the rows
+                       would change which domain the edges get (see below), so it
+                       runs the compiled path.
 
 A new mode subclasses `JxTestHarness` and implements `execute_query`.
 """
@@ -237,6 +240,12 @@ class InterpretedHarness(JxTestHarness):
         container = self.container
 
         query_op = QueryOp.wrap(q, container, self.lang)
+        if query_op.edges:
+            # AN EDGE'S DEFAULT DOMAIN IS INFERRED FROM THE WHOLE CONTAINER, SO PRE-FILTERING
+            # WOULD CHANGE THE ANSWER (SEE test_edge_1.test_where).  THE where STAYS IN THE
+            # QUERY, WHICH MEANS AN edges QUERY IS NOT INTERPRETED - IT TAKES THE COMPILED PATH
+            return container.query(query_op)
+
         rows = FilterOp(container, query_op.where)()
 
         survivors = ListContainer(name=".", data=rows, schema=container.schema)

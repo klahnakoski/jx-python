@@ -52,7 +52,6 @@ simple_test_data =[
 @add_error_reporting
 class TestEdgeTime(BaseTestCase):
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_over_time(self):
         test = {
             "data": simple_test_data,
@@ -117,7 +116,6 @@ class TestEdgeTime(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_over_time_w_sort(self):
         test = {
             "data": simple_test_data,

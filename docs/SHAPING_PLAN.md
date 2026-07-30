@@ -86,7 +86,23 @@ worth reading as a *modelling* example — it is the column-wise style — but n
 
 ## Plan
 
-### Phase 1 — edges, as a dense coordinate space (unblocks `test_edge_1`, `test_edge_2`, `test_edge_time`, `test_time_domain`, the cube half of `test_agg_ops`)
+### Phase 1 — edges, as a dense coordinate space — **DONE 2026-07-30**
+
+Landed as written except for step 5: the output is **rows, not a `Cube`**. The `test_jx`
+harnesses are list-only, and `list_container.py:139` returns `output.data`, which for a `Cube` is
+a dict of `Matrix`. So `_cube_to_rows` walks `Matrix.items()` and emits one row per coordinate
+(empty cells included — `test_where_w_dimension` and `test_edge_limit_big` both require that).
+Building a `Cube` too would be code no test can reach; the prerequisite for `format: "cube"` is
+teaching the harness to produce it, not more code in `list_aggs`. Four rules the plan did not
+predict (an empty group reports nothing even for `sum`; `default` fills the hole before the
+aggregate runs; partition `where` filters are a `case`; domains sort with `value_compare` and
+truncate by `limit`) are recorded in `jx_python/BUGS.md` #4. Results: `test_edge_1` 37/40,
+`test_edge_2` 4/7, `test_edge_time` 2/2, `test_time_domain` 6/8 on both harnesses, 55 tests
+unskipped across the suite, no regressions. Also note the zero-edge `Matrix` defect was **not**
+the prerequisite the plan claimed — no harness asks for `format: "cube"` — but it is fixed and
+pinned by `tests/test_lists.py test_zero_edge_aggregate_is_one_cell`.
+
+The original plan follows, for the record:
 
 Rewrite `list_aggs` in `containers/lists/aggs.py` as five steps, no `windows.py`, no
 incremental accumulator:

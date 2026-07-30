@@ -91,7 +91,7 @@ def _inequality_to_python(self, loop_depth=0):
     )
 
 
-def _binaryop_to_python(self, loop_depth, not_null=False, boolean=False):
+def _binaryop_to_python(self, loop_depth=0, not_null=False, boolean=False):
     op, identity = _python_operators[self.op]
 
     lhs = ToNumberOp(self.lhs).partial_eval(Python).to_python(loop_depth)
@@ -101,7 +101,7 @@ def _binaryop_to_python(self, loop_depth, not_null=False, boolean=False):
     return PythonScript(merge_locals(lhs.locals, rhs.locals), loop_depth, JX_NUMBER, script, self, missing)
 
 
-def multiop_to_python(self, loop_depth):
+def multiop_to_python(self, loop_depth=0):
     sign, zero = _python_operators[self.op]
     if len(self.terms) == 0:
         NULL.to_python(loop_depth)

@@ -33,12 +33,15 @@ non-null values of `frum`, as a set) and `jx_python/expressions/union_op.py to_p
 `partial_eval` now returns `lang.UnionOp` as the language invariant requires. Covered by
 `tests/test_expressions.py test_union` / `test_union_of_one_value` (interpreted + compiled).
 
-**Still open:** `{"aggregate": "union"}` now works in a query too (the groupby/value paths
-run the aggregate expressions directly — `windows.name_to_aggregate` is no longer consulted),
-but the `edges` form still dies in the cube path (#4). Nested/multi-value union coverage
-(mirror the skipped `test_edge_1.py::test_union_*`) is still missing.
+**Done (2026-07-30):** `{"aggregate": "union"}` works on every path — groupby, value, and
+`edges` (#4). A union *of collections* is flat: `UnionOp.__call__` and its `to_python` used to
+build `set(...)` straight from the collection, so a multi-valued member raised
+`TypeError: unhashable type: 'list'`. One cell of an `edges` query is exactly that shape (a
+value per row, each possibly multi-valued). Covered by `tests/test_expressions.py
+test_union_of_collections` (interpreted + compiled), `tests/test_jx/test_agg_ops.py
+test_union_of_multivalue`, and the unskipped `test_edge_1.py::test_union_*`.
 
-## 4. `list_aggs`: edges/cube path still expects the old normalized-select dicts (PARTLY FIXED)
+## 4. `list_aggs`: edges/cube path still expects the old normalized-select dicts (FIXED)
 
 `containers/lists/aggs.py list_aggs()` started with `select = enlist(query.select)`, but
 `query.select` is a `SelectOp`; `enlist` iterates it into tuples, so `ss.name` raised
@@ -54,12 +57,46 @@ SelectOp model and no longer touch `windows.py`:
 Both lean on the aggregates being *collection ops* (`agg.__class__(frum=Literal(values))()`),
 which is why min/max/avg/sum/union needed their `__call__` (see git log).
 
-**Still open:** the `edges` path (`list_aggs` proper) is untouched — it still builds a `Cube`
-of `Matrix` from `windows.name_to_aggregate.get(s.aggregate)(**s)`, which wants a *string*
-aggregate name and a Data-like `s`. Porting it means deciding how edges/domains produce cube
-coordinates under the SelectOp model, and teaching `Cube` about `SelectOne`. That blocks
-`test_edge_*`, most of `test_agg_ops`' cube expectations, and
-`test_filters.py test_edges_and_{empty,null}_prefix`.
+**Done (2026-07-30, docs/SHAPING_PLAN.md Phase 1):** the `edges` path is ported. The cube is
+the working structure — one `Matrix(dims=dims, zeros=list)` per select term, so every
+coordinate exists (with its own list) before any data arrives; one pass appends each row's
+value into the cells it belongs to (`itertools.product(*coord)` fans a multi-valued edge out);
+then each cell is aggregated in place by `_aggregate`, the same helper `groupby_aggs`/
+`value_aggs` use. `windows.py` is out of the path entirely. What the plan did *not* survive:
+
+- **The output is rows, not a `Cube`.** The `test_jx` harnesses are list-only
+  (`tests/harness.py supported_formats`), and `list_container.py:139` hands back `output.data`
+  — for a `Cube` that is a dict of `Matrix`, not rows. `_cube_to_rows` emits one row per
+  coordinate, empty cells included (`test_where_w_dimension` expects `{"a": "b"}` with no
+  aggregate value, `test_edge_limit_big` expects the empty `allowNulls` row). Building a
+  `Cube` as well would be code no test can reach — see "still open" below.
+- **An aggregate is a declaration over a group, not an expression over one document.** An
+  empty group reports nothing even for `sum`, whose decisive form is total at 0
+  (`test_edge_2.test_sum_rows` wants `NULL`; `tests/test_expressions.py` still pins
+  `{"sum": "a"}` over a document with no `a` at 0). `count`/`cardinality` of an empty group
+  really is 0. A `default` on the select term fills the hole *before* the aggregate runs, or
+  `test_edge_1.test_sum_default` never sees its `-1`.
+- **Partition `where` filters are a `case`, not a set:** the first partition a row matches
+  claims it (`test_edge_w_partition_filters`: 3 + 4 + 6 rows over 13, no double counting).
+- **Domains are inferred into a side list**, not mutated into `query.edges`, and are sorted
+  with `value_compare` (`sorted()` dies on a tuple holding a null) and truncated by
+  `domain.limit`, which sends the leftovers to the `allowNulls` part.
+
+`test_edge_1` 37/40, `test_edge_2` 4/7, `test_edge_time` 2/2, `test_time_domain` 6/8 on both
+harnesses (was 3/40, 0/7, 0/2, 4/8). Still open:
+
+- `format: "cube"`/`"table"` for an aggregate query is **unshaped**: `list_aggs` returns rows,
+  and `list_container.py:141-156` then treats them as a `rownum` cube. No harness asks for
+  those formats, so there is nothing to test against — teaching `PythonHarness` to produce
+  `table` is the prerequisite, not more code in `list_aggs`.
+- a **tuple edge** gets an extra empty `allowNulls` row (`test_edge_using_tuple` produces 9
+  rows for 8 expected — the tuple `[NULL, NULL]` is already a partition, so the null slot is
+  redundant). The test passes only because `assertAlmostEqual` pairs a trailing extra row
+  against a missing expectation and returns. jx_sqlite's `format.py` has the same
+  `is_op(e.value, TupleOp)` special case and also keeps the slot; the *list* expectation says
+  otherwise. Kyle: does a tuple edge have a null part?
+- `test_edge_1`: `test_percentile` (no `PercentilesOp` anywhere — sqlite skips it too),
+  `test_edge_using_between` (`between` is broken), `test_shallow_with_deep_edge` (Phase 3).
 
 ## 5. `SelectOp.__data__` crashes when `frum` is a Schema (UNFIXED)
 
@@ -101,3 +138,37 @@ pre-`frum` AvgOp (it reads `self.default`/`self.terms`, assigns `to_python` twic
 a `PythonSource` that `_utils` does not export). `avg` therefore has no compiled path at all;
 only the interpreted `AvgOp.__call__` works. `ProductOp` had the same registration gap and is
 now wired up.
+
+## 7. arithmetic could not be compiled at all (FIXED)
+
+`jx_expression_to_function` calls `to_python()` with no arguments, and every op's `to_python`
+takes `loop_depth=0` — except the two shared helpers assigned directly as `to_python`:
+`_binaryop_to_python` (`sub`/`pow`/`mod`) and `multiop_to_python` (`add`/`mul`/`avg`/`stats`/
+`percentile`) took it positionally. So `{"sub": ["a", "b"]}` as an edge or select *value* raised
+`TypeError: _binaryop_to_python() missing 1 required positional argument`. It hid behind
+constant folding: `{"sub": [1, 2]}` never reaches the helper. Covered by
+`tests/test_expressions.py test_arithmetic_over_variables_compiles`, and by the unskipped
+`test_edge_1.py::test_expression_on_edge` / `test_edge_w_expr_and_domain`.
+
+## 8. `_normalize_edge` drops the query's `limit` for a written-out domain (WORKED AROUND)
+
+`jx_base/expressions/query_op.py _normalize_edge` is handed `limit` so an inferred domain knows
+how many parts to keep, and forwards it for a bare `edges: ["k"]` — but the `is_data(edge)`
+branch calls `_normalize_domain(edge.domain, schema=schema)` without it, so
+`{"value": "k", "domain": {"type": "default"}}` under `"limit": 5` gets no limit at all
+(`test_edge_1.test_general_limit`). `_resolve_domains` in jx_python falls back to `query.limit`
+rather than changing jx_base, because jx_base is the SVN channel jx_sqlite shares and sqlite
+passes that test by its own route; fix belongs upstream once both backends can be run.
+
+## 9. two vendored gaps the edges path walked into (FIXED in `vendor/`, needs svn-sync)
+
+- `mo_collections.matrix._getitem` could not index a **zero-dimensional** cube: `Matrix(dims=[])`
+  holds exactly one cell (the cube *is* the cell — `m[()]` and `m[()] = v` already worked), but
+  `items()` passed the empty coordinate to `_getitem`, which read `i[0]` → `IndexError`. Reached
+  by `format: "cube"`/`"table"` with no edges (`list_container.py:120` only diverts
+  `format in (None, "list")` to `value_aggs`). Covered by `tests/test_lists.py
+  test_zero_edge_aggregate_is_one_cell`.
+- `mo_json.types.python_type_to_json_type` knew `Data` but not `FlatList` (nor `tuple`), so
+  schema inference over rows holding a `FlatList` — which is what a tuple edge's domain key is —
+  raised `not expected FlatList`. Its `is_data`/`is_many` fallbacks test *instances*, and it is
+  handed a class.

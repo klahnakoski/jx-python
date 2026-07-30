@@ -344,7 +344,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_star_select_w_inner_object(self):
         # STAR FLATTENS THE INNER OBJECT TO ITS LEAVES
         # CONTRAST WITH test_no_select_w_inner_object
@@ -1092,7 +1091,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_w_nested_values(self):
         test = {
             "data": [

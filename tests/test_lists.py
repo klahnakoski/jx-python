@@ -7,9 +7,11 @@
 # Contact: Kyle Lahnakoski (kyle@lahnakoski.com)
 #
 from jx_base import Container
-from jx_base.expressions import NULL
+from jx_base.expressions import NULL, QueryOp
 from jx_base.language import value_compare
 from jx_python import ListContainer
+from jx_python.expressions import Python
+from mo_dots import to_data
 from mo_json import INTEGER, STRING, NUMBER, value2json
 from mo_testing.fuzzytestcase import FuzzyTestCase, add_error_reporting
 
@@ -93,6 +95,17 @@ class TestLists(FuzzyTestCase):
 
         deep_columns = con.get_schema("test.b").columns
         self.assertEqual(deep_columns, [{"name": "c", "nested_path": ["test.b", "test"], "json_type": INTEGER}])
+
+    def test_zero_edge_aggregate_is_one_cell(self):
+        # AN AGGREGATE WITH NO edges IN table/cube FORMAT STILL GOES THROUGH THE CUBE PATH, WHERE
+        # THE COORDINATE SPACE IS A ZERO-DIMENSIONAL Matrix - AND SUCH A CUBE *IS* ITS ONE CELL
+        # (mo_collections.matrix._getitem COULD NOT INDEX IT WITH AN EMPTY COORDINATE).  THE
+        # list-ONLY test_jx HARNESSES NEVER ASK FOR THESE FORMATS
+        con = ListContainer(".", [{"a": i} for i in range(3)])
+        query = to_data({"from": con, "select": {"aggregate": "count"}, "format": "table"})
+
+        result = con.query(QueryOp.wrap(query, con, Python))
+        self.assertEqual(result, {"meta": {"format": "table"}, "header": ["count"], "data": [[3]]})
 
     def test_value_compare_two_lists(self):
         a = [{"a": 1, "b": 2}, {"a": 3, "b": 4}, {"a": 5, "b": 6}]
