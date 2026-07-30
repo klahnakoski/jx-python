@@ -4,6 +4,7 @@ from mo_dots import concat_field
 from mo_times import Date
 
 from jx_base import jx_expression, DataClass, Column
+from jx_base.models.names import Names, Scope
 from jx_base.expressions import GtOp, Variable, Literal
 from jx_python.expression_compiler import compile_expression
 from mo_json.types import INTEGER, ARRAY
@@ -132,6 +133,23 @@ class TestVarious(TestCase):
                 nested_path=("a",),
                 last_updated=Date.now(),
             )
+
+
+@add_error_reporting
+class TestNames(TestCase):
+    def test_fan_out_is_not_a_property(self):
+        # A FAN-OUT BINDING IS REACHABLE BY NAME, BUT IT IS NOT PART OF THE DOCUMENT: A SIBLING
+        # ARRAY HAS MANY ELEMENTS PER ELEMENT OF THE PERSPECTIVE, SO document ASSEMBLY
+        # (all_leaves) MUST SKIP IT WHILE resolve/leaves STILL BIND IT
+        scope = Scope(
+            names={"v": ("v_col",), "sibling.x": ("x_col",)},
+            fan_out={"sibling.x": (True,)},
+        )
+        names = Names([scope])
+
+        self.assertEqual([r.name for r in names.all_leaves(".")], ["v"])
+        self.assertEqual(sorted(r.name for r in names.leaves(".")), ["sibling.x", "v"])
+        self.assertEqual(names.resolve("sibling.x"), ("x_col",))
 
 
 def typed_column(name, sql_key):
