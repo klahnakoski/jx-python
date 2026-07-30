@@ -52,6 +52,7 @@ from jx_python.expressions.offset_op import OffsetOp
 from jx_python.expressions.or_op import OrOp
 from jx_python.expressions.percentiles_op import PercentilesOp
 from jx_python.expressions.prefix_op import PrefixOp
+from jx_python.expressions.product_op import ProductOp
 from jx_python.expressions.python_function import PythonFunction
 from jx_python.expressions.python_script import PythonScript
 from jx_python.expressions.range_op import RangeOp

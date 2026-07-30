@@ -68,3 +68,36 @@ which reads `frum.precedence`; after `QueryOp.wrap` the `frum` of the normalized
 `Schema`, so `repr()` of any wrapped query's select raises
 `AttributeError: 'Schema' object has no attribute 'precedence'`. Only hurts debugging/error
 messages today (nothing in the suite prints one), which is why no test pins it.
+
+## 6. `partial_eval` handed back JX ops to the Python language (FIXED)
+
+Three separate ways an expression lost its language on the way through `partial_eval`, all of
+which end at `language.partial_eval`'s `expecting Python`, or worse at a JX op with no
+`to_python`:
+
+- the collection aggregates (`CountOp`, `MinOp`, `MaxOp`, `SumOp`, `ProductOp`, `AvgOp`) built
+  themselves in `__new__` with `object.__new__(CountOp)` — the hard-coded jx_base class, so
+  `lang.CountOp(...)` produced a *JX* op. Now `object.__new__(cls)`.
+- their `partial_eval` returned `MinOp(frum=...)` etc. instead of `lang.MinOp(frum=...)`.
+- `Expression.invert` (the default) returned `NotOp(better)`, and
+  `StrictEqOp.partial_eval`'s `x == 0 -> not x` rewrite returned `NotOp(lhs)`; both now use
+  `lang.NotOp`.
+
+The `x == 0 -> not x` rewrite depends on a second, fragile mechanism: it *mutates*
+`lhs._jx_type = JX_BOOLEAN` so that `NotOp.to_python`'s `ToBooleanOp(term).partial_eval`
+collapses and the host's own truthiness (`not 0`) decides. That only survives because a
+`simplified` op of the right `lang` is returned as-is by the `partial_eval` dispatcher — with
+the language lost, the op was rebuilt and the instance's `_jx_type` went back to
+`JX_INTEGER`, re-inserting `exists(f) and f is not False`, which is True for `0`. So
+`{"eq": [{"count": "arr"}, 0]}` silently matched nothing on the compiled harness.
+
+Covered by `tests/test_jx/test_filters.py test_where_count_empty_collection` (which came in
+from SVN failing) and `tests/test_expressions.py
+test_aggregate_partial_eval_stays_in_language`.
+
+**Still open:** `jx_python/expressions/avg_op.py` is not registered in
+`jx_python/expressions/__init__.py`, and cannot be — its `to_python` is dead code from the
+pre-`frum` AvgOp (it reads `self.default`/`self.terms`, assigns `to_python` twice, and imports
+a `PythonSource` that `_utils` does not export). `avg` therefore has no compiled path at all;
+only the interpreted `AvgOp.__call__` works. `ProductOp` had the same registration gap and is
+now wired up.

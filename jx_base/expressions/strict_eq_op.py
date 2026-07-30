@@ -28,8 +28,8 @@ class StrictEqOp(BaseInequalityOp):
         rhs = self.rhs.partial_eval(lang)
         if is_literal(rhs) and rhs.value == 0:
             lhs._jx_type = JX_BOOLEAN
-            return NotOp(lhs)
+            return lang.NotOp(lhs)
         if is_literal(lhs) and lhs.value == 0:
             rhs._jx_type = JX_BOOLEAN
-            return NotOp(rhs)
+            return lang.NotOp(rhs)
         return lang.StrictEqOp(lhs, rhs)

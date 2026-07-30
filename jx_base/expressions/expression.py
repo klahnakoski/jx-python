@@ -143,7 +143,7 @@ class Expression(BaseExpression):
         elif better is FALSE:
             return TRUE
         else:
-            return NotOp(better)
+            return lang.NotOp(better)
 
     def partial_eval(self, lang):
         """

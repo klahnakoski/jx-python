@@ -24,16 +24,11 @@ class MinOp(Expression):
     _jx_type = JX_NUMBER
 
     def __new__(cls, *terms, frum=None):
-        if frum is not None:
-            op = object.__new__(MinOp)
-            op.__init__(frum=frum)
-            return op
-        elif len(terms) > 1:
+        if frum is None and len(terms) > 1:
             return LeastOp(*terms, nulls=True)
-        else:
-            op = object.__new__(MinOp)
-            op.__init__(frum=terms[0])
-            return op
+        # object.__new__(cls), NOT object.__new__(MinOp): THE LANGUAGE-SPECIFIC SUBCLASS MUST
+        # SURVIVE, OR partial_eval RETURNS A JX OP TO A lang THAT ASKED FOR ITS OWN
+        return object.__new__(cls)
 
     def __init__(self, *terms, frum=None):
         if terms:
@@ -61,4 +56,4 @@ class MinOp(Expression):
         return MinOp(frum=self.frum.map(map_))
 
     def partial_eval(self, lang):
-        return MinOp(frum=self.frum.partial_eval(lang))
+        return lang.MinOp(frum=self.frum.partial_eval(lang))

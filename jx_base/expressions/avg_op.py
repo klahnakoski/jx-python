@@ -47,4 +47,4 @@ class AvgOp(Expression):
         return AvgOp(frum=self.frum.map(map_))
 
     def partial_eval(self, lang):
-        return AvgOp(frum=self.frum.partial_eval(lang))
+        return lang.AvgOp(frum=self.frum.partial_eval(lang))

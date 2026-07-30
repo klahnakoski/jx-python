@@ -167,3 +167,12 @@ class TestOther(FuzzyTestCase):
         self.assertEqual(expr({"a": [1, 2, None, 6]}), 9)
         self.assertEqual(expr({"a": 3}), 3)
         self.assertEqual(expr({}), 0)
+
+    def test_aggregate_partial_eval_stays_in_language(self):
+        # THE AGGREGATES BUILD THEMSELVES IN __new__; IT MUST USE cls SO THE LANGUAGE-SPECIFIC
+        # SUBCLASS SURVIVES - A JX OP HANDED BACK TO Python HAS NO to_python
+        # avg IS OMITTED: jx_python HAS NO WORKING AvgOp.to_python YET (SEE BUGS.md)
+        for op in ["count", "min", "max", "sum", "product"]:
+            expr = jx_expression({op: "a"}).partial_eval(Python)
+            self.assertIs(expr.lang, Python, f"{op} lost the language")
+            expr.to_python(0)
