@@ -10,7 +10,7 @@
 
 
 import mo_dots as dot
-from mo_collections.matrix import Matrix
+from mo_collections.tensor import Tensor
 from mo_dots import (
     Data,
     FlatList,
@@ -56,15 +56,15 @@ class Cube(Container):
 
         # ENSURE frum IS PROPER FORM
         if is_list(select):
-            if edges and OR(not isinstance(v, Matrix) for v in data.values()):
-                Log.error("Expecting data to be a dict with Matrix values")
+            if edges and OR(not isinstance(v, Tensor) for v in data.values()):
+                Log.error("Expecting data to be a dict with Tensor values")
 
         if not edges:
             if not data:
                 if is_list(select):
                     Log.error("not expecting a list of records")
 
-                data = {select.name: Matrix.ZERO}
+                data = {select.name: Tensor.ZERO}
                 self.edges = Null
             elif is_data(data):
                 # EXPECTING NO MORE THAN ONE rownum EDGE IN THE DATA
@@ -77,12 +77,12 @@ class Cube(Container):
                 if is_list(select):
                     Log.error("not expecting a list of records")
 
-                data = {select.name: Matrix.wrap(data)}
+                data = {select.name: Tensor.wrap(data)}
                 self.edges = list_to_data([{
                     "name": "rownum",
                     "domain": {"type": "rownum", "min": 0, "max": len(data), "interval": 1},
                 }])
-            elif isinstance(data, Matrix):
+            elif isinstance(data, Tensor):
                 if is_list(select):
                     Log.error("not expecting a list of records")
 
@@ -91,7 +91,7 @@ class Cube(Container):
                 if is_list(select):
                     Log.error("not expecting a list of records")
 
-                data = {select.name: Matrix(value=data)}
+                data = {select.name: Tensor(value=data)}
                 self.edges = Null
         else:
             self.edges = to_data(edges)
@@ -245,7 +245,7 @@ class Cube(Container):
                 output = Cube(
                     select=self.select,
                     edges=list_to_data([e for e, v in zip(self.edges, coordinates) if v is None]),
-                    data={k: Matrix(values=c.__getitem__(coordinates)) for k, c in self.data.items()},
+                    data={k: Tensor(values=c.__getitem__(coordinates)) for k, c in self.data.items()},
                 )
                 return output
         elif is_text(item):
@@ -302,7 +302,7 @@ class Cube(Container):
         selects = enlist(select)
         is_aggregate = OR(s.aggregate != None and s.aggregate != "none" for s in selects)
         if is_aggregate:
-            values = {s.name: Matrix(value=self.data[s.value].aggregate(s.aggregate)) for s in selects}
+            values = {s.name: Tensor(value=self.data[s.value].aggregate(s.aggregate)) for s in selects}
             return Cube(select, [], values)
         else:
             values = {s.name: self.data[s.value] for s in selects}
@@ -434,7 +434,7 @@ class Cube(Container):
         cnames = self.data.keys()
 
         # ANNOTATE EXISTING CUBE WITH NEW COLUMN
-        m = self.data[window.name] = Matrix(dims=canonical.dims)
+        m = self.data[window.name] = Tensor(dims=canonical.dims)
         for coord in canonical._all_combos():
             row = Data()  # IT IS SAD WE MUST HAVE A Data(), THERE ARE {"script": expression} USING THE DOT NOTATION
             for k in cnames:

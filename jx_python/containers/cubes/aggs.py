@@ -11,7 +11,7 @@
 
 import itertools
 
-from mo_collections.matrix import Matrix
+from mo_collections.tensor import Tensor
 from mo_logs import Log
 
 from jx_base.domains import DefaultDomain, SimpleSetDomain
@@ -42,7 +42,7 @@ def cube_aggs(frum, query):
                     break
 
     result = {
-        s.name: Matrix(
+        s.name: Tensor(
             dims=[len(e.domain.partitions) + (1 if e.allowNulls else 0) for e in query.edges], zeros=s.default,
         )
         for s in select

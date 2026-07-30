@@ -98,7 +98,7 @@ class TestLists(FuzzyTestCase):
 
     def test_zero_edge_aggregate_is_one_cell(self):
         # AN AGGREGATE WITH NO edges IN table/cube FORMAT STILL GOES THROUGH THE CUBE PATH, WHERE
-        # THE COORDINATE SPACE IS A ZERO-DIMENSIONAL Matrix - AND SUCH A CUBE *IS* ITS ONE CELL
+        # THE COORDINATE SPACE IS A ZERO-DIMENSIONAL Tensor - AND SUCH A CUBE *IS* ITS ONE CELL
         # (mo_collections.matrix._getitem COULD NOT INDEX IT WITH AN EMPTY COORDINATE).  THE
         # list-ONLY test_jx HARNESSES NEVER ASK FOR THESE FORMATS
         con = ListContainer(".", [{"a": i} for i in range(3)])

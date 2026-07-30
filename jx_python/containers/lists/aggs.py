@@ -18,7 +18,7 @@ from jx_base.expressions.product_op import ProductOp
 from jx_base.expressions.sum_op import SumOp
 from jx_base.language import is_op, value_compare
 from jx_python.expressions import jx_expression_to_function
-from mo_collections.matrix import Matrix
+from mo_collections.tensor import Tensor
 from mo_dots import Data, Null, exists, to_data
 from jx_base.utils import coalesce, delist, is_true
 from mo_future import first
@@ -38,7 +38,7 @@ def is_aggs(query):
 
 def list_aggs(frum, query):
     """
-    THE edges PATH: THE CUBE IS THE WORKING STRUCTURE.  A Matrix IS DENSE BY CONSTRUCTION, SO
+    THE edges PATH: THE CUBE IS THE WORKING STRUCTURE.  A Tensor IS DENSE BY CONSTRUCTION, SO
     EVERY COORDINATE EXISTS (WITH ITS OWN list OF VALUES) BEFORE ANY DATA ARRIVES; ONE PASS
     DROPS EACH ROW'S VALUE INTO THE CELLS IT BELONGS TO, THEN EACH CELL IS AGGREGATED IN PLACE.
     """
@@ -51,7 +51,7 @@ def list_aggs(frum, query):
     dims = [len(e.domain.partitions) + (1 if e.allowNulls else 0) for e in edges]
 
     s_accessors = [(t.name, jx_expression_to_function(t.value)) for t in terms]
-    result = {t.name: Matrix(dims=dims, zeros=list) for t in terms}
+    result = {t.name: Tensor(dims=dims, zeros=list) for t in terms}
     where = jx_expression_to_function(query.where)
     coord = [None] * len(edges)
     edge_accessor = [(i, make_accessor(e)) for i, e in enumerate(edges)]
@@ -125,7 +125,7 @@ def _cube_to_rows(query, edges, terms, result, dims):
     DOMAIN ORDER, WITH THE allowNulls PART LAST)
     """
     # ANY TERM'S MATRIX ENUMERATES THE COORDINATE SPACE; `select: []` HAS NONE, SO MAKE ONE
-    anchor = result[terms[0].name] if terms else Matrix(dims=dims)
+    anchor = result[terms[0].name] if terms else Tensor(dims=dims)
 
     output = []
     for c, _ in anchor.items():

@@ -12,7 +12,7 @@ from jx_base.expressions.expression import Expression
 from jx_base.expressions.literal import Literal, is_literal
 from jx_base.models.container import Container
 from jx_base.utils import enlist, delist
-from mo_collections.matrix import Matrix
+from mo_collections.tensor import Tensor
 from mo_dots import is_list, from_data, Data
 from mo_json.typed_encoder import ARRAY_KEY
 from mo_json.types import JX_TEXT, JX_ANY, JxType
@@ -112,9 +112,9 @@ class FormatOp(Expression):
                 data = {}
                 for si, s in enumerate(normalized_query.select.terms):
                     if s.aggregate == "count":
-                        data[s.name] = Matrix(dims=dims, zeros=0)
+                        data[s.name] = Tensor(dims=dims, zeros=0)
                     else:
-                        data[s.name] = Matrix(dims=dims)
+                        data[s.name] = Tensor(dims=dims)
 
                 select = [{"name": s.name} for s in normalized_query.select.terms]
 
@@ -166,7 +166,7 @@ class FormatOp(Expression):
                 dims.append(len(domain.partitions) + (1 if allowNulls else 0))
                 edges.append(Data(name=e.name, allowNulls=allowNulls, domain=domain))
 
-            data_cubes = {s["name"]: Matrix(dims=dims) for s in normalized_query.select.terms}
+            data_cubes = {s["name"]: Tensor(dims=dims) for s in normalized_query.select.terms}
 
             r2c = index_to_coordinate(dims)  # WORKS BECAUSE THE DATABASE SORTED THE EDGES TO CONFORM
             for record, row in enumerate(result.data):
