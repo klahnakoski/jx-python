@@ -8,22 +8,30 @@ format}.py` and `jx-sqlite/docs/INTERSECTION_SURVEY.md`.
 Kyle's hedge is half right, and the two halves split cleanly along jx_sqlite's own sub-problem
 list (`INTERSECTION_SURVEY.md §1`):
 
-- **Borrow P7 (the pull plan / result shaping) outright.** It is *not SQL at all* — the survey
+- **Borrow P7 (the pull plan / result shaping) — but only the part Python still needs.** It is
+  *not SQL at all* — the survey
   says so itself: "PullPlan — not SQL at all: the declarative inverse of SqlHierarchy... This
   wants to be its own module regardless of what happens above it." `jx_sqlite/format.py`
   already implements it, against **byte-identical** shared test files, and it reads nothing
   sqlite-specific. jx_python currently has a second, weaker implementation of the same job.
+  Its *cube* branch turns out to be unnecessary here (the cube is jx_python's working
+  structure, not an output reshape); its *deep-document* half is what Phase 3 wants.
 - **Do not borrow P2/P3/P4/P5 (join chain, aligned select lists, branch UNION, order
   recovery), nor `BranchBuilder`.** Every one of those exists to squeeze a hierarchical answer
   through SQL's flat rectangular interface. Python has no such interface. Recursing into the
   data is not just easier — it makes whole classes of jx_sqlite complication *evaporate*
   (see "What disappears in Python" below).
 - **Borrow exactly one idea from P6b (`sql_complete`): materialize the dense coordinate space
-  first, then fill it.** That is `itertools.product` in Python, and it settles the design fork
-  I raised earlier (Matrix accumulator vs. whole-collection aggregate) in favour of the
-  simpler answer.
+  first, then fill it.** In Python that space is **the cube itself** —
+  `Matrix(dims=dims, zeros=list)` — not a coordinate generator. `list_aggs` already allocates
+  exactly that Matrix (`aggs.py:57-60`) and already finalizes it in place
+  (`aggs.py:100-102`); only the per-cell accumulator is wrong. So the design fork I raised
+  earlier (Matrix accumulator vs. whole-collection aggregate) resolves without giving up the
+  Matrix: keep the Matrix, make each cell a plain list, aggregate the list.
 
-So: steal the *back* of the pipeline, ignore the *middle*, and steal one trick from the front.
+So: ignore the *middle*, take one guarantee from the front, and take only the deep-document part
+of the back. The net edit to `list_aggs` is smaller than a rewrite — the Matrix scaffolding is
+already there and correct; what has to go is `windows.name_to_aggregate` and `enlist(query.select)`.
 
 ## Evidence
 
@@ -88,19 +96,37 @@ incremental accumulator:
    edges; the direct `ListContainer.query(...)` path does not, which is why a raw
    `edges: ["a"]` currently fails with `'str' object has no attribute 'domain'`. Normalize (or
    refuse) at the entry, not inside the loop.
-2. **Coordinate space.** `dims = [len(parts) + (1 if allowNulls else 0) …]`; the cell order is
-   `itertools.product(*(range(d) for d in dims))` — which *is* cube order, the same invariant
-   `format.py:133` relies on ("WORKS BECAUSE THE DATABASE SORTED THE EDGES TO CONFORM"). This
-   is `sql_complete` without SQL: every coordinate exists before any data arrives, so empty
-   cells need no special case.
-3. **One pass, values into cells.** For each surviving row, `make_accessor` already yields the
-   part indices per edge; for each `coord in itertools.product(*coords)` append each select
-   term's value into `cells[coord][term]`.
-4. **Aggregate per cell.** `agg.__class__(frum=Literal(values))()` — the identical call
-   `groupby_aggs` already uses. Empty cell → the decisive default falls out for free
-   (`count`→0, `sum`→0, `min`/`max`/`avg`→`NULL`; pinned by `tests/test_expressions.py`).
-5. **Shape.** Emit `Matrix(dims=dims)` per select term for `format: "cube"`, or the flat
-   coordinate rows for `list`/`table`. Phase 2 replaces this step with the shared formatter.
+2. **Coordinate space — the cube, not a generator.** Keep `aggs.py:56-62` as it stands:
+   one `Matrix(dims=[len(parts) + (1 if allowNulls else 0) …])` per select term. Change only
+   `zeros`: from `windows.name_to_aggregate.get(s.aggregate)(**s)` to `list`. That allocates
+   every cell before any data arrives — `sql_complete`'s guarantee, for free, because a Matrix
+   is dense by construction. No `itertools.product` over the coordinate space, and no
+   intermediate dict of cells.
+
+   Verified: `Matrix(dims=dims, zeros=list)` gives each coordinate its own fresh list;
+   `m.items()` enumerates **every** coordinate, empty ones included, in row-major order — the
+   same order `index_to_coordinate(dims)` produces, which is the invariant `format.py:133`
+   leans on ("WORKS BECAUSE THE DATABASE SORTED THE EDGES TO CONFORM"). So the Matrix *is* the
+   dense-rows-in-cube-order intermediate; there is no reason to build flat rows first.
+3. **One pass, values into cells.** `make_accessor` already yields, per edge, the part indices
+   a row matches; `for c in itertools.product(*coord)` at `aggs.py:77`/`:91` already fans one
+   row out over the cells it belongs to. Keep that product — it is inherent (a multi-valued
+   edge puts one row in several cells), not a coordinate enumeration. Replace `acc.add(val)`
+   with `mat[c].append(val)`.
+4. **Aggregate per cell.** `aggs.py:96-102` already walks `m.items()` and writes the finalized
+   value back in place; replace `var.end()` with `agg.__class__(frum=Literal(values))()` — the
+   identical call `groupby_aggs` already uses. Empty cell → the decisive default falls out for
+   free (`count`→0, `sum`→0, `min`/`max`/`avg`→`NULL`; pinned by `tests/test_expressions.py`).
+5. **Shape.** `Cube(select, query.edges, result)` as today, with `m.cube` supplying the nested
+   lists. `windows.py` is out of the path entirely.
+
+   **Prerequisite defect:** a zero-edge cube is broken in the vendored Matrix.
+   `Matrix(dims=[])` never applies `zeros` (its `cube` is `[]`), `m[()]` hands back that same
+   list rather than a cell, and `m.items()` raises `IndexError: tuple index out of range`
+   (`vendor/mo_collections/matrix.py:234` → `_getitem` line 335 indexes the empty coordinate).
+   `format: "cube"` with no edges reaches `list_aggs` (`list_container.py:120` only diverts
+   `format in (None, "list")`), so fix this in `vendor/mo_collections` first — it is an SVN
+   working copy, so the fix is a real fix to mo-collections.
 
 ### Phase 2 — one shaping layer for both backends
 
@@ -112,9 +138,12 @@ repos share. Two small edits are needed on the way in: `jx.sort` → `sorted(...
 value_compare))` (`jx_base.language`), and `untype_field` is only reached for typed sqlite names
 — jx_python keeps `es_column="."` (see `jx_base/CLAUDE.md`), so that branch is inert here.
 
-Do Phase 2 **after** Phase 1, not before: Phase 1 tells us whether jx_python actually wants a
-pull plan or can shape directly, and a wrong seam is more expensive than a duplicated
-formatter.
+Do Phase 2 **after** Phase 1, not before — and expect Phase 1 to *shrink* it. Once the cube is
+the working structure, jx_python never builds flat rows, so `format_flat`'s cube branch (which
+exists to reshape flat rows positionally) has no caller here. What is still worth sharing is the
+narrower part: `format_deep`/`_top_name`/`_deep_header` — deciding which key a deep column lands
+under — which Phase 3 needs. If Phase 1 lands cleanly, re-scope Phase 2 to that and drop the
+`ColumnMapping` move.
 
 ### Phase 3 — nested tables (unblocks ~40 of `test_deep_ops`, most of `test_nested`)
 
@@ -146,10 +175,14 @@ if the goal is test count rather than the shaping seam.
   values wherever they live). A per-cell value list gives "count of values" for free but
   `{"aggregate": "count", "value": "."}` means *rows*. Decide it explicitly at step 3 — a cell
   needs its row count as well as its value lists.
+- **Phase 1, third failure: the zero-edge cube.** See the prerequisite defect above; a
+  `format: "cube"` query with no edges walks straight into `Matrix(dims=[])`. Unskip one such
+  test *before* touching `list_aggs`, or the Matrix bug will read as a `list_aggs` bug.
 - **Phase 2, most likely failure: the seam is wrong.** `format_flat` assumes the producer
-  emitted one dense row per cell **in cube order**. If Phase 1's shaping turns out to want
-  nested output directly (no flat intermediate), moving the formatter buys nothing and costs a
-  jx_base API. That is the reason for the ordering above.
+  emitted one dense row per cell **in cube order**. With the cube as the working structure
+  there is no such producer here, so moving the formatter buys nothing and costs a jx_base API.
+  That is the reason for the ordering above, and the reason Phase 2 is now scoped down to the
+  deep-header logic only.
 - **Phase 3, most likely failure: the parent link.** A view of `a` rows that carries its parent
   by reference makes up-reach trivial but aliases the data; any `update`/`window` that writes
   through the view mutates the fact. Read-only view, or copy — decide before step 2.
