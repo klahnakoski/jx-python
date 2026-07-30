@@ -95,9 +95,12 @@ class Scope:
     root_is_array - THE SCOPE'S OWN TABLE IS AN ARRAY (ITS ROWS ARE ELEMENTS, NOT FACTS)
     boundaries    - PER NAME: TUPLE (ALIGNED WITH names[name]) OF THE ARRAY PATH HOLDING
                     EACH VALUE, RELATIVE TO THE SCOPE ROOT ("." = THE SCOPE'S OWN TABLE)
+    fan_out       - PER NAME: TUPLE (ALIGNED WITH names[name]) OF WHETHER THE VALUE'S TABLE
+                    IS OFF THE PERSPECTIVE'S LINE - MANY OF THEM PER ELEMENT OF THE
+                    PERSPECTIVE (A SIBLING/COUSIN ARRAY), SO NOT A PROPERTY OF ITS DOCUMENT
     """
 
-    __slots__ = ["names", "aliases", "root_is_array", "boundaries"]
+    __slots__ = ["names", "aliases", "root_is_array", "boundaries", "fan_out"]
 
     def __init__(
         self,
@@ -105,16 +108,24 @@ class Scope:
         aliases: Dict[str, Tuple] = None,
         root_is_array: bool = False,
         boundaries: Dict[str, Tuple] = None,
+        fan_out: Dict[str, Tuple] = None,
     ):
         self.names = names or {}
         self.aliases = aliases or {}
         self.root_is_array = root_is_array
         self.boundaries = boundaries or {}
+        self.fan_out = fan_out or {}
 
     def _boundary(self, name: str, index: int) -> str:
         found = self.boundaries.get(name)
         if found is None:
             return "."
+        return found[index]
+
+    def _fan_out(self, name: str, index: int) -> bool:
+        found = self.fan_out.get(name)
+        if found is None:
+            return False
         return found[index]
 
 
@@ -182,6 +193,10 @@ class Names:
         ALL SCOPES, NEAREST FIRST.  A FARTHER SCOPE'S BINDING IS SKIPPED WHEN A NEARER SCOPE
         ALREADY BOUND THE SAME VALUE (SAME COLUMN SEEN UNDER ANOTHER NAME) OR THE SAME NAME
         (SHADOWING).  CONTRAST leaves(): FIRST SCOPE WITH ANY MATCH SUPPLIES THEM ALL.
+
+        A FAN-OUT BINDING IS NOT PART OF THE DOCUMENT: A SIBLING ARRAY HAS MANY ELEMENTS PER
+        ELEMENT OF THE PERSPECTIVE, SO AN ANCESTOR CONTRIBUTES ITS SCALARS, NOT ITS OTHER
+        CHILDREN.  leaves() STILL BINDS THEM - A NAME CAN BE REACHED, IT JUST IS NOT A PROPERTY.
         """
         output = []
         seen_values = set()
@@ -195,7 +210,7 @@ class Names:
                     continue
                 seen_names.add(rel_name)
                 for i, v in enumerate(values):
-                    if id(v) in seen_values:
+                    if id(v) in seen_values or scope._fan_out(name, i):
                         continue
                     seen_values.add(id(v))
                     output.append(ResolvedName(

@@ -21,6 +21,111 @@ from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 @add_error_reporting
 class TestgroupBy1(BaseTestCase):
 
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_groupby_has_no_null_group(self):
+        # A groupby HAS NO DOMAIN: THE GROUPS *ARE* THE VALUES THAT OCCUR, SO THERE IS NO EMPTY
+        # GROUP TO REPORT - CONTRAST test_edge_keeps_null_partition, SAME DATA AND SELECT, WHICH
+        # PADS ITS DOMAIN.  THE `expecting` CLAUSE ASKS FOR THE DEFAULT FORMAT: THE ANSWER MUST
+        # NOT DEPEND ON WHETHER THE FORMAT WAS NAMED.
+        # NOTE: assertAlmostEqual PAIRS ROWS WITH zip_longest AND A None EXPECTATION MATCHES
+        # ANYTHING, SO AN *EXTRA* TRAILING ROW IS TOLERATED - THIS TEST PINS THE VALUES AND THE
+        # SHAPE OF THE GROUP KEY, NOT THE ABSENCE OF THE NULL GROUP
+        test = {
+            "data": [
+                {"a": {"b": "x"}, "v": 1},
+                {"a": {"b": "x"}, "v": 2},
+                {"a": {"b": "y"}, "v": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "s", "value": "v", "aggregate": "sum"},
+                "groupby": ["a.b"],
+            },
+            "expecting": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": "x"}, "s": 3}, {"a": {"b": "y"}, "s": 3}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.b", "s"],
+                "data": [["x", 3], ["y", 3]],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": "x"}, "s": 3}, {"a": {"b": "y"}, "s": 3}],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_groupby_cardinality_and_count(self):
+        # cardinality COUNTS THE DISTINCT VALUES OF A GROUP, count COUNTS THE VALUES: GROUP "b" HAS
+        # v = 1, 1, 2 AND A DOCUMENT WITH NO v AT ALL, SO 2 AND 3 - BOTH SKIP THE NULL.  THE groupby
+        # PATH HAD NO cardinality RULE OF ITS OWN UNTIL IT STARTED SHARING aggregates.py
+        # (NO expecting_cube: A CUBE groupby IS ANSWERED BY THE EDGES PATH, WHICH PADS A COORDINATE
+        # NO DOCUMENT REACHED - SEE docs/TEST_TRIAGE.md CLUSTER 8)
+        test = {
+            "data": [
+                {"a": "b", "v": 1},
+                {"a": "b", "v": 1},
+                {"a": "b", "v": 2},
+                {"a": "b"},
+                {"a": "c", "v": 5},
+                {"a": "c", "v": 5},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "groupby": ["a"],
+                "select": [
+                    {"name": "c", "value": "v", "aggregate": "cardinality"},
+                    {"name": "n", "value": "v", "aggregate": "count"},
+                ],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": "b", "c": 2, "n": 3}, {"a": "c", "c": 1, "n": 2}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a", "c", "n"],
+                "data": [["b", 2, 3], ["c", 1, 2]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_edge_keeps_null_partition(self):
+        # AN EDGE DECLARES A DOMAIN, SO EVERY COORDINATE GETS A CELL - INCLUDING THE NULL PART,
+        # EVEN WHERE NO DOCUMENT LANDS.  ONE ROW MORE THAN test_groupby_has_no_null_group OVER THE
+        # SAME DATA: THAT DENSITY IS THE DIFFERENCE BETWEEN THE TWO CLAUSES.  THE GROUP KEY LANDS
+        # THE SAME WAY IN BOTH (`{"a": {"b": "x"}}`, NOT A FLAT `a.b` KEY)
+        test = {
+            "data": [
+                {"a": {"b": "x"}, "v": 1},
+                {"a": {"b": "x"}, "v": 2},
+                {"a": {"b": "y"}, "v": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "s", "value": "v", "aggregate": "sum"},
+                "edges": ["a.b"],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": "x"}, "s": 3}, {"a": {"b": "y"}, "s": 3}, {}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.b", "s"],
+                "data": [["x", 3], ["y", 3], [NULL, NULL]],
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "data": {"s": [3, 3, NULL]},
+            },
+        }
+        self.utils.execute_tests(test)
+
     def test_no_select(self):
         test = {
             "data": simple_test_data,
@@ -386,7 +491,9 @@ class TestgroupBy1(BaseTestCase):
         self.assertRaises(Exception, self.utils.execute_tests, test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    def test_groupby_is_table(self):
+    def test_groupby_is_list(self):
+        # THE DEFAULT FORMAT IS list, WHATEVER THE CLAUSES.  THE NULL GROUP IS HERE BECAUSE null IS
+        # A VALUE THAT OCCURS (DOCUMENTS WITH NO `a`), NOT BECAUSE A DOMAIN WAS PADDED
         test = {
             "data": simple_test_data,
             "query": {
@@ -397,6 +504,14 @@ class TestgroupBy1(BaseTestCase):
                 "groupby": "a"
             },
             "expecting": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"a": "b", "v": 2},
+                    {"a": "c", "v": 31},
+                    {"v": 3}
+                ]
+            },
+            "expecting_table": {
                 "meta": {"format": "table"},
                 "header": ["a", "v"],
                 "data": [
