@@ -47,7 +47,6 @@ class TestSorting(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_edge_and_sort(self):
         test = {
             "data": [

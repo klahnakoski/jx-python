@@ -27,8 +27,10 @@ class UnionOp(Expression):
         self.frum = frum
 
     def __call__(self, row, rownum=None, rows=None):
+        # A UNION OF COLLECTIONS IS FLAT: A MEMBER THAT IS ITSELF A COLLECTION CONTRIBUTES ITS
+        # OWN MEMBERS - AND A set COULD NOT HOLD IT ANYWAY
         values = enlist(self.frum(row, rownum, rows))
-        return set(v for v in values if exists(v))
+        return set(w for v in values for w in enlist(v) if exists(w))
 
     def __data__(self):
         return {"union": self.frum.__data__()}

@@ -109,7 +109,6 @@ expected3 = list_to_data([
 @add_error_reporting
 class TestTime(BaseTestCase):
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time_variables(self):
         test = {
             "metadata": {},
@@ -160,7 +159,6 @@ class TestTime(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_time2_variables(self):
         test = {
             "metadata": {},

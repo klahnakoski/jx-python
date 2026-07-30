@@ -379,7 +379,6 @@ class TestSetOps(BaseTestCase):
     # THE PAIR: SAME DATA, SAME COLUMN, THE TWO SPELLINGS OF count.  THE `aggregate` PROPERTY
     # COLLAPSES OVER THE ROWS OF THE from; count AS A *VALUE* IS AN EXPRESSION OF ONE DOCUMENT.
     # THE from CLAUSE SAYS WHICH ROWS ARE DOCUMENTS, SO THE TWO CAN NOT MEAN THE SAME THING.
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_as_aggregate(self):
         test = {
             "data": [{"a": 1}, {"a": 2}, {}],
@@ -396,7 +395,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_count_as_expression(self):
         test = {
             "data": [{"a": 1}, {"a": 2}, {}],
@@ -413,7 +411,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_count_of_collection(self):
         # count() AS AN EXPRESSION IS PER DOCUMENT, LIKE test_select_count ABOVE - IT COUNTS THE
         # VALUES IN *THIS* DOCUMENT'S COLLECTION.  IT IS NOT {"value":"arr","aggregate":"count"},
@@ -438,7 +435,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_sum_of_collection(self):
         # LIKE test_select_count_of_collection: AN EXPRESSION OVER *THIS* DOCUMENT'S COLLECTION.
         # sum OF AN EMPTY COLLECTION IS null (DECISIVE: null WHEN ALL TERMS ARE null), WHILE
@@ -521,7 +517,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_max_of_collection(self):
         test = {
             "data": [
@@ -543,7 +538,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_min_of_collection(self):
         test = {
             "data": [
@@ -565,7 +559,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_average_of_collection(self):
         test = {
             "data": [
@@ -885,7 +878,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use in {"python", "interpret"}, "between is broken")
     @skipIf(sys.version_info[:2] <= (3, 9), "parser stack overflow")
     def test_between_missing(self):
         test = {
