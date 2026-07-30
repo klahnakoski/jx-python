@@ -14,7 +14,7 @@ from jx_base.expressions.literal import is_literal
 from jx_base.expressions.variable import Variable, is_variable
 from jx_base.language import is_op
 from mo_imports import export
-from mo_dots import concat_field, is_data
+from mo_dots import concat_field, is_data, literal_field
 from mo_json import JX_ANY, ARRAY, ARRAY_KEY
 
 
@@ -65,7 +65,9 @@ class GetOp(Expression):
         if var_name == "row":
             var_name = "."
         for lit in self.offsets:  # expecting Literal
-            var_name = concat_field(var_name, lit.value)
+            # AN OFFSET IS A PROPERTY *NAME*, SO IT IS ESCAPED BEFORE JOINING: A PROPERTY
+            # LITERALLY NAMED `a.html` IS THE ONE-STEP PATH `a..html`, NOT THE PATH a -> html
+            var_name = concat_field(var_name, literal_field(lit.value))
         return var_name
 
     @property

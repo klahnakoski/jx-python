@@ -468,7 +468,6 @@ class TestSorting(BaseTestCase):
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.elasticsearch.version, "ES can not sort nested amoung docs")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_nested_array(self):
 
         test = {

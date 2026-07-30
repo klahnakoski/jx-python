@@ -54,6 +54,12 @@ class BaseMultiOp(Expression):
             output |= t.vars()
         return output
 
+    def join_vars(self):
+        output = set()
+        for t in self.terms:
+            output |= t.join_vars()
+        return output
+
     def map(self, map_):
         return self.__class__(*(t.map(map_) for t in self.terms), null=self.decisive)
 

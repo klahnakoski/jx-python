@@ -153,6 +153,8 @@ set_default(
         "and": AndOp,
         "array": ArrayOfOp,
         "avg": AvgOp,
+        "average": AvgOp,
+        "mean": AvgOp,
         "strict.add": StrictAddOp,
         "strict.boolean": StrictBooleanOp,
         "strict.mul": StrictMulOp,

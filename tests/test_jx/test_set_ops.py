@@ -321,6 +321,59 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_no_select_w_inner_object(self):
+        # NO SELECT KEEPS THE INNER OBJECT AS A COMPOUND COLUMN
+        # CONTRAST WITH test_star_select_w_inner_object
+        test = {
+            "data": [{"a": {"b": {"c": 1, "d": 2}}}],
+            "query": {"from": TEST_TABLE},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a": {"b": {"c": 1, "d": 2}}}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a"],
+                "data": [[{"b": {"c": 1, "d": 2}}]],
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [{
+                    "name": "rownum",
+                    "domain": {"type": "rownum", "min": 0, "max": 1, "interval": 1},
+                }],
+                "data": {"a": [{"b": {"c": 1, "d": 2}}]},
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_star_select_w_inner_object(self):
+        # STAR FLATTENS THE INNER OBJECT TO ITS LEAVES
+        # CONTRAST WITH test_no_select_w_inner_object
+        test = {
+            "data": [{"a": {"b": {"c": 1, "d": 2}}}],
+            "query": {"from": TEST_TABLE, "select": "*"},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"a.b.c": 1, "a.b.d": 2}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.b.c", "a.b.d"],
+                "data": [[1, 2]],
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [{
+                    "name": "rownum",
+                    "domain": {"type": "rownum", "min": 0, "max": 1, "interval": 1},
+                }],
+                "data": {"a.b.c": [1], "a.b.d": [2]},
+            },
+        }
+        self.utils.execute_tests(test)
+
     def test_dot_select(self):
         test = {
             "data": [{"a": "b"}],
@@ -1015,7 +1068,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "sqlite", "nested array as value leaks hidden cols (__id__/__order__/__parent__); cluster 1 join assembly")
     def test_select_array_as_value(self):
         test = {
             "data": [
@@ -1053,7 +1105,6 @@ class TestSetOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "fix me first")
     def test_select_w_nested_values(self):
         test = {
             "data": [
@@ -1069,11 +1120,13 @@ class TestSetOps(BaseTestCase):
                 ],
             },
             "expecting_table": {
+                # NO SELECT => IMPLIED NAME ".", WHICH DECLARES THE TOP-LEVEL
+                # PROPERTIES AS COLUMNS (SEE docs/jx_expressions_leaves.md)
                 "meta": {"format": "table"},
-                "header": ["."],
+                "header": ["_a"],
                 "data": [
-                    [{"_a": {"k": [{"b": 1}, {"b": 2}]}}],
-                    [{"_a": {"k": [{"b": 1}, {"b": 2}]}}],
+                    [{"k": [{"b": 1}, {"b": 2}]}],
+                    [{"k": [{"b": 1}, {"b": 2}]}],
                 ],
             },
             "expecting_cube": {
@@ -1082,9 +1135,9 @@ class TestSetOps(BaseTestCase):
                     "name": "rownum",
                     "domain": {"type": "rownum", "min": 0, "max": 2, "interval": 1},
                 }],
-                "data": {".": [
-                    {"_a": {"k": [{"b": 1}, {"b": 2}]}},
-                    {"_a": {"k": [{"b": 1}, {"b": 2}]}},
+                "data": {"_a": [
+                    {"k": [{"b": 1}, {"b": 2}]},
+                    {"k": [{"b": 1}, {"b": 2}]},
                 ]},
             },
         }
@@ -1158,7 +1211,6 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skipIf(global_settings.use == "sqlite", "select . (_source) over doc with nested array leaks hidden cols; cluster 1 join assembly")
     def test_select_id_and_source(self):
         test = {
             "data": [{"_id": "test_id", "v": 4, "a": [{"b": 1}, {"b": 2}, {"b": 2}]},],

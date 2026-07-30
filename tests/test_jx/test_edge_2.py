@@ -402,7 +402,7 @@ class TestEdge2(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skip("between is broken")
+    @skipIf(global_settings.use in {"python", "interpret"}, "between is broken")
     def test_edge_using_missing_between2(self):
         test = {
             "data": [

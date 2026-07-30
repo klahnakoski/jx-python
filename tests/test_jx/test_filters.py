@@ -424,6 +424,24 @@ class TestFilters(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    def test_where_count_empty_collection(self):
+        # count() of a collection that has no values is 0, not null: the predicate is a
+        # property of the document, so a document with no child rows must still be tested
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": "id",
+                "where": {"eq": [{"count": "arr"}, 0]},
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [3]},
+        }
+        self.utils.execute_tests(test)
+
     def test_where_max(self):
         # max(...) is decisive: it takes the largest present value, skipping nulls
         test = {

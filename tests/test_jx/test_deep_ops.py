@@ -191,7 +191,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "groupby header mints `_a..v` (dot doubling in group.py naming)")
     def test_deep_select_column_w_groupby(self):
         test = {
             "data": [
@@ -860,7 +859,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "GUID `_id` not bound from nested origin (NAMES.md #7); also drops empty-parent row")
     def test_id_select(self):
         """
         ALWAYS GOOD TO HAVE AN ID, CALL IT "_id"
@@ -1955,7 +1953,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_deep_edge_w_shallow_expression(self):
         test = {
             "data": [
@@ -2006,7 +2003,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_deep_edge_w_shallow_var(self):
         test = {
             "data": [
@@ -2058,7 +2054,98 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
+    def test_edge_w_deep_agg_beside_plain_term(self):
+        # A PLAIN TERM CAN NOT COLLAPSE THE DOCUMENTS OF A COORDINATE, SO BOTH TERMS COME BACK
+        # ONE VALUE PER DOCUMENT (A MULTIVALUE), AND THE AGGREGATE FRAMES ONE DOCUMENT
+        test = {
+            "data": [
+                {"v": 0, "a": [{"t": "x", "b": 7}, {"t": "x", "b": 6}, {"t": "y", "b": 5}, {"t": "y", "b": 4}]},
+                {"v": 1, "a": [{"t": "x", "b": 1}, {"t": "x", "b": 2}, {"t": "y", "b": 3}, {"t": "z", "b": 4}]},
+            ],
+            "query": {"from": TEST_TABLE, "select": ["v", {"value": "a.b", "aggregate": "sum"}], "edges": ["a.t"]},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"a": {"t": "x", "b": [13, 3]}, "v": [0, 1]},
+                    {"a": {"t": "y", "b": [9, 3]}, "v": [0, 1]},
+                    {"a": {"t": "z", "b": 4}, "v": 1},
+                    {}
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.t", "v", "a.b"],
+                "data": [
+                    ["x", [0, 1], [13, 3]],
+                    ["y", [0, 1], [9, 3]],
+                    ["z", 1, 4],
+                    [NULL, NULL, NULL]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [{"name": "a.t", "domain": {"type": "set", "partitions": [
+                    {"value": "x"},
+                    {"value": "y"},
+                    {"value": "z"}
+                ]}}],
+                "data": {
+                    "v": [[0, 1], [0, 1], 1, NULL],
+                    "a.b": [[13, 3], [9, 3], 4, NULL]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_edge_w_agg_beside_plain_term_from_nested(self):
+        # SAME QUERY FROM THE NESTED ORIGIN: `a.b` IS NOW ONE VALUE PER DOCUMENT, SO ITS
+        # AGGREGATE HAS ONLY THE COORDINATE TO COLLAPSE, WHILE `v` IS STILL A MULTIVALUE
+        test = {
+            "data": [
+                {"v": 0, "a": [{"t": "x", "b": 7}, {"t": "x", "b": 6}, {"t": "y", "b": 5}, {"t": "y", "b": 4}]},
+                {"v": 1, "a": [{"t": "x", "b": 1}, {"t": "x", "b": 2}, {"t": "y", "b": 3}, {"t": "z", "b": 4}]},
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "select": ["v", {"value": "a.b", "aggregate": "sum"}],
+                "edges": ["a.t"],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"a": {"t": "x", "b": 16}, "v": [0, 0, 1, 1]},
+                    {"a": {"t": "y", "b": 12}, "v": [0, 0, 1]},
+                    {"a": {"t": "z", "b": 4}, "v": 1},
+                    {}
+                ]
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["a.t", "v", "a.b"],
+                "data": [
+                    ["x", [0, 0, 1, 1], 16],
+                    ["y", [0, 0, 1], 12],
+                    ["z", 1, 4],
+                    [NULL, NULL, NULL]
+                ]
+            },
+            "expecting_cube": {
+                "meta": {"format": "cube"},
+                "edges": [{"name": "a.t", "domain": {"type": "set", "partitions": [
+                    {"value": "x"},
+                    {"value": "y"},
+                    {"value": "z"}
+                ]}}],
+                "data": {
+                    "v": [[0, 0, 1, 1], [0, 0, 1], 1, NULL],
+                    "a.b": [16, 12, 4, NULL]
+                }
+            }
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_nested_property_edge_w_shallow_expression(self):
         test = {
             "data": [
@@ -2109,10 +2196,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(
-        global_settings.use == "sqlite",
-        "per-origin-row child aggregation: plain sibling select falls into edges.py aggregates (sql_aggs KeyError 'null')",
-    )
     def test_deep_origin_agg_on_child(self):
         # origin is a nested table (not the fact table); aggregate values from its child table
         test = {

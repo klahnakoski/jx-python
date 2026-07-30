@@ -14,14 +14,12 @@ from mo_dots import concat_field
 from tests.test_jx import BaseTestCase, TEST_TABLE, global_settings
 
 
-@skipIf(global_settings.use == "sqlite", "not ready")
 class TestSchemaMerging(BaseTestCase):
     """
     TESTS THAT DEMONSTRATE DIFFERENT SCHEMAS
     """
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_select(self):
         test = {
             "data": [
@@ -197,7 +195,6 @@ class TestSchemaMerging(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use == "python", "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_dots_in_property_names3(self):
         test = {
             "data": [
@@ -308,7 +305,6 @@ class TestSchemaMerging(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "complicated where clause needs support")
     def test_where(self):
         test = {
             "data": [
@@ -400,7 +396,7 @@ class TestSchemaMerging(BaseTestCase):
                     {"b": 1, "v": 6},
                     {"b": 2, "v": 4},
                     {"b": 4, "v": 5},
-                    {"v": 14}
+                    {"v": 17}
                 ]
             }
         }

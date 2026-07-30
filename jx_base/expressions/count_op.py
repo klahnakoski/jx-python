@@ -50,6 +50,15 @@ class CountOp(Expression):
     def __data__(self):
         return {"count": self.frum.__data__()}
 
+    def vars(self):
+        return self.frum.vars()
+
+    def join_vars(self):
+        return set()  # AN AGGREGATE OVER A COLLECTION BRINGS ITS OWN SOURCE
+
+    def map(self, map_):
+        return CountOp(frum=self.frum.map(map_))
+
     def partial_eval(self, lang):
         return lang.CountOp(frum=self.frum.partial_eval(lang))
 

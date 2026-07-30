@@ -10,7 +10,6 @@
 
 
 from jx_base.expressions.expression import Expression
-from jx_base.expressions.false_op import FALSE
 from jx_base.expressions.least_op import LeastOp
 from mo_json.types import JX_NUMBER
 
@@ -47,11 +46,11 @@ class MinOp(Expression):
     def vars(self):
         return self.frum.vars()
 
+    def join_vars(self):
+        return set()  # AN AGGREGATE OVER A COLLECTION BRINGS ITS OWN SOURCE
+
     def map(self, map_):
         return MinOp(frum=self.frum.map(map_))
-
-    def missing(self, lang):
-        return FALSE
 
     def partial_eval(self, lang):
         return MinOp(frum=self.frum.partial_eval(lang))

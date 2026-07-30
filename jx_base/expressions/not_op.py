@@ -43,6 +43,9 @@ class NotOp(Expression):
     def vars(self):
         return self.term.vars()
 
+    def join_vars(self):
+        return self.term.join_vars()
+
     def map(self, map_):
         return NotOp(self.term.map(map_))
 

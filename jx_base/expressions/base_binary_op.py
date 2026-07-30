@@ -50,6 +50,9 @@ class BaseBinaryOp(Expression):
     def vars(self):
         return self.lhs.vars() | self.rhs.vars()
 
+    def join_vars(self):
+        return self.lhs.join_vars() | self.rhs.join_vars()
+
     def map(self, map_):
         return self.__class__([self.lhs.map(map_), self.rhs.map(map_)])
 

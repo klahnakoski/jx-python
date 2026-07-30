@@ -423,7 +423,6 @@ class TestEdge1(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "deal with nested table as value")
     def test_union_values(self):
         data = [
             {"a": "x"},
@@ -481,7 +480,6 @@ class TestEdge1(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "deal with nested table as value")
     def test_union_nested_objects(self):
         data = [
             {"a": "x"},
@@ -539,7 +537,6 @@ class TestEdge1(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "deal with nested table as value")
     def test_multiple_union(self):
         data = [
             {"a": "x"},
@@ -1545,7 +1542,7 @@ class TestEdge1(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skip("between is broken")
+    @skipIf(global_settings.use in {"python", "interpret"}, "between is broken")
     def test_edge_using_between(self):
         test = {
             "data": [

@@ -100,6 +100,18 @@ class Expression(BaseExpression):
     def vars(self):
         raise Log.error("{type} has no `vars` method", type=self.__class__.__name__)
 
+    def join_vars(self):
+        """
+        THE VARS THIS EXPRESSION NEEDS *JOINED* INTO THE QUERY, WHICH IS NOT ALWAYS vars():
+        AN OPERATOR THAT RESOLVES ITS OWN SOURCE (AN AGGREGATE OVER A COLLECTION BRINGS ITS OWN
+        FROM) READS A VAR WITHOUT NEEDING IT JOINED.
+
+        THE DEFAULT IS vars() - JOINING MORE THAN REQUIRED IS SLOWER, NEVER WRONG - SO AN OP
+        ONLY OVERRIDES THIS WHEN IT KNOWS BETTER, AND COMPOSITE OPS MUST FORWARD IT (SEE
+        BaseMultiOp, BaseBinaryOp, NotOp) OR THE OVERRIDE BELOW THEM IS LOST.
+        """
+        return self.vars()
+
     def map(self, map):
         raise Log.error("{type} has no `map` method", type=self.__class__.__name__)
 

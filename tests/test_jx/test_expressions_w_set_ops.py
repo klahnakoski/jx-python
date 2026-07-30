@@ -383,6 +383,217 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
+    # THE PAIR: SAME DATA, SAME COLUMN, THE TWO SPELLINGS OF count.  THE `aggregate` PROPERTY
+    # COLLAPSES OVER THE ROWS OF THE from; count AS A *VALUE* IS AN EXPRESSION OF ONE DOCUMENT.
+    # THE from CLAUSE SAYS WHICH ROWS ARE DOCUMENTS, SO THE TWO CAN NOT MEAN THE SAME THING.
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_count_as_aggregate(self):
+        test = {
+            "data": [{"a": 1}, {"a": 2}, {}],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": "a", "aggregate": "count"},
+            },
+            "expecting_list": {"meta": {"format": "value"}, "data": 2},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[2]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_count_as_expression(self):
+        test = {
+            "data": [{"a": 1}, {"a": 2}, {}],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"count": "a"}},
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [1, 1, 0]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[1], [1], [0]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_count_of_collection(self):
+        # count() AS AN EXPRESSION IS PER DOCUMENT, LIKE test_select_count ABOVE - IT COUNTS THE
+        # VALUES IN *THIS* DOCUMENT'S COLLECTION.  IT IS NOT {"value":"arr","aggregate":"count"},
+        # WHICH COUNTS OVER THE WHOLE TABLE.
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"count": "arr"}},
+                "sort": "id",
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [3, 1, 0]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[3], [1], [0]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_sum_of_collection(self):
+        # LIKE test_select_count_of_collection: AN EXPRESSION OVER *THIS* DOCUMENT'S COLLECTION.
+        # sum OF AN EMPTY COLLECTION IS null (DECISIVE: null WHEN ALL TERMS ARE null), WHILE
+        # count OF ONE IS 0
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"sum": "arr"}},
+                "sort": "id",
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [6, 7, null]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[6], [7], [null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    # AN AGGREGATE OVER A NESTED BRANCH, BESIDE A PLAIN TERM: THE PLAIN TERM KEEPS ONE ROW PER
+    # DOCUMENT, SO THE AGGREGATE CAN ONLY BE FRAMING ONE DOCUMENT - ONE SUM OF THIS DOCUMENT'S
+    # a._b.b, NOT OF THE TABLE'S.  CONTRAST test_count_as_aggregate, WHERE THE SELECT IS
+    # ALL-AGGREGATE AND COLLAPSES THE WHOLE RESULT TO ONE ROW.  THE THREE SPELLINGS BELOW MEAN
+    # THE SAME THING; THE THIRD IS THE ONE THE NORMALIZED FORM WRITES OUT.
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_nested_aggregate_beside_plain_term(self):
+        test = {
+            "data": [
+                {"v": 0, "a": {"_b": [{"b": 7}, {"b": 6}, {"b": 5}, {"b": 4}]}},
+                {"v": 1, "a": {"_b": [{"b": 1}]}},
+                {"v": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": ["v", {"name": "b", "value": "a._b.b", "aggregate": "sum"}],
+                "sort": "v",
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"v": 0, "b": 22}, {"v": 1, "b": 1}, {"v": 2}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["v", "b"],
+                "data": [[0, 22], [1, 1], [2, null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_nested_aggregate_as_subquery(self):
+        test = {
+            "data": [
+                {"v": 0, "a": {"_b": [{"b": 7}, {"b": 6}, {"b": 5}, {"b": 4}]}},
+                {"v": 1, "a": {"_b": [{"b": 1}]}},
+                {"v": 2},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": [
+                    "v",
+                    {"name": "b", "value": {"from": "a._b", "select": {"value": "b", "aggregate": "sum"}}},
+                ],
+                "sort": "v",
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"v": 0, "b": 22}, {"v": 1, "b": 1}, {"v": 2}],
+            },
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["v", "b"],
+                "data": [[0, 22], [1, 1], [2, null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_max_of_collection(self):
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"max": "arr"}},
+                "sort": "id",
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [3, 7, null]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[3], [7], [null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_min_of_collection(self):
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"min": "arr"}},
+                "sort": "id",
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [1, 7, null]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[1], [7], [null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_average_of_collection(self):
+        test = {
+            "data": [
+                {"id": 1, "arr": [1, 2, 3]},
+                {"id": 2, "arr": [7]},
+                {"id": 3},
+            ],
+            "query": {
+                "from": TEST_TABLE,
+                "select": {"name": "n", "value": {"average": "arr"}},
+                "sort": "id",
+            },
+            "expecting_list": {"meta": {"format": "list"}, "data": [2, 7, null]},
+            "expecting_table": {
+                "meta": {"format": "table"},
+                "header": ["n"],
+                "data": [[2], [7], [null]],
+            },
+        }
+        self.utils.execute_tests(test)
+
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     def test_select_average(self):
         test = {
@@ -687,7 +898,7 @@ class TestSetOps(BaseTestCase):
         }
         self.utils.execute_tests(test)
 
-    @skip("between is broken")
+    @skipIf(global_settings.use in {"python", "interpret"}, "between is broken")
     @skipIf(sys.version_info[:2] <= (3, 9), "parser stack overflow")
     def test_between_missing(self):
         test = {
