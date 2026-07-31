@@ -50,7 +50,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "multivalue column: GetOp.to_sql arity error (partial_eval/to_sql ordering), order-dependent flake")
     def test_select_in_w_multivalue(self):
         test = {
             "data": [
@@ -88,7 +87,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "multivalue column: GetOp.to_sql arity error (partial_eval/to_sql ordering), order-dependent flake")
     def test_select_when_on_multivalue(self):
         test = {
             "data": [
@@ -1780,6 +1778,128 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_sibling_of_origin(self):
+        # `a` AND `k` ARE BOTH ARRAYS OF THE FACT.  FROM AN `a` ELEMENT THERE ARE MANY `k`, SO
+        # `k` IS A FAN-OUT, NOT A PROPERTY OF THAT DOCUMENT: IT HAS NO VALUE HERE, LIKE ANY NAME
+        # THE PERSPECTIVE CAN NOT REACH.  CONTRAST `o`, ONE VALUE PER ELEMENT (UP-REACH), AND
+        # CONTRAST `select *` FROM THE SAME ORIGIN, WHICH DOES NOT OFFER `k` AT ALL.
+        test = {
+            "data": [
+                {"o": 1, "a": [{"v": 1}, {"v": 2}], "k": [{"z": 9}]},
+                {"o": 2, "a": [{"v": 3}], "k": [{"z": 8}, {"z": 7}]},
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "select": ["v", "o", "k.z"],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"v": 1, "o": 1, "k":{"z": 9}},
+                    {"v": 2, "o": 1, "k":{"z": 9}},
+                    {"v": 3, "o": 2, "k":{"z": [8, 7]}},
+                ],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_where_on_sibling_of_origin(self):
+        # A where ON THE SIBLING FILTERS THE SIBLING'S OWN ROWS, AND A DOCUMENT WHOSE SIBLING
+        # ROWS ALL FAILED HAS NO MATCHING `k` AT ALL - SO EVERY ELEMENT OF ITS ORIGIN GOES.
+        # o=1's k IS 8,7 (NO 9) AND o=2 HAS NO k: BOTH DROP OUT.
+        # THE SURVIVORS ARE THE *LARGEST* v ON PURPOSE: assertAlmostEqual PAIRS ROWS WITH
+        # zip_longest AND A None EXPECTATION MATCHES ANYTHING, SO AN EXTRA *TRAILING* ROW IS
+        # TOLERATED - ONLY AN UNWANTED ROW THAT SORTS FIRST CAN FAIL THE TEST
+        test = {
+            "data": [
+                {"o": 1, "a": [{"v": 1}, {"v": 2}], "k": [{"z": 8}, {"z": 7}]},
+                {"o": 2, "a": [{"v": 3}]},
+                {"o": 3, "a": [{"v": 4}, {"v": 5}], "k": [{"z": 9}]},
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "select": ["v"],
+                "where": {"eq": {"k.z": 9}},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [{"v": 4}, {"v": 5}],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_cousin_of_origin(self):
+        # OFF THE ORIGIN'S LINE BY MORE THAN ONE HOP: THE COMMON ANCESTOR IS STILL THE FACT, SO
+        # `k.deep` IS REACHED THE SAME WAY.  NAMING THE ARRAY (`k`) GIVES ITS ELEMENTS; NAMING
+        # A LEAF INSIDE IT (`k.deep.z`) GIVES A BARE MULTIVALUE OF THAT LEAF.
+        data = [
+            {"o": 1, "a": [{"v": 1}, {"v": 2}], "k": {"deep": [{"z": 9}]}},
+            {"o": 2, "a": [{"v": 3}], "k": {"deep": [{"z": 8}, {"z": 7}]}},
+        ]
+        self.utils.execute_tests({
+            "data": data,
+            "query": {"from": concat_field(TEST_TABLE, "a"), "select": ["v", "k.deep.z"]},
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"v": 1, "k": {"deep": {"z": 9}}},
+                    {"v": 2, "k": {"deep": {"z": 9}}},
+                    {"v": 3, "k": {"deep": {"z": [8, 7]}}},
+                ],
+            },
+        })
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_sibling_from_deep_origin(self):
+        # THE ORIGIN IS ITSELF NESTED, SO THE COMMON ANCESTOR IS TWO LEVELS UP.  THE where IS ON
+        # THE ORIGIN'S OWN VALUE: IT MUST STILL APPLY ON THE SIBLING'S ARM, WHICH CARRIES THE
+        # ORIGIN'S COLUMNS - UNFILTERED THERE, IT WOULD RE-EMIT THE ELEMENTS THE where REMOVED.
+        test = {
+            "data": [
+                {"o": 1, "a": [{"b": [{"n": 1}, {"n": 2}]}], "k": [{"z": 9}]},
+                {"o": 2, "a": [{"b": [{"n": 3}]}], "k": [{"z": 8}, {"z": 7}]},
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a.b"),
+                "select": ["n", "k.z"],
+                "where": {"gt": {"n": 1}},
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"n": 2, "k": {"z": 9}},
+                    {"n": 3, "k": {"z": [8, 7]}},
+                ],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
+    def test_select_two_siblings_and_own_child(self):
+        # THREE BRANCHES OFF ONE ELEMENT - TWO SIBLINGS AND THE ORIGIN'S OWN CHILD - EACH
+        # COLLAPSING INDEPENDENTLY.  THE ASSEMBLER MUST KEEP EACH BRANCH'S ROWS APART.
+        test = {
+            "data": [
+                {"o": 1, "a": [{"v": 1, "c": [{"w": 5}]}], "k": [{"z": 9}], "m": [{"y": "p"}]},
+                {"o": 2, "a": [{"v": 2}], "k": [{"z": 8}, {"z": 7}]},
+            ],
+            "query": {
+                "from": concat_field(TEST_TABLE, "a"),
+                "select": ["v", "c.w", "k.z", "m.y"],
+            },
+            "expecting_list": {
+                "meta": {"format": "list"},
+                "data": [
+                    {"v": 1, "c": {"w": 5}, "k": {"z": 9}, "m": {"y": "p"}},
+                    {"v": 2, "k": {"z": [8, 7]}},
+                ],
+            },
+        }
+        self.utils.execute_tests(test)
+
+    @skipIf(global_settings.use in {"python", "interpret"}, "jx_python known failure")
     @skipIf(global_settings.use == "sqlite", "needs ..* (parent-star) relative names")
     def test_deep_star_w_parent(self):
         # SELECTING * IS LIKE . BUT WITH DIFFERENT COLUMN NAMES
@@ -1873,7 +1993,6 @@ class TestDeepOps(BaseTestCase):
         self.utils.execute_tests(test)
 
     @skipIf(global_settings.use == "python", "jx_python known failure")
-    @skipIf(global_settings.use == "sqlite", "broken")
     def test_from_shallow_select_deep_column(self):
         # QUERY AS IF _a.b IS A NULTI-VALUED COLUMN
         test = {
